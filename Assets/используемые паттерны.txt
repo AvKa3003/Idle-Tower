@@ -1,0 +1,86 @@
+Используемые паттерны (Idle Tower)
+Кратко: идея + пример из проекта. Дополняем по ходу разбора.
+
+
+================================================================================
+Архитектура (не GoF)
+================================================================================
+
+MVP (Model — View — Presenter)
+  Идея: View только рисует; Presenter связывает клики с Systems и обновляет View
+        по событиям. Model = runtime-данные и системы.
+  Пример: RoomView (клик) → TowerPresenter → BuildingSystem.TryBuild;
+          GameEvents.ResourceChanged → ResourceBarPresenter → ResourceBarPanel.
+
+Разделение Definitions / Runtime
+  Идея: баланс и типы (SO, не меняются в Play) отдельно от состояния сессии
+        (кошелёк, башня, таймеры).
+  Пример: ResourceDefinition.asset (что такое «дерево») vs ResourceWallet
+          (сколько дерева сейчас).
+
+Event Bus
+  Идея: системы публикуют факты «состояние изменилось»; UI подписывается,
+        не наоборот.
+  Пример: GameEvents.RaiseResourceChanged → ResourceBarPresenter обновляет цифры.
+
+
+================================================================================
+GoF и близкие
+================================================================================
+
+Strategy (Стратегия)
+  Идея: один интерфейс, разные реализации; вызывающий код не знает деталей.
+  Пример: IRoomBehavior — ProductionRoomBehavior, OpenUiRoomBehavior, Passive…
+          RoomBehaviorSystem вызывает behavior.Tick(), не зная тип комнаты.
+
+Plugin (наш вариант Strategy + Unity)
+  Идея: стратегия подключается через asset в данных, без правки ядра.
+  Пример: RoomDefinition.Behavior → Production_Lumbermill.asset;
+          новая комната = новый .asset + при необходимости новый класс behavior.
+
+Template Method (Шаблонный метод)
+  Идея: базовый класс задаёт контракт (набор методов), наследники заполняют шаги.
+  Пример: RoomBehaviorBase / IRoomBehavior — OnRoomBuilt, Tick, OnRoomClicked,
+          CreateDefaultState; ProductionRoomBehavior реализует свою логику.
+
+Observer (Наблюдатель)
+  Идея: издатель уведомляет подписчиков об изменении, не зная кто они.
+  Пример: GameEvents.GameTick, ResourceChanged, RoomBuilt;
+          Presenters подписываются в OnEnable, отписываются в OnDisable.
+
+Facade (Фасад)
+  Идея: простая точка входа к группе подсистем.
+  Пример: GameServices — Balance, Wallet, Tower, TickSystem в одном месте;
+          GameBootstrap и системы не ищут друг друга по сцене.
+
+DTO (Data Transfer Object)
+  Идея: объект только с данными для передачи между слоями, без логики.
+  Пример: RoomStatusInfo (что показать на overlay), RoomClickResult (какой UI
+          открыть), TickContext (данные одного тика).
+
+Service Locator (лёгкий)
+  Идея: общий реестр сервисов; код запрашивает зависимости из одного места.
+  Пример: GameServices + передача services в TickContext / RoomBehaviorContext.
+
+Prototype (задел)
+  Идея: копия объекта без разделения ссылок на вложенные коллекции.
+  Пример: ProductionBehaviorState.Clone() — копия ElapsedByMode; пока не вызывается.
+
+Memento (задел, фаза 6)
+  Идея: сохранить и восстановить внутреннее состояние без раскрытия деталей.
+  Пример: behavior.SerializeState / DeserializeState + SaveSystem.
+
+
+================================================================================
+Игровые приёмы (не из книги GoF)
+================================================================================
+
+Fixed timestep / tick loop
+  Идея: симуляция шагами фиксированной длины (TickDelta), не каждый кадр Unity;
+        детерминизм и офлайн-доход.
+  Пример: GameTickSystem — accumulator, ProcessSingleTick, TPS из GameBalanceConfig.
+
+Simulation vs Presentation
+  Идея: логика в тиках и Systems; картинка и звук реагируют на события.
+  Пример: RoomBehaviorSystem.OnTick меняет кошелёк; GameEvents.GameTick обновляет
+          overlay на RoomView.

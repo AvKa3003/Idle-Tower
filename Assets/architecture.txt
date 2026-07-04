@@ -1,0 +1,848 @@
+================================================================================
+АРХИТЕКТУРА ПРОЕКТА — IDLE TOWER (по мотивам Idle Apocalypse)
+================================================================================
+Версия: 1.11
+Статус: согласование завершено → реализация по фазам 1–5
+
+Согласовано:
+  [x] Строгое разделение Systems / Presenters / Views (вариант 2)
+  [x] Тик-цикл: 10 тиков/сек (настраиваемо), баланс в секундах (GameDuration)
+  [x] RoomBehavior: SO-плагин, отдельный Production asset на комнату, RoomUiId enum,
+      клики → прямой вызов System из Presenter, overlay состояния в MVP
+  [x] UnlockRules: AND, AlwaysAvailable, скрывать locked, уникальность RoomDefinition
+  [x] Линейная башня: один столбец, без ветвления
+  [x] GameEvents: статический класс; Raise только из Systems; EventChannel — после MVP
+
+Ключевые решения:
+  - Башня строго линейная (один столбец этажей снизу вверх), ветвления нет.
+  - Функционал комнаты — не фиксирован: производство, свой UI, мини-игра и т.д.
+  - Каждая комната ссылается на RoomBehavior (ScriptableObject) — плагин поведения.
+  - Ядро знает только: построить, кликнуть, тикнуть, сохранить. Детали — в behavior.
+  - Тик-цикл: частота тиков настраивается (плавность UI); баланс задаётся только в секундах.
+
+Цель: расширяемая архитектура, в которой геймплей, UI и данные разделены.
+Новые комнаты, ресурсы и экраны добавляются через ScriptableObject и префабы
+без правки ядра систем.
+
+
+================================================================================
+1. ПРИНЦИПЫ
+================================================================================
+
+1.1 Разделение слоёв (строгое, вариант 2)
+    Data → Systems → Presenters → Views
+
+    Systems   — игровая логика; никаких ссылок на Canvas, Button, TMP.
+    Presenters — единственный слой, который вызывает Systems и обновляет Views.
+    Views     — только отображение: ссылки на UI, SetText/Show/Hide, без бизнес-логики.
+
+    Правило: на каждую панель/экран — пара классов *Panel (View) + *Presenter.
+    Исключений для «простых» попапов нет — единообразие важнее экономии файлов.
+
+1.2 Конфиг через ScriptableObject
+    Комнаты, ресурсы, дерево разблокировок — ассеты в Project, не хардкод в коде.
+
+1.3 События состояния — GameEvents (статический Event Bus)
+
+    Два канала (не смешивать):
+    - Команды (клики): View → Presenter → System.Method()
+    - Факты (состояние): System → GameEvents.Raise* → Presenter → View
+
+    Реализация MVP: статический класс Scripts/Core/Events/GameEvents.cs
+    - public static event + public static void Raise*(...) для каждого события
+    - Публикуют ТОЛЬКО Systems после изменения данных
+    - RoomBehavior → вызывает Systems (ResourceSystem.Add и т.д.), НЕ GameEvents напрямую
+    - Подписываются Presenters в OnEnable, отписка в OnDisable
+
+    События MVP (реализовать сразу):
+    ┌──────────────────────────┬─────────────────────────┬──────────────────────────┐
+    │ Событие                  │ Кто Raise               │ Кто слушает (MVP)        │
+    ├──────────────────────────┼─────────────────────────┼──────────────────────────┤
+    │ ResourceChanged          │ ResourceSystem          │ ResourceBarPresenter     │
+    │   (resource, newAmount)  │ Add / TrySpend          │                          │
+    │ RoomBuilt                │ BuildingSystem          │ TowerPresenter           │
+    │   (floorIndex, room)     │ TryBuild успех          │                          │
+    │ GameTick                 │ GameTickSystem          │ TowerPresenter (overlay) │
+    │   (TickContext ctx)      │ каждый тик              │                          │
+    │ ProductionModeChanged    │ RoomBehaviorSystem      │ TowerPresenter,          │
+    │   (floorIndex, modeIndex)│ TrySetMode              │ ProductionModePresenter  │
+    │ OperationModeUnlocked    │ RoomBehaviorSystem      │ ProductionModePresenter  │
+    │   (floorIndex, modeIndex)│ TryUnlockMode           │                          │
+    └──────────────────────────┴─────────────────────────┴──────────────────────────┘
+
+    События отложены (заложить в коде как TODO / закомментированный шаблон):
+    - ScreenChanged(ScreenId id) — когда появится 2+ экрана (Settings, Shop…)
+      Raise из ScreenManager.Show; слушатели: скрыть/показать панели главного экрана
+
+    UI после действия игрока (вариант A):
+    - RoomSelectionPresenter: TryBuild → при успехе сам _panel.Hide()
+    - ResourceBar / башня обновляются по ResourceChanged / RoomBuilt, не из RoomSelectionPresenter
+
+    Расширение после MVP (рекомендации, не обязательно сразу):
+    1) IGameEvents + GameEvents : IGameEvents — для unit-тестов без статики
+    2) EventChannel SO (см. п. 9) — звук/VFX из Inspector
+    3) Новое событие — только если ≥2 подписчика или слабая связность критична
+    4) Не публиковать команды (BuildRoom, OpenPanel) — только факты состояния
+    5) Аналитика: отдельный AnalyticsListener подписывается на GameEvents
+
+1.3.1 EventChannel — отложено (напоминание)
+    Файл EventChannel.cs НЕ пишем в MVP. Описание и сценарий — в разделе 9.
+
+1.4 Единая точка входа
+    GameBootstrap на сцене инициализирует сервисы и связывает их с вью.
+
+1.5 Состояние игры отделено от отображения
+    TowerState / SaveData — чистые данные. TowerView только отражает состояние.
+
+1.6 Расширяемость
+    - Новая комната = RoomDefinition.asset + RoomBehavior.asset + запись в BuildingTree
+    - Новый ресурс = ResourceDefinition.asset
+    - Новый тип функционала = новый класс RoomBehavior (наследник) + SO-ассет
+    - Новый экран = IScreen + регистрация в ScreenManager (комната может на него ссылаться)
+
+1.7 Линейная башня (фиксировано, без ветвления)
+    - Один столбец этажей снизу вверх; на этаже — одна комната.
+    - Ровно один build-slot сверху; геометрического ветвления нет и не планируется.
+    - «Ветвление» только в выборе комнаты из разблокированных в UI постройки.
+    - RoomDefinition.Behavior — ОБЯЗАТЕЛЬНО, без null; для декора — PassiveRoomBehavior (когда понадобится).
+    - Класс (ProductionRoomBehavior.cs) = логика; .asset = параметры в Inspector (см. п. 1.7.1).
+    - MVP production: отдельный behavior asset на каждую комнату (Production_Lumbermill, Production_Quarry).
+    - Смена ProductionMode: у каждого режима свой ElapsedSeconds; при TrySetMode меняется только ActiveModeIndex.
+    - SerializeState / DeserializeState — внутри каждого behavior, общего формата нет.
+
+1.7.1 ScriptableObject и формат .asset
+    - .cs  — код: алгоритмы, контракт IRoomBehavior, валидация.
+    - .asset — YAML-файл Unity в Project; экземпляр SO с твоими настройками (modes, durations, icons).
+    - Создание: ПКМ → Create → IdleTower → Production Room Behavior → Production_Lumbermill.asset
+    - RoomDefinition ссылается на .asset через поле Behavior (перетаскивание в Inspector).
+    - Зачем разделение: одна логика — много конфигов; баланс меняется без правки .cs; логика не смешана с полями Inspector.
+
+1.7.2 Действия пользователя vs события состояния
+    - Действия игрока (клик по комнате, слоту, кнопке): View → Presenter → прямой вызов System.
+      Systems НЕ подписываются на клики через GameEvents.
+    - События состояния: GameEvents → Presenters (см. п. 1.3)
+
+1.8 Тик-цикл (Tick-based simulation)
+    Частота тиков и баланс РАЗДЕЛЕНЫ:
+    - TicksPerSecond (TPS) — настраиваемая «плавность» симуляции и UI; на баланс не влияет.
+    - Все длительности в данных — в секундах (GameDuration), не в количестве тиков.
+
+    Параметры (GameBalanceConfig):
+    - int TicksPerSecond           — частота тиков (настраивается в asset при разработке); MVP: 10
+    - float MaxCatchUpSeconds      — сколько секунд симуляции догоняем за один кадр (напр. 2.0)
+    - int MaxTicksPerFrame         — вычисляется: TicksPerSecond * MaxCatchUpSeconds (10*2=20)
+
+    Вычисляемые значения:
+    - TickInterval = 1f / TicksPerSecond
+    - При смене TPS пересчитывается только TickInterval; таймеры в секундах не сбрасываются.
+
+    Алгоритм (GameBootstrap.Update):
+    1) _accumulator += Time.deltaTime
+    2) while (_accumulator >= TickInterval && ticksThisFrame < MaxTicksPerFrame):
+         _accumulator -= TickInterval
+         currentTick++
+         TickContext: CurrentTick, TickDelta=TickInterval, TicksPerSecond, Services
+         IGameSystem.OnTick в фиксированном порядке
+         GameEvents.GameTick(ctx)
+    3) Остаток _accumulator — для интерполяции UI (опционально)
+
+    SimulationTimer (вместо счётчика тиков):
+    - float elapsed в state поведения (у Production — ElapsedByMode[ActiveModeIndex])
+    - каждый тик: elapsed += ctx.TickDelta
+    - срабатывание: elapsed >= duration.TotalSeconds → действие, elapsed = 0
+    - смена TPS 10→30: elapsed сохраняется → баланс в реальных секундах тот же
+
+    GameDuration ([Serializable] struct):
+    - int Minutes, int Seconds
+    - float TotalSeconds => Minutes * 60f + Seconds
+    - Пример: Minutes=0, Seconds=30 → 30 сек; Minutes=1, Seconds=30 → 90 сек
+    - В Inspector задаёшь минуты и секунды; в коде везде TotalSeconds.
+
+    currentTick (ulong) — счётчик тиков (отладка, save, аналитика); не использовать для баланса.
+
+    Офлайн (позже):
+    - elapsedWallSeconds = now - lastSaveTime
+    - SimulateForSeconds(elapsedWallSeconds) — тики без лимита MaxTicksPerFrame, без UI
+
+
+================================================================================
+2. СТРУКТУРА ПАПОК (Scripts/)
+================================================================================
+
+Scripts/
+├── Core/
+│   ├── GameBootstrap.cs          — старт игры, wiring; Update → GameTickSystem
+│   ├── GameServices.cs           — доступ к зарегистрированным системам
+│   ├── GameTickSystem.cs         — аккумулятор времени, вызов тиков, currentTick
+│   ├── IGameSystem.cs            — Init / OnTick(TickContext) / Dispose
+│   ├── TickContext.cs            — currentTick, tickDelta, services
+│   └── Events/
+│       └── GameEvents.cs         — статический bus (MVP)
+│       (после MVP: EventChannel.cs — см. раздел 9)
+│
+├── Data/
+│   ├── Definitions/
+│   │   ├── ResourceDefinition.cs — id, displayName, icon
+│   │   ├── RoomDefinition.cs     — id, prefab, cost, behavior, unlockRules
+│   │   ├── BuildingTreeConfig.cs — дерево доступных комнат
+│   │   ├── GameBalanceConfig.cs  — TPS, стартовые ресурсы, MaxCatchUpSeconds
+│   │   └── GameDuration.cs       — Minutes + Seconds → TotalSeconds (баланс)
+│   └── Runtime/
+│       ├── ResourceWallet.cs
+│       ├── TowerState.cs
+│       ├── FloorData.cs          — комната + RoomBehaviorState (данные поведения)
+│       └── RoomBehaviorState.cs  — сериализуемое состояние поведения на этаже
+│
+├── Rooms/
+│   ├── IRoomBehavior.cs          — контракт поведения комнаты
+│   ├── RoomBehaviorBase.cs       — абстрактный ScriptableObject
+│   ├── RoomUiId.cs               — enum типобезопасных id UI комнат
+│   ├── RoomBehaviorContext.cs    — floorIndex, services, state, tower
+│   ├── Behaviors/
+│   │   ├── ProductionRoomBehavior.cs   — idle-производство + смена режимов
+│   │   ├── OpenUiRoomBehavior.cs       — открывает экран/панель по клику
+│   │   └── PassiveRoomBehavior.cs      — декор / без взаимодействия (заглушка)
+│   └── Production/
+│       ├── ProductionMode.cs
+│       └── SimulationTimer.cs    — AdvanceCycle, GetProgress01
+│
+├── Systems/
+│   ├── ResourceSystem.cs
+│   ├── BuildingSystem.cs
+│   ├── UnlockTreeSystem.cs
+│   ├── RoomBehaviorSystem.cs     — диспетчер: Tick, OnBuilt, OnClick, Save
+│   └── SaveSystem.cs
+│
+├── UI/
+│   ├── ScreenManager.cs          — переключение экранов
+│   ├── IScreen.cs                — Show / Hide
+│   ├── Screens/
+│   │   └── MainTowerScreen.cs    — главный экран с башней
+│   ├── Panels/                   — (legacy name → см. Views/)
+│   ├── Views/                    — *Panel, *View, *Screen — только отображение
+│   └── Presenters/             — обязательная пара к каждому View
+│       ├── ResourceBarPresenter.cs
+│       ├── RoomSelectionPresenter.cs
+│       ├── TowerPresenter.cs
+│       └── Rooms/                — UI презентеры RoomBehavior
+│
+└── Tower/
+    ├── TowerView.cs              — контейнер этажей, позиционирование по сетке
+    ├── FloorSlotView.cs          — слот «построить здесь» (кликабельный)
+    └── RoomView.cs               — визуал построенной комнаты
+
+
+================================================================================
+3. МОДЕЛЬ ДАННЫХ
+================================================================================
+
+3.1 ResourceDefinition (ScriptableObject)
+    - string Id
+    - string DisplayName
+    - Sprite Icon
+
+3.2 IRoomBehavior / RoomBehaviorBase (ScriptableObject)
+    Контракт — ядро вызывает только эти методы; внутри — любая логика:
+
+    - OnRoomBuilt(RoomBehaviorContext ctx)
+    - OnRoomClicked(RoomBehaviorContext ctx) → RoomClickResult
+        RoomClickResult: { RoomUiId? OpenUi } — behavior не открывает UI сам
+    - Tick(TickContext ctx)
+    - CreateDefaultState() → RoomBehaviorState
+    - SerializeState / DeserializeState — формат свой у каждого behavior
+    - GetRoomStatusInfo(ctx) → RoomStatusInfo (MVP overlay на RoomView)
+
+    RoomStatusInfo (для overlay в MVP):
+    - Sprite OutputIcon               — иконка первого OutputPerCycle (MVP)
+    - string ModeLabel              — «Дерево», «Камень»
+    - int AmountPerCycle            — количество первого OutputPerCycle (MVP)
+    - ResourceCost[] OutputPerCycle — полный список выхода (для UI с несколькими иконками позже)
+    - float Progress01              — ElapsedSeconds / CycleDuration (0..1)
+    - float ElapsedSeconds, float CycleTotalSeconds — для текста «2.1 / 3.0»
+
+    ProductionBehaviorState:
+    - Dictionary<int, float> ElapsedByMode   — прогресс цикла отдельно для каждого modeIndex
+    - int ActiveModeIndex
+    - List<int> UnlockedModeIndices
+    При TrySetMode: ActiveModeIndex меняется; ElapsedByMode не трогается — прогресс режимов сохраняется по отдельности.
+    Tick и overlay читают/пишут ElapsedByMode[ActiveModeIndex] (через ActiveElapsedSeconds).
+
+    RoomUiId (enum, расширяется при новом UI):
+    - None
+    - ProductionMode              — выбор режима производства
+    - Shop                        — (позже)
+
+    Реализации:
+    - ProductionRoomBehavior  — production; отдельный .asset на комнату (modes в asset)
+    - OpenUiRoomBehavior      — OnRoomClicked → OpenUi = Shop
+    - PassiveRoomBehavior     — заглушка; создать когда понадобится декор
+
+3.3 RoomDefinition (ScriptableObject)
+    - string Id
+    - string DisplayName
+    - Sprite Icon
+    - GameObject Prefab
+    - ResourceCost[] Cost
+    - RoomBehaviorBase Behavior    — ОБЯЗАТЕЛЬНО: определяет функционал комнаты
+    - UnlockRule[] UnlockRules
+
+3.4 OperationMode (ProductionMode.cs — производство и крафт это одно)
+    Термин: «операция» = цикл на этаже. Без входа = производство; с входом = крафт.
+
+    - string Id, DisplayName, Icon
+    - ResourceCost[] OutputPerCycle      — выдача за цикл (один или несколько ресурсов); пусто = нет выхода
+    - GameDuration CycleDuration
+    - ResourceCost[] InputPerCycle       — потребление за цикл; пусто = бесплатное производство
+    - ResourceCost[] UnlockCost          — разовая оплата, чтобы режим стал доступен; пусто = открыт сразу
+    - UnlockRule[] UnlockRules           — условия видимости (AND), как у комнат; опционально
+    - bool UnlockedByDefault             — true для стартового режима (обычно modes[0])
+
+    Цикл Tick (каждый вызов behavior.Tick) — одна операция для производства и крафта:
+
+    - canAfford = InputPerCycle пуст → true; иначе CanAfford(InputPerCycle)
+    - SimulationTimer.AdvanceCycle(elapsed, TickDelta, CycleDuration, canAfford) → bool cycleComplete
+    - если !canAfford → ElapsedByMode[active] = 0 каждый тик (сброс прогресса крафта)
+    - если cycleComplete → TrySpend(InputPerCycle) при непустом входе → Add(OutputPerCycle) → elapsed = 0
+    - Когда ресурсов снова хватает — таймер крафта набирается с нуля
+
+    Overlay: Progress01 = 0 пока canAfford == false (цикл сброшен).
+
+    Разблокировка режима (отдельно от выбора активного):
+    - TryUnlockMode(floor, modeIndex): UnlockRules ✓, ещё не unlocked, CanAfford(UnlockCost)
+      → TrySpend(UnlockCost) → добавить modeIndex в UnlockedModes в state
+    - TrySetMode(floor, modeIndex): mode уже unlocked → ActiveModeIndex; прогресс других режимов не меняется
+
+    ProductionBehaviorState:
+    - Dictionary<int, float> ElapsedByMode — отдельный таймер на каждый режим
+    - int ActiveModeIndex
+    - List<int> UnlockedModeIndices   — modes[0] в OnRoomBuilt всегда
+
+3.4.1 GameDuration
+    - int Minutes, int Seconds
+    - float TotalSeconds
+    Используется везде, где в балансе есть время: производство, кулдауны, бафы.
+
+3.5 UnlockRule (разблокировка для списка ПОСТРОЙКИ)
+    Типы (enum UnlockRuleType):
+    - AlwaysAvailable           — комната всегда в списке (если ещё не построена)
+    - RequiresRoomBuilt         — на башне есть этаж с указанным RoomDefinition
+
+    Логика нескольких правил на одной комнате: AND (все должны выполниться).
+    RequiresResourceAmount — не используется.
+
+    Уникальность: каждый RoomDefinition можно построить на башне только 1 раз.
+    Повтор «той же» комнаты в late game — отдельный RoomDefinition в BuildingTreeConfig
+    (копия с новым Id, своими UnlockRules, своим Cost); может требовать уже построенную
+    «оригинальную» комнату через RequiresRoomBuilt.
+
+    Пример дубликата:
+    - room_lumbermill        — AlwaysAvailable, строится 1 раз
+    - room_lumbermill_t2     — RequiresRoomBuilt(room_lumbermill) + другие rules,
+                               отдельный asset, тот же prefab/behavior или свой
+
+3.6 BuildingTreeConfig (ScriptableObject)
+    - RoomDefinition[] AllRooms — полный реестр комнат для UnlockTreeSystem
+
+    «Дерево» — логическое: связи через RequiresRoomBuilt между RoomDefinition.
+    Геометрия башни линейная; ветвление — в выборе, какую из разблокированных комнат строить.
+
+3.6.1 Разделение Unlock vs Cost
+    - UnlockRules  — комната попадает в список UI (UnlockTreeSystem)
+    - Cost         — хватает ли ресурсов (BuildingSystem.CanAfford)
+    Заблокированные (rules не выполнены) — не показываются в UI.
+    Разблокированные без ресурсов — показываются dim / «недоступно для постройки».
+
+3.7 TowerState (runtime)
+    - List<FloorData> Floors
+    FloorData:
+    - RoomDefinition BuiltRoom      — null только у верхнего build-slot
+    - RoomBehaviorState State       — произвольные данные поведения (режим, прогресс, флаги)
+
+    Инвариант: линейная башня, один build-slot сверху.
+
+3.8 ResourceWallet (runtime)
+    - Dictionary<string, int> по ResourceDefinition.Id
+
+3.9 RoomBehaviorContext (runtime, не сохраняется)
+    - int FloorIndex
+    - FloorData Floor
+    - TowerState Tower
+    - GameServices Services
+    Передаётся в каждый вызов behavior — доступ к ресурсам, UI, событиям без жёсткой связи.
+
+
+================================================================================
+4. СИСТЕМЫ И ОТВЕТСТВЕННОСТЬ
+================================================================================
+
+4.0 GameTickSystem
+    Параметры — см. п. 1.8. Кратко:
+    - TicksPerSecond — только в GameBalanceConfig (при разработке)
+    - MaxTicksPerFrame = TicksPerSecond * MaxCatchUpSeconds (при TPS=10, CatchUp=2с → 20)
+    - SimulateForSeconds(float) — офлайн, без MaxTicksPerFrame
+
+    Порядок систем на тик:
+    1) RoomBehaviorSystem
+    2) (будущие: BuffSystem, QuestSystem…)
+    3) SaveSystem (позже)
+
+4.1 ResourceSystem
+    (без изменений — общий для многих behaviors)
+
+4.2 UnlockTreeSystem
+    - GetAvailableRooms(TowerState) → RoomDefinition[]
+      1) Перебор BuildingTreeConfig.AllRooms
+      2) Пропуск, если этот RoomDefinition уже построен на башне (уникальность)
+      3) Пропуск, если не все UnlockRules выполнены (AND)
+      4) AlwaysAvailable: правило всегда true; такие комнаты в списке с самого начала
+         (пока не построены — см. шаг 2)
+
+    - IsAvailable(RoomDefinition room, TowerState) → bool
+      Те же проверки; используется в BuildingSystem.TryBuild
+
+    - EvaluateRule(UnlockRule, TowerState) → bool
+      AlwaysAvailable → true
+      RequiresRoomBuilt → tower содержит этаж с room.RequiredRoom
+
+4.3 BuildingSystem
+    - TryBuild(floorIndex, RoomDefinition) → BuildResult
+      1) floorIndex — верхний пустой build-slot
+      2) UnlockTreeSystem.IsAvailable(room, tower)
+      3) ResourceSystem.CanAfford(room.Cost) — иначе отказ
+      4) ResourceSystem.TrySpend(cost)
+      5) Записать комнату, новый слот сверху
+      6) RoomBehaviorSystem.OnRoomBuilt(floorIndex)
+      7) GameEvents.RoomBuilt
+    - CanAfford(room) → bool — только ресурсы (для dim в UI)
+
+4.4 RoomBehaviorSystem
+    - OnTick(TickContext ctx)
+    - OnRoomClicked(int floorIndex) → RoomClickResult
+    - OnRoomBuilt(int floorIndex)
+    - TryUnlockMode(floorIndex, modeIndex) → bool   — разовая оплата UnlockCost
+    - TrySetMode(floorIndex, modeIndex) → bool      — выбор активного (только unlocked)
+    - GetOperationModes(floorIndex) → список для UI (locked/unlocked/active, costs)
+    - GetRoomStatusInfo(floorIndex) → RoomStatusInfo
+
+4.5 ProductionRoomBehavior
+    - OnRoomBuilt: modes[0] → UnlockedModes; ActiveModeIndex = 0
+    - Tick: логика производства/крафта (см. п. 3.4); сброс ElapsedByMode[active] при нехватке InputPerCycle
+    - OnRoomClicked: если modes.Length > 1 или есть незакрытые unlock → OpenUi = ProductionMode
+    - SerializeState: ElapsedByMode, ActiveModeIndex, UnlockedModeIndices
+
+4.6 OpenUiRoomBehavior (пример behavior)
+    - OnRoomClicked → RoomClickResult { OpenUi = RoomUiId.Shop }
+    - TowerPresenter → ShopPresenter.OpenForFloor(floorIndex)
+    - OnTick: пусто
+
+4.7 ScreenManager
+    (без изменений — экраны открываются и с главного меню, и из комнат)
+
+4.8 SaveSystem
+    - Сохраняет currentTick + TowerState + Wallet (для офлайн-симуляции позже)
+    - Сохраняет TowerState.Floors[].State через behavior.SerializeState
+    - При загрузке — behavior.DeserializeState
+
+
+================================================================================
+5. ПОТОКИ (MVP по ТЗ)
+================================================================================
+
+5.1 Старт игры
+    GameBootstrap → создаёт/находит GameServices
+    → ResourceSystem.Init (стартовые ресурсы на 1-ю комнату)
+    → TowerState: 0 построенных этажей, 1 build slot внизу
+    → MainTowerScreen.Show
+    → TowerView отрисовывает один FloorSlotView
+
+5.2 Клик по слоту постройки
+    FloorSlotView.OnClick → TowerPresenter.HandleBuildSlotClicked(floorIndex)
+    → RoomSelectionPresenter.Open(floorIndex)
+    → rooms = UnlockTreeSystem.GetAvailableRooms(tower)
+    → для каждой: unlocked=true, canAfford = BuildingSystem.CanAfford(room)
+    → RoomSelectionPanel: только unlocked; canAfford=false → dim + подсказка по Cost
+
+5.3 Выбор комнаты (вариант A)
+    RoomSelectionPresenter.OnRoomSelected(room)
+    → result = BuildingSystem.TryBuild(floorIndex, room)
+    → при успехе: RoomSelectionPresenter._panel.Hide()  (локальный UI)
+    → GameEvents.RoomBuilt → TowerPresenter строит этаж
+    → GameEvents.ResourceChanged → ResourceBarPresenter обновляет цифры
+    → успех: закрыть панель, TowerPresenter обновляет TowerView
+    → новый FloorSlotView на этаж выше (смещение по сетке вверх)
+    → RoomView на построенном этаже
+
+5.4 Производство (тик-цикл + баланс в секундах)
+    TPS=10 → TickInterval=0.1с; CycleDuration=3с → ~30 тиков на 1 ресурс.
+    TPS=20 → TickInterval=0.05с; тот же CycleDuration → ~60 тиков на 1 ресурс.
+    Результат один: 1 ресурс каждые 3 реальные секунды.
+
+    GameTickSystem.OnTick → RoomBehaviorSystem → ProductionRoomBehavior
+    → SimulationTimer.AdvanceCycle(elapsed, 0.1, cycleDuration, canAfford: true)
+    → при return true → Add(OutputPerCycle), elapsed = 0
+
+5.5 Вторая комната
+    (без изменений по балансу)
+
+5.6 Клик по комнате → ProductionModePanel (MVP)
+    RoomView → TowerPresenter → RoomBehaviorSystem.OnRoomClicked
+    → OpenUi = ProductionMode (если есть режимы кроме дефолта или не все разблокированы)
+
+5.6.1 Разблокировка и выбор режима
+    ProductionModePresenter.OpenForFloor(floor)
+    → GetOperationModes: для каждого mode
+        locked (не unlocked) → показать UnlockCost, кнопка «Открыть» → TryUnlockMode
+        unlocked → кнопка «Выбрать» → TrySetMode; active выделен
+        canAfford для UnlockCost / InputPerCycle — dim + подсказка
+
+5.6.2 Overlay
+    GameEvents.GameTick → TowerPresenter.RefreshAllRoomOverlays()
+    → для каждого этажа: info = RoomBehaviorSystem.GetRoomStatusInfo(floor)
+    → RoomView.SetStatus(info) — прогресс-бар, иконка ресурса, «+1 / 3 сек»
+    Также обновлять после RoomBuilt, смены режима (ProductionModePresenter).
+
+5.7 Добавление нового типа комнаты в будущем (без правки ядра)
+    1) Написать класс MyCustomRoomBehavior : RoomBehaviorBase
+    2) Create Asset → My Custom Room Behavior
+    3) В RoomDefinition указать этот Behavior
+    4) При необходимости — свой UI-префаб и Screen, открываемый из OnRoomClicked
+
+
+================================================================================
+6. UI И ПРЕЗЕНТЕРЫ (строгий вариант 2)
+================================================================================
+
+Паттерн: каждый UI-модуль = View + Presenter (всегда пара).
+
+View (*Panel, *View, *Screen):
+  - MonoBehaviour со ссылками на UI-элементы
+  - Публичные методы отображения: SetRooms(), SetAmount(), Show(), Hide()
+  - События клика наружу: C# event / UnityEvent → Presenter (не в System!)
+  - НЕ вызывает GameServices, BuildingSystem, ResourceSystem
+
+Presenter (*Presenter):
+  - Действия игрока: прямой вызов Systems (BuildingSystem, RoomBehaviorSystem…)
+  - Изменения состояния: подписка на GameEvents (ResourceChanged, RoomBuilt, GameTick)
+  - Маршрутизация RoomUiId → нужный Presenter (TowerPresenter → ProductionModePresenter)
+
+Связка в сцене:
+  - Presenter и View на одном GameObject или Presenter ссылается на View через SerializeField
+  - GameBootstrap / Screen не связывает View с Systems напрямую
+
+Обязательные пары для MVP:
+  - ResourceBarPanel        + ResourceBarPresenter
+  - RoomSelectionPanel      + RoomSelectionPresenter
+  - MainTowerScreen         + MainTowerPresenter (или TowerPresenter для башни)
+  - TowerView               + TowerPresenter
+  - FloorSlotView / RoomView — клики → TowerPresenter (прямой вызов или C# event на Presenter)
+
+UI поведений комнат (строго):
+  - ProductionModePanel + ProductionModePresenter
+  - Behavior возвращает RoomUiId в RoomClickResult; TowerPresenter открывает нужный Presenter
+  - RoomBehavior НЕ открывает Canvas
+
+Структура папок UI:
+  UI/
+    Views/       — *Panel, *View, *Screen (только отображение)
+    Presenters/  — вся логика привязки UI ↔ Systems
+    Presenters/Rooms/  — презентеры UI конкретных RoomBehavior
+
+ScreenManager:
+  - Переключает IScreen (View); Presenter экрана активен вместе с View
+  - Canvas: активен один экран; Presenter подписан пока экран виден
+
+
+================================================================================
+7. БАШНЯ И СЕТКА
+================================================================================
+
+TowerView:
+  - verticalSpacing, slotAnchor — настраиваются в Inspector (ты)
+  - При добавлении этажа: localPosition.y += verticalSpacing
+  - Порядок детей: снизу вверх (этаж 0 внизу)
+
+FloorSlotView:
+  - Button / IPointerClick
+  - Визуал «пустой слот» — спрайт назначаешь ты
+
+RoomView:
+  - SetRoom(RoomDefinition) — визуал prefab
+  - SetStatus(RoomStatusInfo) — MVP: прогресс-бар, иконка output, label режима, текст времени
+  - OnClick → TowerPresenter.HandleRoomClicked(floorIndex)
+
+
+================================================================================
+8. КОНФИГ MVP (баланс для первых ассетов)
+================================================================================
+
+Цель MVP: 4 ресурса, цепочка производство → крафт, разблокировка режимов за ресурсы,
+переключение режимов, крафт с 1 и 2 входами, сброс цикла при нехватке.
+
+Ресурсы (4 штуки — Create → IdleTower → Resource Definition):
+  ┌────────────┬────────────┬──────────────────────────────────────────┐
+  │ Id         │ DisplayName│ Откуда в MVP                             │
+  ├────────────┼────────────┼──────────────────────────────────────────┤
+  │ wood       │ Дерево     │ Лесопилка [0] Добыча                     │
+  │ planks     │ Доски      │ Лесопилка [1] Распил (крафт из wood)       │
+  │ stone      │ Камень     │ Карьер [0] Добыча                          │
+  │ bricks     │ Кирпич     │ Карьер [1] Обжиг (крафт stone + planks)    │
+  └────────────┴────────────┴──────────────────────────────────────────┘
+
+Комнаты (постройка этажа):
+  room_lumbermill
+    UnlockRules: [AlwaysAvailable]
+    Cost: пусто (или стартовый grant не нужен)
+    Behavior → Production_Lumbermill.asset
+
+  room_quarry
+    UnlockRules: [RequiresRoomBuilt(room_lumbermill)]
+    Cost: wood × 10
+    Behavior → Production_Quarry.asset
+
+Production_Lumbermill.asset — OperationMode[]:
+  [0] «Добыча»
+      UnlockedByDefault: true
+      InputPerCycle: —
+      OutputPerCycle: wood × 1
+      CycleDuration: 3 сек
+
+  [1] «Распил»
+      UnlockedByDefault: false
+      UnlockCost: wood × 5          ← разово открыть режим
+      InputPerCycle: wood × 3       ← крафт; при нехватке — сброс цикла
+      OutputPerCycle: planks × 1
+      CycleDuration: 4 сек
+
+Production_Quarry.asset — OperationMode[]:
+  [0] «Добыча»
+      UnlockedByDefault: true
+      InputPerCycle: —
+      OutputPerCycle: stone × 1
+      CycleDuration: 3 сек
+
+  [1] «Обжиг»
+      UnlockedByDefault: false
+      UnlockCost: stone × 8
+      InputPerCycle: stone × 2, planks × 1   ← два входа; тест сброса если нет досок
+      OutputPerCycle: bricks × 1
+      CycleDuration: 5 сек
+
+Тик-настройки (GameBalanceConfig):
+  - TicksPerSecond = 10
+  - MaxCatchUpSeconds = 2.0
+  - MaxTicksPerFrame = 20  (вычисляется: 10 × 2)
+
+Стартовые ресурсы (GameBalanceConfig):
+  - wood: 0 (первая комната бесплатна; дерево копится с лесопилки)
+
+Сценарий проверки в Play Mode:
+  1. Построить лесопилку → режим [0], копится wood
+  2. Накопить 5+ wood → клик по комнате → открыть «Распил» (UnlockCost)
+  3. Переключить на [1] → при 3+ wood идёт крафт досок; при <3 — прогресс сброшен
+  4. Построить карьер (10 wood) → stone
+  5. Открыть «Обжиг», переключить → нужны stone + planks; без досок цикл сбрасывается
+  6. ResourceBar показывает все 4 ресурса
+
+BuildingTreeConfig.AllRooms: room_lumbermill, room_quarry
+
+(после MVP) room_shop, room_workshop — отдельные RoomDefinition + behaviors
+
+
+================================================================================
+9. РАСШИРЕНИЕ В БУДУЩЕМ
+================================================================================
+
+GameEvents / EventChannel (после MVP):
+  Зачем EventChannel:
+    - ScriptableObject-«канал» на каждое событие (ResourceChangedChannel.asset)
+    - Компоненты в сцене (Audio, ParticleSystem) подписываются через Inspector,
+      без нового Presenter.cs на каждый звук
+    - GameEvents.Raise* дополнительно вызывает channel.Raise — мост из кода в SO
+
+  Пример (позже):
+    ResourceSystem.Add → GameEvents.RaiseResourceChanged
+      → ResourceBarPresenter (код)
+      → ResourceChangedChannel.asset → SfxPlayer на сцене (Inspector)
+
+  ScreenChanged (отложено, не забыть):
+    - Добавить в GameEvents при втором экране
+    - ScreenManager.Show(id) → RaiseScreenChanged
+    - Presenters решают: скрыть ResourceBar на Shop, показать на MainTower
+
+- Новый RoomBehavior: крафт, бои, квесты — отдельный SO + класс
+- Доп. ProductionMode — только данные в ProductionRoomBehavior
+- Офлайн-доход: GameTickSystem.SimulateForSeconds(elapsed) без лимита кадра
+- Мета-прогресс, престиж: отдельные системы + SaveSystem
+- Addressables для комнат: RoomDefinition загружает prefab по address
+- Localization: DisplayName через Localization Package
+- Аналитика: подписчик на GameEvents без изменения систем
+
+
+================================================================================
+10. ЗАВИСИМОСТИ МЕЖДУ КОМПОНЕНТАМИ (диаграмма)
+================================================================================
+
+    [ScriptableObjects: Resources, Rooms, Tree, Balance]
+                        │
+                        ▼
+              ┌─────────────────┐
+              │  GameBootstrap  │─── Update (только аккумулятор)
+              └────────┬────────┘
+                       │
+                       ▼
+              ┌─────────────────┐
+              │ GameTickSystem  │─── фиксированный тик каждые TickInterval
+              └────────┬────────┘
+                       │ OnTick (детерминированный порядок)
+                       ▼
+    ┌──────────────────────────────────────────┐
+    │  RoomBehaviorSystem │ (future systems)    │
+    └───────┬─────────┴────────┬───────────────┘
+            │                  │
+            ▼                  ▼
+     [ResourceWallet]    [TowerState + currentTick]
+            │                  │
+            └────────┬─────────┘
+                     │ events
+                     ▼
+            ┌────────────────┐
+            │ Presenters / UI │
+            └────────┬───────┘
+                     ▼
+            [TowerView, Panels, Screens]
+                     ▲
+            RoomBehavior.OnRoomClicked → любой UI
+
+
+================================================================================
+11. ЧТО ДЕЛАЕШЬ ТЫ В UNITY (не код)
+================================================================================
+
+После согласования архитектуры и написания скриптов:
+
+1. Создать папку Assets/Data/Resources и Assets/Data/Rooms
+2. Create → IdleTower → Resource Definition ×4 (wood, planks, stone, bricks)
+3. Create → IdleTower → Production Room Behavior ×2 (Lumbermill, Quarry)
+4. Create → IdleTower → Room Definition ×2, указать Behavior на каждой
+5. Create → IdleTower → Game Balance Config, Building Tree Config
+5. На сцене: GameObject «GameBootstrap» + компонент GameBootstrap
+6. Canvas: ScreenManager, MainTowerScreen, ResourceBar, RoomSelectionPanel
+7. Префабы: FloorSlot, RoomOption, ResourceSlot — привязать к вью-скриптам
+8. TowerView на сцене: указать spacing, prefab слота
+9. Назначить ссылки в Inspector по чеклисту из GameBootstrap
+
+Подробный чеклист привязок выдам отдельным сообщением после реализации скриптов.
+
+
+[x] Имена папок и классов — оставляем как в документе
+
+Статус: согласование завершено → реализация по фазам 1–5.
+
+После фаз 1–5 — инструкция по сборке сцены (фаза 5, твоя часть).
+
+================================================================================
+12. ПОРЯДОК РЕАЛИЗАЦИИ
+================================================================================
+
+Порядок фаз 1→5 обязателен (зависимости снизу вверх). Фаза 6 — после рабочего MVP.
+
+────────────────────────────────────────────────────────────────────────────────
+ФАЗА 1 — Ядро + определения данных
+────────────────────────────────────────────────────────────────────────────────
+
+Я (C#):
+  Core: GameServices, GameBootstrap (каркас), GameTickSystem, TickContext,
+        IGameSystem, GameEvents (+ TODO ScreenChanged)
+  Data/Definitions: ResourceDefinition, RoomDefinition, GameBalanceConfig,
+        BuildingTreeConfig, GameDuration, UnlockRule, ResourceCost
+  Data/Runtime: ResourceWallet, TowerState, FloorData, RoomBehaviorState
+  Rooms: IRoomBehavior, RoomBehaviorBase, RoomBehaviorContext, RoomUiId,
+        RoomClickResult, RoomStatusInfo
+  Rooms/Production: ProductionMode, SimulationTimer
+  [CreateAssetMenu] на все SO
+
+Ты (Unity):
+  Ничего. Ждёшь окончания фазы; проверяешь, что проект компилируется без ошибок.
+
+────────────────────────────────────────────────────────────────────────────────
+ФАЗА 2 — Игровые системы + production behavior
+────────────────────────────────────────────────────────────────────────────────
+
+Я (C#):
+  ResourceSystem, UnlockTreeSystem, BuildingSystem, RoomBehaviorSystem
+  ProductionRoomBehavior (+ state serialize/deserialize)
+  PassiveRoomBehavior — НЕ в MVP (когда понадобится декор)
+  Связка систем в GameServices
+
+Ты (Unity):
+  Ничего. Опционально: после фазы создать папки Assets/Data/… (ещё без asset'ов).
+
+────────────────────────────────────────────────────────────────────────────────
+ФАЗА 3 — Вью башни
+────────────────────────────────────────────────────────────────────────────────
+
+Я (C#):
+  TowerView, FloorSlotView, RoomView (SetRoom, SetStatus, OnClick → callback)
+  Префабы не создаю — только скрипты с SerializeField
+
+Ты (Unity):
+  Префаб FloorSlot (спрайт пустого слота, Button)
+  Префаб RoomView или заготовка на этаже: Image/progress bar для overlay
+  Можно черновые квадраты — визуал потом
+
+────────────────────────────────────────────────────────────────────────────────
+ФАЗА 4 — UI (Views + Presenters)
+────────────────────────────────────────────────────────────────────────────────
+
+Я (C#):
+  IScreen, ScreenManager, MainTowerScreen
+  Views: ResourceBarPanel, ResourceSlotView, RoomSelectionPanel, RoomOptionView,
+         ProductionModePanel, OperationOptionView (минимально для смены режимов)
+  Presenters: ResourceBarPresenter, RoomSelectionPresenter, TowerPresenter,
+         ProductionModePresenter
+  MainTowerPresenter (если нужен тонкий слой экрана)
+
+Ты (Unity):
+  Canvas + EventSystem
+  Разметка UI: полоска ресурсов сверху, попап выбора комнаты (скрыт по умолчанию)
+  Префабы RoomOption, ResourceSlot
+  Привязать View-компоненты к объектам Canvas
+
+────────────────────────────────────────────────────────────────────────────────
+ФАЗА 5 — Сборка и запуск MVP
+────────────────────────────────────────────────────────────────────────────────
+
+Я (C#):
+  GameBootstrap: полный wiring (services, tick, presenters, tower, config refs)
+  Чеклист привязок в Inspector (комментарий или SETUP.md)
+  Исправление ошибок компиляции/интеграции
+
+Ты (Unity):
+  1. Assets/Data/ResourceDefinitions/ — wood, planks, stone, bricks (4 asset)
+  2. Assets/Data/Behaviors/ — Production_Lumbermill, Production_Quarry
+  3. Assets/Data/Rooms/ — room_lumbermill, room_quarry
+  4. GameBalanceConfig (TPS=10, стартовые ресурсы)
+  5. BuildingTreeConfig (обе комнаты в AllRooms)
+  6. Сцена: GameObject GameBootstrap + все ссылки
+  7. TowerView на сцене: spacing, prefab FloorSlot, RoomView
+  8. Presenters ↔ Views ↔ GameBootstrap по чеклисту
+  9. Play Mode: постройка, производство, второй этаж за 10 ресурсов
+
+────────────────────────────────────────────────────────────────────────────────
+ФАЗА 6 — После MVP (не блокирует запуск)
+────────────────────────────────────────────────────────────────────────────────
+
+Я: SaveSystem, OpenUiRoomBehavior, ScreenChanged, EventChannel, PassiveRoomBehavior
+Ты: второй экран, звуки, полировка визуала
+
+Дополнения к исходному плану фаз:
+  - RoomStatus overlay (прогресс) — скрипты фаза 3–4, префаб фаза 3
+  - ProductionMode UI — полный MVP: unlock за ресурсы + выбор режима + крафт с InputPerCycle
+  - PassiveRoomBehavior убран из MVP
+  - Тестовые SO создаёшь ты в фазе 5, не я (YAML asset'ы в Project)
+
+================================================================================
+13. СОГЛАСОВАНИЕ (архив)
+================================================================================
+
+[x] Все пункты согласованы. Имена папок — без изменений.
