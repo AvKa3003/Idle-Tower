@@ -84,6 +84,8 @@
     3) Новое событие — только если ≥2 подписчика или слабая связность критична
     4) Не публиковать команды (BuildRoom, OpenPanel) — только факты состояния
     5) Аналитика: отдельный AnalyticsListener подписывается на GameEvents
+    6) Оптимизация событий/UI (см. п. 9.1) — batch ResourceChanged, debounce отрисовки;
+       в MVP: один Raise на каждый изменённый ресурс (TrySpend/Add), этого достаточно
 
 1.3.1 EventChannel — отложено (напоминание)
     Файл EventChannel.cs НЕ пишем в MVP. Описание и сценарий — в разделе 9.
@@ -142,7 +144,7 @@
          _accumulator -= TickInterval
          currentTick++
          TickContext: CurrentTick, TickDelta=TickInterval, TicksPerSecond, Services
-         IGameSystem.OnTick в фиксированном порядке
+         ITickable.OnTick в фиксированном порядке
          GameEvents.GameTick(ctx)
     3) Остаток _accumulator — для интерполяции UI (опционально)
 
@@ -174,7 +176,7 @@ Scripts/
 │   ├── GameBootstrap.cs          — старт игры, wiring; Update → GameTickSystem
 │   ├── GameServices.cs           — доступ к зарегистрированным системам
 │   ├── GameTickSystem.cs         — аккумулятор времени, вызов тиков, currentTick
-│   ├── IGameSystem.cs            — Init / OnTick(TickContext) / Dispose
+│   ├── ITickable.cs              — OnTick(TickContext); участник тик-цикла
 │   ├── TickContext.cs            — currentTick, tickDelta, services
 │   └── Events/
 │       └── GameEvents.cs         — статический bus (MVP)
@@ -381,13 +383,22 @@ Scripts/
     - MaxTicksPerFrame = TicksPerSecond * MaxCatchUpSeconds (при TPS=10, CatchUp=2с → 20)
     - SimulateForSeconds(float) — офлайн, без MaxTicksPerFrame
 
-    Порядок систем на тик:
+    Порядок ITickable на тик (RegisterTickable):
     1) RoomBehaviorSystem
     2) (будущие: BuffSystem, QuestSystem…)
     3) SaveSystem (позже)
 
+    ITickable vs Scripts/Systems/:
+    - ITickable (Core) — только то, что вызывается каждый тик из GameTickSystem
+    - ResourceSystem, BuildingSystem, UnlockTreeSystem — сервисы по запросу через
+      GameServices; ITickable не реализуют
+    - RoomBehaviorSystem — и сервис (GameServices.RoomBehaviors), и ITickable
+    - Инициализация игры — GameServices.InitializeNewGame(), не ITickable
+
 4.1 ResourceSystem
-    (без изменений — общий для многих behaviors)
+    CanAfford, TrySpend, Add; Raise ResourceChanged после изменения кошелька.
+    MVP: при TrySpend/Add с несколькими ResourceCost — отдельный Raise на каждый
+    ресурс (простота; оптимизация batch — п. 9.1, фаза 6).
 
 4.2 UnlockTreeSystem
     - GetAvailableRooms(TowerState) → RoomDefinition[]
@@ -415,7 +426,7 @@ Scripts/
       7) GameEvents.RoomBuilt
     - CanAfford(room) → bool — только ресурсы (для dim в UI)
 
-4.4 RoomBehaviorSystem
+4.4 RoomBehaviorSystem (ITickable + сервис)
     - OnTick(TickContext ctx)
     - OnRoomClicked(int floorIndex) → RoomClickResult
     - OnRoomBuilt(int floorIndex)
@@ -669,6 +680,20 @@ GameEvents / EventChannel (после MVP):
     - ScreenManager.Show(id) → RaiseScreenChanged
     - Presenters решают: скрыть ResourceBar на Shop, показать на MainTower
 
+9.1 Оптимизация событий и отрисовки UI (после MVP, фаза 6)
+  Сейчас (MVP): ResourceSystem вызывает RaiseResourceChanged на каждый ресурс в
+  TrySpend/Add; Presenter обновляет View при каждом Raise. Для 4 ресурсов и редких
+  трат/крафта — нормально, не оптимизируем.
+
+  Позже (если лаги или много ресурсов за одну операцию):
+    - Batch: ResourcesChanged(ResourceDefinition[] или snapshot кошелька) — один Raise
+      после TrySpend/Add вместо N вызовов ResourceChanged
+    - Debounce UI: Presenter помечает dirty на событиях, полный Refresh на GameTick
+      или в LateUpdate (один проход за кадр)
+    - Разделить: GameTick — overlay/прогресс; ResourceChanged batch — полоска ресурсов
+
+  Не делать до стабильного MVP без измеренной проблемы.
+
 - Новый RoomBehavior: крафт, бои, квесты — отдельный SO + класс
 - Доп. ProductionMode — только данные в ProductionRoomBehavior
 - Офлайн-доход: GameTickSystem.SimulateForSeconds(elapsed) без лимита кадра
@@ -693,7 +718,7 @@ GameEvents / EventChannel (после MVP):
               ┌─────────────────┐
               │ GameTickSystem  │─── фиксированный тик каждые TickInterval
               └────────┬────────┘
-                       │ OnTick (детерминированный порядок)
+                       │ ITickable.OnTick (детерминированный порядок)
                        ▼
     ┌──────────────────────────────────────────┐
     │  RoomBehaviorSystem │ (future systems)    │
@@ -752,7 +777,7 @@ GameEvents / EventChannel (после MVP):
 
 Я (C#):
   Core: GameServices, GameBootstrap (каркас), GameTickSystem, TickContext,
-        IGameSystem, GameEvents (+ TODO ScreenChanged)
+        ITickable, GameEvents (+ TODO ScreenChanged)
   Data/Definitions: ResourceDefinition, RoomDefinition, GameBalanceConfig,
         BuildingTreeConfig, GameDuration, UnlockRule, ResourceCost
   Data/Runtime: ResourceWallet, TowerState, FloorData, RoomBehaviorState
@@ -833,6 +858,7 @@ GameEvents / EventChannel (после MVP):
 ────────────────────────────────────────────────────────────────────────────────
 
 Я: SaveSystem, OpenUiRoomBehavior, ScreenChanged, EventChannel, PassiveRoomBehavior
+    Оптимизация GameEvents/UI (п. 9.1): batch ResourceChanged, debounce Presenters
 Ты: второй экран, звуки, полировка визуала
 
 Дополнения к исходному плану фаз:

@@ -6,7 +6,7 @@ namespace IdleTower.Core
     public class GameTickSystem
     {
         private readonly GameServices _services;
-        private readonly List<IGameSystem> _systems = new();
+        private readonly List<ITickable> _tickables = new();
         private float _accumulator;
         private ulong _currentTick;
 
@@ -18,15 +18,15 @@ namespace IdleTower.Core
             _services = services;
         }
 
-        public void RegisterSystem(IGameSystem system)
+        public void RegisterTickable(ITickable tickable)
         {
-            if (system != null && !_systems.Contains(system))
-                _systems.Add(system);
+            if (tickable != null && !_tickables.Contains(tickable))
+                _tickables.Add(tickable);
         }
 
-        public void ClearSystems()
+        public void ClearTickables()
         {
-            _systems.Clear();
+            _tickables.Clear();
         }
 
         public void ProcessUpdate(float deltaTime)
@@ -67,8 +67,8 @@ namespace IdleTower.Core
             _currentTick++;
             var context = new TickContext(_currentTick, tickInterval, ticksPerSecond, _services);
 
-            foreach (var system in _systems)
-                system.OnTick(context);
+            foreach (var tickable in _tickables)
+                tickable.OnTick(context);
 
             GameEvents.RaiseGameTick(context);
         }

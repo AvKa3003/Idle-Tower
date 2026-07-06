@@ -1,5 +1,6 @@
 using IdleTower.Data.Definitions;
 using IdleTower.Data.Runtime;
+using IdleTower.Systems;
 
 namespace IdleTower.Core
 {
@@ -11,6 +12,11 @@ namespace IdleTower.Core
         public TowerState Tower { get; }
         public GameTickSystem TickSystem { get; }
 
+        public ResourceSystem Resources { get; }
+        public UnlockTreeSystem UnlockTree { get; }
+        public BuildingSystem Building { get; }
+        public RoomBehaviorSystem RoomBehaviors { get; }
+
         public GameServices(GameBalanceConfig balance, BuildingTreeConfig buildingTree)
         {
             Balance = balance;
@@ -18,21 +24,20 @@ namespace IdleTower.Core
             Wallet = new ResourceWallet();
             Tower = new TowerState();
             TickSystem = new GameTickSystem(this);
+
+            Resources = new ResourceSystem(this);
+            UnlockTree = new UnlockTreeSystem(this);
+            RoomBehaviors = new RoomBehaviorSystem(this);
+            Building = new BuildingSystem(this);
+
+            TickSystem.RegisterTickable(RoomBehaviors);
         }
 
         public void InitializeNewGame()
         {
             Wallet.Clear();
             Tower.ResetWithEmptyBuildSlot();
-
-            if (Balance?.StartingResources != null)
-            {
-                foreach (var entry in Balance.StartingResources)
-                {
-                    if (entry.Resource != null && entry.Amount > 0)
-                        Wallet.Add(entry.Resource, entry.Amount);
-                }
-            }
+            Resources.ApplyStartingResources();
         }
     }
 }

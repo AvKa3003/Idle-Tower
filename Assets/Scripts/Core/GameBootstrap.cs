@@ -24,8 +24,6 @@ namespace IdleTower.Core
 
             _services = new GameServices(balanceConfig, buildingTreeConfig);
             _services.InitializeNewGame();
-
-            // IGameSystem регистрируются в фазе 2 (RoomBehaviorSystem и др.)
         }
 
         private void Update()
@@ -35,7 +33,7 @@ namespace IdleTower.Core
 
         private void OnDestroy()
         {
-            _services?.TickSystem.ClearSystems();
+            _services?.TickSystem.ClearTickables();
         }
     }
 }
