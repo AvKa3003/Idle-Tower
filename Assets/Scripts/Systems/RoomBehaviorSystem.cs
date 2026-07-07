@@ -19,90 +19,90 @@ namespace IdleTower.Systems
         public void OnTick(TickContext tickContext)
         {
             var tower = _services.Tower;
-            for (var i = 0; i < tower.Floors.Count; i++)
+            for (var i = 0; i < tower.Rooms.Count; i++)
             {
-                var floor = tower.Floors[i];
-                if (floor.IsBuildSlot || floor.BuiltRoom?.Behavior == null)
+                var room = tower.Rooms[i];
+                if (room.IsEmpty || room.BuiltRoom?.Behavior == null)
                     continue;
 
                 var context = CreateContext(i);
-                floor.BuiltRoom.Behavior.Tick(context, tickContext);
+                room.BuiltRoom.Behavior.Tick(context, tickContext);
             }
         }
 
-        public void OnRoomBuilt(int floorIndex)
+        public void OnRoomBuilt(int roomIndex)
         {
-            if (!TryCreateContext(floorIndex, out var context))
+            if (!TryCreateContext(roomIndex, out var context))
                 return;
 
-            context.Floor.BuiltRoom?.Behavior?.OnRoomBuilt(context);
+            context.TowerRoom.BuiltRoom?.Behavior?.OnRoomBuilt(context);
         }
 
-        public RoomClickResult OnRoomClicked(int floorIndex)
+        public RoomClickResult OnRoomClicked(int roomIndex)
         {
-            if (!TryCreateContext(floorIndex, out var context) || context.Floor.BuiltRoom?.Behavior == null)
+            if (!TryCreateContext(roomIndex, out var context) || context.TowerRoom.BuiltRoom?.Behavior == null)
                 return RoomClickResult.None;
 
-            return context.Floor.BuiltRoom.Behavior.OnRoomClicked(context);
+            return context.TowerRoom.BuiltRoom.Behavior.OnRoomClicked(context);
         }
 
-        public bool TryUnlockMode(int floorIndex, int modeIndex)
+        public bool TryUnlockMode(int roomIndex, int modeIndex)
         {
-            if (!TryCreateContext(floorIndex, out var context))
+            if (!TryCreateContext(roomIndex, out var context))
                 return false;
 
-            if (context.Floor.BuiltRoom?.Behavior is not ProductionRoomBehavior production)
+            if (context.TowerRoom.BuiltRoom?.Behavior is not ProductionRoomBehavior production)
                 return false;
 
             return production.TryUnlockMode(context, modeIndex);
         }
 
-        public bool TrySetMode(int floorIndex, int modeIndex)
+        public bool TrySetMode(int roomIndex, int modeIndex)
         {
-            if (!TryCreateContext(floorIndex, out var context))
+            if (!TryCreateContext(roomIndex, out var context))
                 return false;
 
-            if (context.Floor.BuiltRoom?.Behavior is not ProductionRoomBehavior production)
+            if (context.TowerRoom.BuiltRoom?.Behavior is not ProductionRoomBehavior production)
                 return false;
 
             return production.TrySetMode(context, modeIndex);
         }
 
-        public IReadOnlyList<OperationModeInfo> GetOperationModes(int floorIndex)
+        public IReadOnlyList<OperationModeInfo> GetOperationModes(int roomIndex)
         {
-            if (!TryCreateContext(floorIndex, out var context))
+            if (!TryCreateContext(roomIndex, out var context))
                 return System.Array.Empty<OperationModeInfo>();
 
-            if (context.Floor.BuiltRoom?.Behavior is not ProductionRoomBehavior production)
+            if (context.TowerRoom.BuiltRoom?.Behavior is not ProductionRoomBehavior production)
                 return System.Array.Empty<OperationModeInfo>();
 
             return production.GetOperationModes(context);
         }
 
-        public RoomStatusInfo GetRoomStatusInfo(int floorIndex)
+        public RoomStatusInfo GetRoomStatusInfo(int roomIndex)
         {
-            if (!TryCreateContext(floorIndex, out var context) || context.Floor.BuiltRoom?.Behavior == null)
+            if (!TryCreateContext(roomIndex, out var context) || context.TowerRoom.BuiltRoom?.Behavior == null)
                 return null;
 
-            return context.Floor.BuiltRoom.Behavior.GetRoomStatusInfo(context);
+            return context.TowerRoom.BuiltRoom.Behavior.GetRoomStatusInfo(context);
         }
 
-        private bool TryCreateContext(int floorIndex, out RoomBehaviorContext context)
+        private bool TryCreateContext(int roomIndex, out RoomBehaviorContext context)
         {
-            var floor = _services.Tower.GetFloor(floorIndex);
-            if (floor == null || floor.IsBuildSlot)
+            var towerRoom = _services.Tower.GetRoom(roomIndex);
+            if (towerRoom == null || towerRoom.IsEmpty)
             {
                 context = default;
                 return false;
             }
 
-            context = new RoomBehaviorContext(floorIndex, floor, _services.Tower, _services);
+            context = new RoomBehaviorContext(roomIndex, towerRoom, _services.Tower, _services);
             return true;
         }
 
-        private RoomBehaviorContext CreateContext(int floorIndex)
+        private RoomBehaviorContext CreateContext(int roomIndex)
         {
-            TryCreateContext(floorIndex, out var context);
+            TryCreateContext(roomIndex, out var context);
             return context;
         }
     }

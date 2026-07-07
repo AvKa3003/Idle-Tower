@@ -36,7 +36,7 @@ namespace IdleTower.Core
         public void InitializeNewGame()
         {
             Wallet.Clear();
-            Tower.ResetWithEmptyBuildSlot();
+            Tower.ResetWithEmptyRoom();
             Resources.ApplyStartingResources();
         }
     }

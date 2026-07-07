@@ -5,15 +5,15 @@ namespace IdleTower.Rooms
 {
     public readonly struct RoomBehaviorContext
     {
-        public int FloorIndex { get; }
-        public FloorData Floor { get; }
+        public int RoomIndex { get; }
+        public TowerRoom TowerRoom { get; }
         public TowerState Tower { get; }
         public GameServices Services { get; }
 
-        public RoomBehaviorContext(int floorIndex, FloorData floor, TowerState tower, GameServices services)
+        public RoomBehaviorContext(int roomIndex, TowerRoom towerRoom, TowerState tower, GameServices services)
         {
-            FloorIndex = floorIndex;
-            Floor = floor;
+            RoomIndex = roomIndex;
+            TowerRoom = towerRoom;
             Tower = tower;
             Services = services;
         }

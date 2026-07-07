@@ -150,7 +150,7 @@ namespace IdleTower.Rooms.Behaviors
                 return false;
 
             state.UnlockMode(modeIndex);
-            GameEvents.RaiseOperationModeUnlocked(context.FloorIndex, modeIndex);
+            GameEvents.RaiseOperationModeUnlocked(context.RoomIndex, modeIndex);
             return true;
         }
 
@@ -167,7 +167,7 @@ namespace IdleTower.Rooms.Behaviors
                 return true;
 
             state.ActiveModeIndex = modeIndex;
-            GameEvents.RaiseProductionModeChanged(context.FloorIndex, modeIndex);
+            GameEvents.RaiseProductionModeChanged(context.RoomIndex, modeIndex);
             return true;
         }
 
@@ -214,7 +214,7 @@ namespace IdleTower.Rooms.Behaviors
         }
 
         private static ProductionBehaviorState GetState(RoomBehaviorContext context)
-            => context.Floor.State as ProductionBehaviorState;
+            => context.TowerRoom.State as ProductionBehaviorState;
 
         private bool HasLockedModes(RoomBehaviorContext context)
         {

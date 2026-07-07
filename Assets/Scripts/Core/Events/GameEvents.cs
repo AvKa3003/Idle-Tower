@@ -19,16 +19,16 @@ namespace IdleTower.Core.Events
         public static void RaiseResourceChanged(ResourceDefinition resource, int newAmount)
             => ResourceChanged?.Invoke(resource, newAmount);
 
-        public static void RaiseRoomBuilt(int floorIndex, RoomDefinition room)
-            => RoomBuilt?.Invoke(floorIndex, room);
+        public static void RaiseRoomBuilt(int roomIndex, RoomDefinition room)
+            => RoomBuilt?.Invoke(roomIndex, room);
 
         public static void RaiseGameTick(TickContext context)
             => GameTick?.Invoke(context);
 
-        public static void RaiseProductionModeChanged(int floorIndex, int modeIndex)
-            => ProductionModeChanged?.Invoke(floorIndex, modeIndex);
+        public static void RaiseProductionModeChanged(int roomIndex, int modeIndex)
+            => ProductionModeChanged?.Invoke(roomIndex, modeIndex);
 
-        public static void RaiseOperationModeUnlocked(int floorIndex, int modeIndex)
-            => OperationModeUnlocked?.Invoke(floorIndex, modeIndex);
+        public static void RaiseOperationModeUnlocked(int roomIndex, int modeIndex)
+            => OperationModeUnlocked?.Invoke(roomIndex, modeIndex);
     }
 }

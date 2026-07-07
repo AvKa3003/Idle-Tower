@@ -22,7 +22,7 @@ namespace IdleTower.Systems
             return _services.Resources.CanAfford(room.Cost);
         }
 
-        public BuildResult TryBuild(int floorIndex, RoomDefinition room)
+        public BuildResult TryBuild(int roomIndex, RoomDefinition room)
         {
             var tower = _services.Tower;
             if (room == null)
@@ -31,8 +31,8 @@ namespace IdleTower.Systems
             if (room.Behavior == null)
                 return BuildResult.MissingBehavior;
 
-            if (floorIndex != tower.BuildSlotFloorIndex)
-                return BuildResult.InvalidFloor;
+            if (roomIndex != tower.EmptyRoomIndex)
+                return BuildResult.InvalidRoomIndex;
 
             if (!_services.UnlockTree.IsAvailable(room, tower))
                 return BuildResult.NotAvailable;
@@ -44,10 +44,10 @@ namespace IdleTower.Systems
                 return BuildResult.CannotAfford;
 
             var initialState = room.Behavior.CreateDefaultState();
-            tower.AddBuiltFloor(room, initialState);
-            _services.RoomBehaviors.OnRoomBuilt(floorIndex);
+            tower.AddBuiltRoom(room, initialState);
+            _services.RoomBehaviors.OnRoomBuilt(roomIndex);
 
-            GameEvents.RaiseRoomBuilt(floorIndex, room);
+            GameEvents.RaiseRoomBuilt(roomIndex, room);
             return BuildResult.Success;
         }
     }
