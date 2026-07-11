@@ -1,14 +1,15 @@
 using IdleTower.Data.Definitions;
+using IdleTower.UI.Presenters;
 using UnityEngine;
 
 namespace IdleTower.Core
 {
-    /// <summary>Точка входа. Полный wiring презентеров — фаза 5.</summary>
+    /// <summary>Точка входа. Presenters инициализируются через MainTowerPresenter.</summary>
     public class GameBootstrap : MonoBehaviour
     {
         [SerializeField] private GameBalanceConfig balanceConfig;
         [SerializeField] private BuildingTreeConfig buildingTreeConfig;
-
+        [SerializeField] private MainTowerPresenter mainTowerPresenter;
         private GameServices _services;
 
         public GameServices Services => _services;
@@ -24,6 +25,7 @@ namespace IdleTower.Core
 
             _services = new GameServices(balanceConfig, buildingTreeConfig);
             _services.InitializeNewGame();
+            mainTowerPresenter?.Initialize(_services);
         }
 
         private void Update()

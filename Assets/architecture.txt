@@ -1,7 +1,7 @@
 ================================================================================
 АРХИТЕКТУРА ПРОЕКТА — IDLE TOWER (по мотивам Idle Apocalypse)
 ================================================================================
-Версия: 1.11
+Версия: 1.12
 Статус: согласование завершено → реализация по фазам 1–5
 
 Согласовано:
@@ -165,6 +165,61 @@
     Офлайн (позже):
     - elapsedWallSeconds = now - lastSaveTime
     - SimulateForSeconds(elapsedWallSeconds) — тики без лимита MaxTicksPerFrame, без UI
+
+1.9 Именование (слои, типы, методы)
+
+    Цель: по имени сразу видеть уровень абстракции и направление потока данных.
+
+    Типы и суффиксы
+    ┌──────────────────┬─────────────┬──────────────────────────┬─────────────────────────┐
+    │ Суффикс / тип    │ Слой        │ Направление              │ Пример                  │
+    ├──────────────────┼─────────────┼──────────────────────────┼─────────────────────────┤
+    │ *Definition      │ Data        │ конфиг (SO), только чт.  │ RoomDefinition          │
+    │ *State, Wallet   │ Data        │ runtime-состояние сессии │ TowerState, Wallet      │
+    │ *Info            │ Systems     │ System → Presenter (DTO) │ OperationModeInfo       │
+    │ *Display         │ UI          │ Presenter → View (DTO)   │ RoomOptionDisplay       │
+    │ *Panel, *View    │ UI          │ только отображение       │ RoomSelectionPanel      │
+    │ *Presenter       │ UI          │ мост View ↔ Systems      │ TowerPresenter          │
+    │ *System          │ Systems     │ игровая логика           │ BuildingSystem          │
+    └──────────────────┴─────────────┴──────────────────────────┴─────────────────────────┘
+
+    *Info — read-model от System к Presenter: факты состояния (unlocked, active,
+    canAfford, progress). Без UI-разметки (без текстов кнопок, ShowUnlockButton).
+    *Display — DTO от Presenter к View: что нарисовать (label, кнопки, interactable).
+    Presenter может передать *Info во View напрямую, если View уже принимает этот
+    формат (пример: RoomStatusInfo → RoomView.SetStatus).
+
+    Поток данных:
+      System ──*Info──► Presenter ──*Display──► View
+      View (клик) ──event──► Presenter ──Try*/Get*──► System
+      System ──Raise──► GameEvents ──► Presenter ──Set*/Show──► View
+
+    Методы Systems
+    - Try*   — команда с проверкой (TryBuild, TrySpend, TrySetMode); bool или enum
+    - Get*   — чтение без изменения (GetOperationModes, GetRoomStatusInfo)
+    - On*    — lifecycle в ITickable / behavior (OnTick, OnRoomBuilt) — не путать с Presenter
+
+    Методы Presenter
+    - Handle*  — обработчик клика/события View (команда снизу): HandleRoomSelected,
+                 HandleEmptyRoomClicked. Вызывает System или другой Presenter.
+    - On*      — обработчик GameEvents (факт сверху): OnRoomBuilt, OnResourceChanged.
+                 Читает System, обновляет View; не вызывает Try* без необходимости.
+    - Refresh* — пересборка UI: чтение System → *Info/*Display → View (SetOptions, SetStatus)
+    - Build*   — маппинг *Info → *Display внутри Presenter (BuildDisplay)
+    - Open* / Close* / Show / Hide — управление видимостью попапа
+
+    Методы View
+    - Set*   — подставить данные в UI (SetOptions, SetStatus, SetResource)
+    - Show / Hide — видимость панели
+    - event Clicked, RoomSelected, … — сигнал «нажали» наружу; без вызова Systems
+
+    GameEvents
+    - Raise* — публикуют только Systems после изменения данных
+    - Подписчики в Presenter именуют обработчики On* (не Handle*)
+
+    События View vs GameEvents (не смешивать):
+    - View.event + Presenter.Handle*  = команда игрока
+    - GameEvents + Presenter.On*      = факт «состояние уже изменилось»
 
 
 ================================================================================
@@ -808,7 +863,7 @@ GameEvents / EventChannel (после MVP):
   Ничего. Опционально: после фазы создать папки Assets/Data/… (ещё без asset'ов).
 
 ────────────────────────────────────────────────────────────────────────────────
-ФАЗА 3 — Вью башни
+ФАЗА 3 — Вью башни [выполнено в коде]
 ────────────────────────────────────────────────────────────────────────────────
 
 Я (C#) — Scripts/Tower/:
@@ -824,7 +879,7 @@ GameEvents / EventChannel (после MVP):
        - roomIconFallback (Image, опционально)
        - statusOverlay (Panel):
            progressFill (Image, Type=Filled)
-           outputIcon, modeLabelText, amountText, timeText (UI Text)
+           outputIcon, modeLabelText, amountText, timeText (TextMeshProUGUI)
            waitingForInputIndicator (опционально)
   3. На сцене: GameObject Tower с TowerView — roomsRoot, emptyRoomViewPrefab, roomViewPrefab
   4. verticalSpacing подогнать под размер спрайта (напр. 120 для UI)
@@ -835,22 +890,53 @@ GameEvents / EventChannel (после MVP):
 связка в фазе 4–5.
 
 ────────────────────────────────────────────────────────────────────────────────
-ФАЗА 4 — UI (Views + Presenters)
+ФАЗА 4 — UI (Views + Presenters) [выполнено в коде]
 ────────────────────────────────────────────────────────────────────────────────
 
-Я (C#):
-  IScreen, ScreenManager, MainTowerScreen
-  Views: ResourceBarPanel, ResourceSlotView, RoomSelectionPanel, RoomOptionView,
-         ProductionModePanel, OperationOptionView (минимально для смены режимов)
-  Presenters: ResourceBarPresenter, RoomSelectionPresenter, TowerPresenter,
-         ProductionModePresenter
-  MainTowerPresenter (если нужен тонкий слой экрана)
+Предпосылки (уже есть после этапов 2–3):
+  - Systems: ResourceSystem, BuildingSystem, UnlockTreeSystem, RoomBehaviorSystem
+  - Tower: Scripts/Tower/ — TowerView, EmptyRoomView, RoomView (RoomView — TMP-тексты)
+  - View башни НЕ переписываем; TowerPresenter подключается к готовым событиям
+    EmptyRoomClicked / RoomClicked и методам SyncFromState / SetRoomStatus
+  - Полный wiring в GameBootstrap — этап 5; в этапе 4 — скрипты + разметка UI
+
+Я (C#) — Scripts/UI/:
+  Инфраструктура:
+    IScreen, ScreenManager, MainTowerScreen
+  Views/ (только отображение + события клика, без GameServices):
+    ResourceBarPanel, ResourceSlotView
+    RoomSelectionPanel, RoomOptionView
+    ProductionModePanel, OperationOptionView
+  Presenters/ (View ↔ Systems ↔ GameEvents):
+    ResourceBarPresenter      — ResourceChanged → обновить слоты
+    RoomSelectionPresenter    — GetAvailableRooms, CanAfford, TryBuild
+    TowerPresenter            — EmptyRoomClicked → выбор комнаты;
+                                RoomClicked → OnRoomClicked → RoomUiId;
+                                RoomBuilt / GameTick → SyncFromState, SetRoomStatus
+    ProductionModePresenter   — GetOperationModes, TryUnlockMode, TrySetMode
+    MainTowerPresenter        — тонкий слой экрана (если нужен)
+  Presenters/Rooms/           — UI презентеры RoomBehavior (расширение позже)
+
+  Не в этапе 4: SO ресурсов/комнат (этап 5). GameBootstrap вызывает MainTowerPresenter.Initialize
+  если ссылка назначена; остальные Inspector-привязки — чеклист этапа 5.
 
 Ты (Unity):
-  Canvas + EventSystem
-  Разметка UI: полоска ресурсов сверху, попап выбора комнаты (скрыт по умолчанию)
-  Префабы RoomOption, ResourceSlot
-  Привязать View-компоненты к объектам Canvas
+  Уже с этапа 3 (не дублировать): Canvas, EventSystem, Tower + префабы EmptyRoom/RoomView
+  Новое на Canvas:
+    1. ResourceBar — горизонтальный контейнер слотов ресурсов (сверху)
+    2. RoomSelectionPanel — попап выбора комнаты (скрыт по умолчанию, SetActive false)
+    3. ProductionModePanel — попап режимов производства (скрыт по умолчанию)
+  Префабы:
+    ResourceSlot   — иконка + TextMeshProUGUI количества
+    RoomOption     — имя комнаты, стоимость, кнопка; dim если !canAfford
+    OperationOption — режим: label, locked/active, кнопка unlock или выбрать
+  На каждый блок — View-скрипт; поля Image/Button/TextMeshProUGUI привязать в Inspector
+  Presenter на том же GameObject, что View, или отдельный объект со ссылкой на View
+  TowerPresenter — на объекте Tower (ссылка на TowerView + RoomSelectionPresenter +
+    ProductionModePresenter)
+
+  Проверка этапа 4 (без SO, этап 5): Play Mode без ошибок; панели Show/Hide;
+    клик EmptyRoom открывает RoomSelection (список может быть пуст без BuildingTreeConfig)
 
 ────────────────────────────────────────────────────────────────────────────────
 ФАЗА 5 — Сборка и запуск MVP

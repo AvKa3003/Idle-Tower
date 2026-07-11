@@ -22,6 +22,8 @@ namespace IdleTower.Core
             Balance = balance;
             BuildingTree = buildingTree;
             Wallet = new ResourceWallet();
+
+            // Инициализация runtime данных
             Tower = new TowerState();
             TickSystem = new GameTickSystem(this);
 
