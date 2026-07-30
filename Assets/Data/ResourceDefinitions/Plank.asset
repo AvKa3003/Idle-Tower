@@ -10,8 +10,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9fcc9250a4687d744a390d921debda6e, type: 3}
-  m_Name: Planks
+  m_Name: Plank
   m_EditorClassIdentifier: Assembly-CSharp::IdleTower.Data.Definitions.ResourceDefinition
-  id: 
-  displayName: 
-  icon: {fileID: 0}
+  id: plank
+  displayName: "\u0414\u043E\u0441\u043A\u0438"
+  icon: {fileID: 4536570729799689407, guid: 9749e0d5e1cc21e43b0a588e6bef2ad9, type: 3}

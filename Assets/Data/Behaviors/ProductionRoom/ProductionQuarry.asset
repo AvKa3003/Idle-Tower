@@ -1,0 +1,47 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a019ad14704228144bac0cded42887ef, type: 3}
+  m_Name: ProductionQuarry
+  m_EditorClassIdentifier: Assembly-CSharp::IdleTower.Rooms.Behaviors.ProductionRoomBehavior
+  modes:
+  - id: mine
+    displayName: "\u0414\u043E\u0431\u044B\u0447\u0430"
+    icon: {fileID: -5933715298724706184, guid: e36dbd28e68e0fb46814af4f1feefca0, type: 3}
+    outputPerCycle:
+    - Resource: {fileID: 11400000, guid: b56467bb7bfbd0e429c51406d0a6f5e4, type: 2}
+      Amount: 1
+    cycleDuration:
+      Minutes: 0
+      Seconds: 2
+    inputPerCycle: []
+    unlockCost: []
+    unlockRules: []
+    unlockedByDefault: 1
+  - id: firing
+    displayName: "\u041E\u0431\u0436\u0438\u0433"
+    icon: {fileID: -1098394567047818143, guid: 1008565dd8679414dba1cd566fa4fbf9, type: 3}
+    outputPerCycle:
+    - Resource: {fileID: 11400000, guid: 13cb60f13b5682f46ba2d36e781cef6f, type: 2}
+      Amount: 2
+    cycleDuration:
+      Minutes: 0
+      Seconds: 3
+    inputPerCycle:
+    - Resource: {fileID: 11400000, guid: b56467bb7bfbd0e429c51406d0a6f5e4, type: 2}
+      Amount: 5
+    unlockCost:
+    - Resource: {fileID: 11400000, guid: 6f9a325df12a750439fe2fd353ca0c4f, type: 2}
+      Amount: 2
+    - Resource: {fileID: 11400000, guid: b56467bb7bfbd0e429c51406d0a6f5e4, type: 2}
+      Amount: 4
+    unlockRules: []
+    unlockedByDefault: 0

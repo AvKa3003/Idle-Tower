@@ -1,0 +1,45 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a019ad14704228144bac0cded42887ef, type: 3}
+  m_Name: ProductionLumbermill
+  m_EditorClassIdentifier: Assembly-CSharp::IdleTower.Rooms.Behaviors.ProductionRoomBehavior
+  modes:
+  - id: harvest
+    displayName: "\u0414\u043E\u0431\u044B\u0447\u0430"
+    icon: {fileID: 6561241054156491886, guid: c26c229d92de1f74cb20cc14fd781c7e, type: 3}
+    outputPerCycle:
+    - Resource: {fileID: 11400000, guid: 6057606f450efbc41814c3ad3ddb61b6, type: 2}
+      Amount: 1
+    cycleDuration:
+      Minutes: 0
+      Seconds: 2
+    inputPerCycle: []
+    unlockCost: []
+    unlockRules: []
+    unlockedByDefault: 1
+  - id: sawmill
+    displayName: "\u0420\u0430\u0441\u043F\u0438\u043B"
+    icon: {fileID: 2227013682443029248, guid: d4846324d28cad6459815ad5d5f6d31b, type: 3}
+    outputPerCycle:
+    - Resource: {fileID: 11400000, guid: 6f9a325df12a750439fe2fd353ca0c4f, type: 2}
+      Amount: 2
+    cycleDuration:
+      Minutes: 0
+      Seconds: 4
+    inputPerCycle:
+    - Resource: {fileID: 11400000, guid: 6057606f450efbc41814c3ad3ddb61b6, type: 2}
+      Amount: 3
+    unlockCost:
+    - Resource: {fileID: 11400000, guid: 6057606f450efbc41814c3ad3ddb61b6, type: 2}
+      Amount: 5
+    unlockRules: []
+    unlockedByDefault: 0

@@ -12,4 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 84fdbdd729cce7b4eb129d7b9e0b503f, type: 3}
   m_Name: BuildingTreeConfig
   m_EditorClassIdentifier: Assembly-CSharp::IdleTower.Data.Definitions.BuildingTreeConfig
-  allRooms: []
+  allRooms:
+  - {fileID: 11400000, guid: 57b82393253bddc419a1b3dbac37abf4, type: 2}
+  - {fileID: 11400000, guid: d411cdca8f16c5f438f7a91fa467989f, type: 2}

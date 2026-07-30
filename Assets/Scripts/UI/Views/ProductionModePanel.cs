@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace IdleTower.UI.Views
 {
@@ -9,16 +10,27 @@ namespace IdleTower.UI.Views
         [SerializeField] private GameObject root;
         [SerializeField] private Transform optionsRoot;
         [SerializeField] private OperationOptionView optionPrefab;
+        [SerializeField] private Button closeButton;
 
         private readonly List<OperationOptionView> _options = new();
 
         public event Action<int> UnlockClicked;
         public event Action<int> SelectClicked;
+        public event Action CloseClicked;
 
         private void Awake()
         {
             if (root == null)
                 root = gameObject;
+
+            if (closeButton != null)
+                closeButton.onClick.AddListener(HandleCloseClick);
+        }
+
+        private void OnDestroy()
+        {
+            if (closeButton != null)
+                closeButton.onClick.RemoveListener(HandleCloseClick);
         }
 
         public void Show()
@@ -29,6 +41,18 @@ namespace IdleTower.UI.Views
         public void Hide()
         {
             root.SetActive(false);
+            ClearOptions();
+        }
+
+        public void Open(IReadOnlyList<OperationOptionDisplay> displays)
+        {
+            if (root != null)
+                root.SetActive(false);
+
+            RefreshOptions(displays);
+
+            if (root != null)
+                root.SetActive(true);
         }
 
         public void SetOptions(IReadOnlyList<OperationOptionDisplay> displays)
@@ -47,6 +71,24 @@ namespace IdleTower.UI.Views
                 option.UnlockClicked += HandleUnlockClicked;
                 option.SelectClicked += HandleSelectClicked;
                 _options.Add(option);
+            }
+        }
+
+        public void RefreshOptions(IReadOnlyList<OperationOptionDisplay> displays)
+        {
+            if (displays == null || optionPrefab == null)
+                return;
+
+            if (_options.Count != displays.Count)
+            {
+                SetOptions(displays);
+                return;
+            }
+
+            for (var i = 0; i < displays.Count; i++)
+            {
+                if (_options[i] != null)
+                    _options[i].SetDisplay(displays[i]);
             }
         }
 
@@ -78,6 +120,11 @@ namespace IdleTower.UI.Views
         private void HandleSelectClicked(int modeIndex)
         {
             SelectClicked?.Invoke(modeIndex);
+        }
+
+        private void HandleCloseClick()
+        {
+            CloseClicked?.Invoke();
         }
     }
 }

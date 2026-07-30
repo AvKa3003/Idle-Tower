@@ -10,8 +10,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9fcc9250a4687d744a390d921debda6e, type: 3}
-  m_Name: Bricks
+  m_Name: StoneBrick
   m_EditorClassIdentifier: Assembly-CSharp::IdleTower.Data.Definitions.ResourceDefinition
-  id: 
-  displayName: 
-  icon: {fileID: 0}
+  id: stoneBricks
+  displayName: "\u041A\u0430\u043C\u0435\u043D\u043D\u044B\u0435 \u043A\u0438\u0440\u043F\u0438\u0447\u0438"
+  icon: {fileID: -885076277289445797, guid: 23dcd7160710a664587d1de697f96144, type: 3}

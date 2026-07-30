@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9fcc9250a4687d744a390d921debda6e, type: 3}
   m_Name: Stone
   m_EditorClassIdentifier: Assembly-CSharp::IdleTower.Data.Definitions.ResourceDefinition
-  id: 
-  displayName: 
-  icon: {fileID: 0}
+  id: stone
+  displayName: "\u041A\u0430\u043C\u043D\u0438"
+  icon: {fileID: 5725184139431673129, guid: 1aff24b4884607343ba7f50fe1a749d1, type: 3}

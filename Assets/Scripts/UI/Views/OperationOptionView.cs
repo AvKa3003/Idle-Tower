@@ -42,25 +42,26 @@ namespace IdleTower.UI.Views
 
             if (labelText != null)
             {
-                var prefix = display.IsActive ? "▶ " : string.Empty;
+                var prefix = display.IsActive ? "> " : string.Empty;
                 labelText.text = prefix + (display.Label ?? string.Empty);
             }
 
             if (detailText != null)
                 detailText.text = display.DetailText ?? string.Empty;
 
+            var interactable = display.Interactable;
+
             if (unlockButton != null)
+            {
+                unlockButton.interactable = display.ShowUnlockButton && interactable;
                 unlockButton.gameObject.SetActive(display.ShowUnlockButton);
+            }
 
             if (selectButton != null)
+            {
+                selectButton.interactable = display.ShowSelectButton && interactable;
                 selectButton.gameObject.SetActive(display.ShowSelectButton);
-
-            var interactable = display.Interactable;
-            if (unlockButton != null && display.ShowUnlockButton)
-                unlockButton.interactable = interactable;
-
-            if (selectButton != null && display.ShowSelectButton)
-                selectButton.interactable = interactable;
+            }
 
             if (canvasGroup != null)
                 canvasGroup.alpha = interactable ? 1f : 0.45f;

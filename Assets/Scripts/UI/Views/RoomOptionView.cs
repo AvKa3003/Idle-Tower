@@ -51,10 +51,7 @@ namespace IdleTower.UI.Views
                 nameText.text = string.IsNullOrEmpty(room.DisplayName) ? room.name : room.DisplayName;
 
             if (costText != null)
-            {
-                var costLabel = UiTextFormat.FormatCosts(room.Cost);
-                costText.text = string.IsNullOrEmpty(costLabel) ? "Бесплатно" : costLabel;
-            }
+                costText.text = display.CostText ?? string.Empty;
 
             SetAffordable(display.CanAfford);
         }

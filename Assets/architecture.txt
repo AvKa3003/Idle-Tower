@@ -943,9 +943,9 @@ GameEvents / EventChannel (после MVP):
 ────────────────────────────────────────────────────────────────────────────────
 
 Я (C#):
-  GameBootstrap: полный wiring (services, tick, presenters, tower, config refs)
-  Чеклист привязок в Inspector (комментарий или SETUP.md)
-  Исправление ошибок компиляции/интеграции
+  GameBootstrap: полный wiring (configs + MainTowerPresenter, валидация, warnings) [готово]
+  Чеклист привязок в Inspector (комментарий или SETUP.md) — отложено
+  Исправление ошибок компиляции/интеграции — после твоего тестирования
 
 Ты (Unity):
   1. Assets/Data/ResourceDefinitions/ — wood, planks, stone, bricks (4 asset)

@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6f8ca1f189fa21549ba89bd26d52b3cb, type: 3}
+  m_Name: Quarry
+  m_EditorClassIdentifier: Assembly-CSharp::IdleTower.Data.Definitions.RoomDefinition
+  id: roomLumbermill
+  displayName: "\u041A\u0430\u0440\u044C\u0435\u0440"
+  icon: {fileID: -892183819787830546, guid: d45996205d7aac544bbaad5b27c19e24, type: 3}
+  prefab: {fileID: 0}
+  cost:
+  - Resource: {fileID: 11400000, guid: 6f9a325df12a750439fe2fd353ca0c4f, type: 2}
+    Amount: 2
+  behavior: {fileID: 11400000, guid: b21ecbda904aac94fa0312cfccce3498, type: 2}
+  unlockRules:
+  - Type: 1
+    RequiredRoom: {fileID: 11400000, guid: 57b82393253bddc419a1b3dbac37abf4, type: 2}

@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+using IdleTower.Core;
 using IdleTower.Data.Definitions;
 using TMPro;
 using UnityEngine;
@@ -9,25 +9,7 @@ namespace IdleTower.UI.Views
     public static class UiTextFormat
     {
         public static string FormatCosts(ResourceCost[] costs)
-        {
-            if (costs == null || costs.Length == 0)
-                return string.Empty;
-
-            var parts = new List<string>(costs.Length);
-            foreach (var cost in costs)
-            {
-                if (cost.Resource == null || cost.Amount <= 0)
-                    continue;
-
-                var name = string.IsNullOrEmpty(cost.Resource.DisplayName)
-                    ? cost.Resource.name
-                    : cost.Resource.DisplayName;
-
-                parts.Add($"{name} x{cost.Amount}");
-            }
-
-            return string.Join(", ", parts);
-        }
+            => ResourceTextFormat.FormatCosts(costs);
     }
 
     public class ResourceSlotView : MonoBehaviour

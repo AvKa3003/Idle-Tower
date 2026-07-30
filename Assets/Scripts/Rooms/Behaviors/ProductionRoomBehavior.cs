@@ -111,7 +111,9 @@ namespace IdleTower.Rooms.Behaviors
             var info = new RoomStatusInfo
             {
                 ModeLabel = mode.DisplayName,
+                InputPerCycle = mode.InputPerCycle,
                 OutputPerCycle = mode.OutputPerCycle,
+                CycleSummary = ResourceTextFormat.FormatCycle(mode.InputPerCycle, mode.OutputPerCycle),
                 Progress01 = SimulationTimer.GetProgress01(elapsed, duration, canAfford),
                 ElapsedSeconds = elapsed,
                 CycleTotalSeconds = duration,

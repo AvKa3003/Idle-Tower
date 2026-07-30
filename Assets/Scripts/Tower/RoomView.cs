@@ -98,7 +98,7 @@ namespace IdleTower.Tower
                 modeLabelText.text = info.ModeLabel ?? string.Empty;
 
             if (amountText != null)
-                amountText.text = info.AmountPerCycle > 0 ? $"+{info.AmountPerCycle}" : string.Empty;
+                amountText.text = info.CycleSummary ?? string.Empty;
 
             if (timeText != null)
             {

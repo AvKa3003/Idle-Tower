@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9fcc9250a4687d744a390d921debda6e, type: 3}
   m_Name: Wood
   m_EditorClassIdentifier: Assembly-CSharp::IdleTower.Data.Definitions.ResourceDefinition
-  id: 
-  displayName: 
-  icon: {fileID: 0}
+  id: wood
+  displayName: "\u0414\u0435\u0440\u0435\u0432\u043E"
+  icon: {fileID: 7440981132975211316, guid: a4227f7287c9f164db86e5c32b4d1746, type: 3}

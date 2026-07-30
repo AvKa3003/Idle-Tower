@@ -1,5 +1,8 @@
 using System.Collections.Generic;
 using IdleTower.Core;
+using IdleTower.Core.Events;
+using IdleTower.Data.Definitions;
+using IdleTower.Rooms.Production;
 using IdleTower.Systems;
 using IdleTower.UI.Views;
 using UnityEngine;
@@ -9,13 +12,13 @@ namespace IdleTower.UI.Presenters
     /// <summary>
     /// ProductionModePresenter — попап режимов производства (_roomIndex).
     ///
-    /// Получает: OpenForRoom, NotifyRoomModeChanged от TowerPresenter; клики панели
-    /// Отправляет: ProductionModePanel.SetOptions, Show, Hide; TryUnlockMode, TrySetMode
+    /// Получает: OpenForRoom, NotifyRoomModeChanged от TowerPresenter; клики панели; GameEvents.ResourceChanged
+    /// Отправляет: ProductionModePanel.Open / RefreshOptions, Hide; TryUnlockMode, TrySetMode
     ///
     /// View:        ProductionModePanel
     /// Systems:      RoomBehaviors (чтение + TryUnlockMode, TrySetMode)
     /// Presenters:   — (вызывается из TowerPresenter)
-    /// GameEvents:   —
+    /// GameEvents:   ResourceChanged (слушает, пока попап открыт)
     /// </summary>
     public class ProductionModePresenter : MonoBehaviour
     {
@@ -23,17 +26,20 @@ namespace IdleTower.UI.Presenters
 
         private GameServices _services;
         private int _roomIndex = -1;
-        private bool _subscribed;
+        private bool _panelSubscribed;
+        private bool _gameEventsSubscribed;
 
         public void Initialize(GameServices services)
         {
             _services = services;
-            Subscribe();
+            SubscribePanel();
+            SubscribeGameEvents();
         }
 
         private void OnDestroy()
         {
-            Unsubscribe();
+            UnsubscribePanel();
+            UnsubscribeGameEvents();
         }
 
         public void OpenForRoom(int roomIndex)
@@ -42,8 +48,7 @@ namespace IdleTower.UI.Presenters
                 return;
 
             _roomIndex = roomIndex;
-            RefreshOptions();
-            panel.Show();
+            panel.Open(BuildDisplays());
         }
 
         public void Close()
@@ -57,6 +62,11 @@ namespace IdleTower.UI.Presenters
             if (_roomIndex < 0)
                 return;
 
+            panel.RefreshOptions(BuildDisplays());
+        }
+
+        private List<OperationOptionDisplay> BuildDisplays()
+        {
             var modes = _services.RoomBehaviors.GetOperationModes(_roomIndex);
             var displays = new List<OperationOptionDisplay>(modes.Count);
 
@@ -70,17 +80,17 @@ namespace IdleTower.UI.Presenters
                 displays.Add(BuildDisplay(info));
             }
 
-            panel.SetOptions(displays);
+            return displays;
         }
 
-        private static OperationOptionDisplay BuildDisplay(OperationModeInfo info)
+        private OperationOptionDisplay BuildDisplay(OperationModeInfo info)
         {
             var mode = info.Mode;
             var label = string.IsNullOrEmpty(mode.DisplayName) ? mode.Id : mode.DisplayName;
+            var detail = BuildModeDetailText(mode, info);
 
             if (info.IsUnlocked)
             {
-                var detail = info.IsActive ? "Активен" : "Нажми «Выбрать»";
                 return new OperationOptionDisplay(
                     info.ModeIndex,
                     label,
@@ -96,24 +106,44 @@ namespace IdleTower.UI.Presenters
                 return new OperationOptionDisplay(
                     info.ModeIndex,
                     label,
-                    "Условия не выполнены",
+                    detail,
                     isActive: false,
                     showUnlockButton: false,
                     showSelectButton: false,
                     interactable: false);
             }
 
-            var unlockCost = UiTextFormat.FormatCosts(mode.UnlockCost);
-            var costLabel = string.IsNullOrEmpty(unlockCost) ? "Открыть" : $"Открыть: {unlockCost}";
-
             return new OperationOptionDisplay(
                 info.ModeIndex,
                 label,
-                costLabel,
+                detail,
                 isActive: false,
                 showUnlockButton: true,
                 showSelectButton: false,
                 interactable: info.CanAffordUnlock);
+        }
+
+        private string BuildModeDetailText(OperationMode mode, OperationModeInfo info)
+        {
+            if (info.IsUnlocked)
+            {
+                return ResourceTextFormat.FormatModeDetailWithBalance(
+                    mode.InputPerCycle,
+                    mode.OutputPerCycle,
+                    mode.CycleDuration,
+                    resource => _services.Wallet.GetAmount(resource));
+            }
+
+            if (!info.RulesMet)
+                return "Условия не выполнены";
+
+            var unlockCost = ResourceTextFormat.FormatCostsWithBalance(
+                mode.UnlockCost,
+                resource => _services.Wallet.GetAmount(resource));
+
+            return string.IsNullOrEmpty(unlockCost)
+                ? "Бесплатно"
+                : $"Открыть: {unlockCost}";
         }
 
         private void HandleUnlockClicked(int modeIndex)
@@ -138,24 +168,57 @@ namespace IdleTower.UI.Presenters
             _services.RoomBehaviors.TrySetMode(_roomIndex, modeIndex);
         }
 
-        private void Subscribe()
+        private void OnResourceChanged(ResourceDefinition resource, int newAmount)
         {
-            if (_subscribed || panel == null)
+            if (_roomIndex < 0)
+                return;
+
+            RefreshOptions();
+        }
+
+        private void SubscribePanel()
+        {
+            if (_panelSubscribed || panel == null)
                 return;
 
             panel.UnlockClicked += HandleUnlockClicked;
             panel.SelectClicked += HandleSelectClicked;
-            _subscribed = true;
+            panel.CloseClicked += HandleCloseClicked;
+            _panelSubscribed = true;
         }
 
-        private void Unsubscribe()
+        private void UnsubscribePanel()
         {
-            if (!_subscribed || panel == null)
+            if (!_panelSubscribed || panel == null)
                 return;
 
             panel.UnlockClicked -= HandleUnlockClicked;
             panel.SelectClicked -= HandleSelectClicked;
-            _subscribed = false;
+            panel.CloseClicked -= HandleCloseClicked;
+            _panelSubscribed = false;
+        }
+
+        private void SubscribeGameEvents()
+        {
+            if (_gameEventsSubscribed)
+                return;
+
+            GameEvents.ResourceChanged += OnResourceChanged;
+            _gameEventsSubscribed = true;
+        }
+
+        private void UnsubscribeGameEvents()
+        {
+            if (!_gameEventsSubscribed)
+                return;
+
+            GameEvents.ResourceChanged -= OnResourceChanged;
+            _gameEventsSubscribed = false;
+        }
+
+        private void HandleCloseClicked()
+        {
+            Close();
         }
     }
 }

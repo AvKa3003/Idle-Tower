@@ -12,14 +12,14 @@ namespace IdleTower.UI.Presenters
     ///
     /// View:        MainTowerScreen
     /// Systems:      —
-    /// Presenters:   ResourceBar, RoomSelection, ProductionMode, Tower
+    /// Presenters:   Header, RoomSelection, ProductionMode, Tower
     /// GameEvents:   —
     /// </summary>
     public class MainTowerPresenter : MonoBehaviour
     {
         [SerializeField] private ScreenManager screenManager;
         [SerializeField] private MainTowerScreen mainTowerScreen;
-        [SerializeField] private ResourceBarPresenter resourceBar;
+        [SerializeField] private HeaderPresenter header;
         [SerializeField] private RoomSelectionPresenter roomSelection;
         [SerializeField] private ProductionModePresenter productionMode;
         [SerializeField] private TowerPresenter tower;
@@ -34,9 +34,9 @@ namespace IdleTower.UI.Presenters
             if (screenManager != null && mainTowerScreen != null)
                 screenManager.Register(mainTowerScreen);
 
-            resourceBar?.Initialize(services);
             roomSelection?.Initialize(services);
             productionMode?.Initialize(services);
+            header?.Initialize(services, roomSelection, productionMode);
             tower?.Initialize(services);
 
             if (screenManager != null)

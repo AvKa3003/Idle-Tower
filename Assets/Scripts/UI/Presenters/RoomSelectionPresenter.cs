@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using IdleTower.Core;
+using IdleTower.Core.Events;
 using IdleTower.Data.Definitions;
 using IdleTower.Systems;
 using IdleTower.UI.Views;
@@ -10,13 +11,13 @@ namespace IdleTower.UI.Presenters
     /// <summary>
     /// RoomSelectionPresenter — попап «что построить» в пустой слот (_pendingRoomIndex).
     ///
-    /// Получает: вызов Open(roomIndex) от TowerPresenter; клик RoomSelectionPanel.RoomSelected
-    /// Отправляет: RoomSelectionPanel.SetOptions, Show, Hide; Building.TryBuild
+    /// Получает: вызов Open(roomIndex) от TowerPresenter; клик RoomSelectionPanel; GameEvents.ResourceChanged
+    /// Отправляет: RoomSelectionPanel.Open / RefreshOptions, Hide; Building.TryBuild
     ///
     /// View:        RoomSelectionPanel
     /// Systems:      UnlockTree (чтение), Building.CanAfford (чтение), Building.TryBuild (запись)
     /// Presenters:   — (вызывается из TowerPresenter)
-    /// GameEvents:   —
+    /// GameEvents:   ResourceChanged (слушает, пока попап открыт)
     /// </summary>
     public class RoomSelectionPresenter : MonoBehaviour
     {
@@ -24,17 +25,20 @@ namespace IdleTower.UI.Presenters
 
         private GameServices _services;
         private int _pendingRoomIndex = -1;
-        private bool _subscribed;
+        private bool _panelSubscribed;
+        private bool _gameEventsSubscribed;
 
         public void Initialize(GameServices services)
         {
             _services = services;
-            Subscribe();
+            SubscribePanel();
+            SubscribeGameEvents();
         }
 
         private void OnDestroy()
         {
-            Unsubscribe();
+            UnsubscribePanel();
+            UnsubscribeGameEvents();
         }
 
         public void Open(int roomIndex)
@@ -43,8 +47,7 @@ namespace IdleTower.UI.Presenters
                 return;
 
             _pendingRoomIndex = roomIndex;
-            RefreshOptions();
-            panel.Show();
+            panel.Open(BuildDisplays());
         }
 
         public void Close()
@@ -54,6 +57,14 @@ namespace IdleTower.UI.Presenters
         }
 
         private void RefreshOptions()
+        {
+            if (_pendingRoomIndex < 0)
+                return;
+
+            panel.RefreshOptions(BuildDisplays());
+        }
+
+        private List<RoomOptionDisplay> BuildDisplays()
         {
             var tower = _services.Tower;
             var available = _services.UnlockTree.GetAvailableRooms(tower);
@@ -66,10 +77,20 @@ namespace IdleTower.UI.Presenters
                     continue;
 
                 var canAfford = _services.Building.CanAfford(room);
-                displays.Add(new RoomOptionDisplay(room, canAfford));
+                var costText = BuildCostText(room.Cost);
+                displays.Add(new RoomOptionDisplay(room, canAfford, costText));
             }
 
-            panel.SetOptions(displays);
+            return displays;
+        }
+
+        private string BuildCostText(ResourceCost[] cost)
+        {
+            var costLabel = ResourceTextFormat.FormatCostsWithBalance(
+                cost,
+                resource => _services.Wallet.GetAmount(resource));
+
+            return string.IsNullOrEmpty(costLabel) ? "Бесплатно" : costLabel;
         }
 
         private void HandleRoomSelected(RoomDefinition room)
@@ -84,22 +105,55 @@ namespace IdleTower.UI.Presenters
                 Debug.Log($"[RoomSelection] TryBuild failed: {result}");
         }
 
-        private void Subscribe()
+        private void OnResourceChanged(ResourceDefinition resource, int newAmount)
         {
-            if (_subscribed || panel == null)
+            if (_pendingRoomIndex < 0)
+                return;
+
+            RefreshOptions();
+        }
+
+        private void SubscribePanel()
+        {
+            if (_panelSubscribed || panel == null)
                 return;
 
             panel.RoomSelected += HandleRoomSelected;
-            _subscribed = true;
+            panel.CloseClicked += HandleCloseClicked;
+            _panelSubscribed = true;
         }
 
-        private void Unsubscribe()
+        private void UnsubscribePanel()
         {
-            if (!_subscribed || panel == null)
+            if (!_panelSubscribed || panel == null)
                 return;
 
             panel.RoomSelected -= HandleRoomSelected;
-            _subscribed = false;
+            panel.CloseClicked -= HandleCloseClicked;
+            _panelSubscribed = false;
+        }
+
+        private void SubscribeGameEvents()
+        {
+            if (_gameEventsSubscribed)
+                return;
+
+            GameEvents.ResourceChanged += OnResourceChanged;
+            _gameEventsSubscribed = true;
+        }
+
+        private void UnsubscribeGameEvents()
+        {
+            if (!_gameEventsSubscribed)
+                return;
+
+            GameEvents.ResourceChanged -= OnResourceChanged;
+            _gameEventsSubscribed = false;
+        }
+
+        private void HandleCloseClicked()
+        {
+            Close();
         }
     }
 }
