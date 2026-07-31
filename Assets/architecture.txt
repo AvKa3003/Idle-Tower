@@ -305,7 +305,8 @@ Scripts/
 │   ├── ResourceSystem.cs
 │   ├── BuildingSystem.cs
 │   ├── UnlockTreeSystem.cs
-│   ├── RoomBehaviorSystem.cs     — Tick, OnBuilt, OnClick, Try*Mode (фасад)
+│   ├── RoomBehaviorSystem.cs     — Tick, OnBuilt, OnClick, Status
+│   ├── ProductionSystem.cs       — Try*Mode / GetOperationModes
 │   ├── OperationModeInfo.cs
 │   └── BuildResult.cs
 │       (фаза 6: SaveSystem.cs)
@@ -530,11 +531,14 @@ Scripts/
     - CanAfford(room) → bool
 
 4.4 RoomBehaviorSystem (ITickable + сервис)
-    - OnTick / OnRoomClicked / OnRoomBuilt
+    - OnTick / OnRoomClicked / OnRoomBuilt / GetRoomStatusInfo
+    - Без knowledge о production-режимах
+
+4.4.1 ProductionSystem
     - TryUnlockMode(roomIndex, ModeId) / TrySetMode(roomIndex, ModeId) → bool
       (делегирует в ProductionRoomBehavior; Raise mode-событий — внутри behavior)
     - GetOperationModes(roomIndex) → OperationModeInfo[]
-    - GetRoomStatusInfo(roomIndex) → RoomStatusInfo
+    - Presenter: ProductionModePresenter → services.Production
 
 4.5 ProductionRoomBehavior
     - OnRoomBuilt: unlock modes[0] (+ UnlockedByDefault); ActiveModeId = modes[0].Id
@@ -577,7 +581,7 @@ Scripts/
 
 5.5–5.6 Клик по комнате → ProductionMode (ModeId)
     OnRoomClicked → RoomUiId.ProductionMode → ProductionModePresenter
-    TryUnlockMode / TrySetMode(ModeId); overlay по GameTick + mode-событиям
+    services.Production.TryUnlockMode / TrySetMode; overlay по GameTick + mode-событиям
 
 5.7 Новый тип комнаты без правки ядра
     Новый RoomBehavior класс + .asset + RoomDefinition + запись в BuildingTree
@@ -823,7 +827,7 @@ GameEvents / Presenters вывода (звук постройки — реали
 ФАЗА 2 — Игровые системы + production [готово]
 ────────────────────────────────────────────────────────────────────────────────
 
-  ResourceSystem, UnlockTreeSystem, BuildingSystem, RoomBehaviorSystem
+  ResourceSystem, UnlockTreeSystem, BuildingSystem, RoomBehaviorSystem, ProductionSystem
   ProductionRoomBehavior (+ serialize/deserialize)
   OpenUi / Passive — не в этой фазе (фаза 6)
 

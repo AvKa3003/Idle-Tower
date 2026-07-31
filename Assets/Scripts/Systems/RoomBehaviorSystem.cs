@@ -1,13 +1,14 @@
-using System.Collections.Generic;
 using IdleTower.Core;
 using IdleTower.Core.Events;
 using IdleTower.Data.Runtime;
 using IdleTower.Rooms;
-using IdleTower.Rooms.Behaviors;
-using IdleTower.Rooms.Production;
 
 namespace IdleTower.Systems
 {
+    /// <summary>
+    /// Диспетчер поведений комнат: Tick, OnBuilt, OnClick, Status.
+    /// Production-режимы — в <see cref="ProductionSystem"/>.
+    /// </summary>
     public class RoomBehaviorSystem : ITickable
     {
         private readonly GameServices _services;
@@ -45,39 +46,6 @@ namespace IdleTower.Systems
                 return RoomClickResult.None;
 
             return context.TowerRoom.BuiltRoom.Behavior.OnRoomClicked(context);
-        }
-
-        public bool TryUnlockMode(int roomIndex, ModeId modeId)
-        {
-            if (!TryCreateContext(roomIndex, out var context))
-                return false;
-
-            if (context.TowerRoom.BuiltRoom?.Behavior is not ProductionRoomBehavior production)
-                return false;
-
-            return production.TryUnlockMode(context, modeId);
-        }
-
-        public bool TrySetMode(int roomIndex, ModeId modeId)
-        {
-            if (!TryCreateContext(roomIndex, out var context))
-                return false;
-
-            if (context.TowerRoom.BuiltRoom?.Behavior is not ProductionRoomBehavior production)
-                return false;
-
-            return production.TrySetMode(context, modeId);
-        }
-
-        public IReadOnlyList<OperationModeInfo> GetOperationModes(int roomIndex)
-        {
-            if (!TryCreateContext(roomIndex, out var context))
-                return System.Array.Empty<OperationModeInfo>();
-
-            if (context.TowerRoom.BuiltRoom?.Behavior is not ProductionRoomBehavior production)
-                return System.Array.Empty<OperationModeInfo>();
-
-            return production.GetOperationModes(context);
         }
 
         public RoomStatusInfo GetRoomStatusInfo(int roomIndex)

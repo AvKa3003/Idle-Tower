@@ -16,7 +16,7 @@ namespace IdleTower.UI.Presenters
     /// Отправляет: ProductionModePanel.Open / RefreshOptions, Hide; TryUnlockMode, TrySetMode
     ///
     /// View:        ProductionModePanel
-    /// Systems:      RoomBehaviors (чтение + TryUnlockMode, TrySetMode)
+    /// Systems:      Production (чтение + TryUnlockMode, TrySetMode)
     /// Presenters:   — (вызывается из TowerPresenter)
     /// GameEvents:   ResourceChanged (слушает, пока попап открыт)
     /// </summary>
@@ -67,7 +67,7 @@ namespace IdleTower.UI.Presenters
 
         private List<OperationOptionDisplay> BuildDisplays()
         {
-            var modes = _services.RoomBehaviors.GetOperationModes(_roomIndex);
+            var modes = _services.Production.GetOperationModes(_roomIndex);
             var displays = new List<OperationOptionDisplay>(modes.Count);
 
             for (var i = 0; i < modes.Count; i++)
@@ -151,7 +151,7 @@ namespace IdleTower.UI.Presenters
             if (_services == null || _roomIndex < 0)
                 return;
 
-            _services.RoomBehaviors.TryUnlockMode(_roomIndex, modeId);
+            _services.Production.TryUnlockMode(_roomIndex, modeId);
         }
 
         public void NotifyRoomModeChanged(int roomIndex)
@@ -165,7 +165,7 @@ namespace IdleTower.UI.Presenters
             if (_services == null || _roomIndex < 0)
                 return;
 
-            _services.RoomBehaviors.TrySetMode(_roomIndex, modeId);
+            _services.Production.TrySetMode(_roomIndex, modeId);
         }
 
         private void OnResourceChanged(ResourceDefinition resource, int newAmount)

@@ -16,6 +16,7 @@ namespace IdleTower.Core
         public UnlockTreeSystem UnlockTree { get; }
         public BuildingSystem Building { get; }
         public RoomBehaviorSystem RoomBehaviors { get; }
+        public ProductionSystem Production { get; }
 
         public GameServices(GameBalanceConfig balance, BuildingTreeConfig buildingTree)
         {
@@ -30,6 +31,7 @@ namespace IdleTower.Core
             Resources = new ResourceSystem(this);
             UnlockTree = new UnlockTreeSystem(this);
             RoomBehaviors = new RoomBehaviorSystem(this);
+            Production = new ProductionSystem(this);
             Building = new BuildingSystem(this);
 
             TickSystem.RegisterTickable(RoomBehaviors);
