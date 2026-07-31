@@ -6,12 +6,14 @@
 Архитектура (не GoF)
 ================================================================================
 
-MVP (Model — View — Presenter)
-  Идея: View только рисует; Presenter связывает клики с Systems и обновляет View
-        по событиям. Model = runtime-данные и системы.
-  Пример: RoomView (клик) → TowerPresenter → BuildingSystem.TryBuild;
-          GameEvents.ResourceChanged → ResourceListPresenter → ResourceListPanel
-          (пока модалка ресурсов открыта).
+MVP (Model — View — Presenter) — в Idle Tower
+  Presenter = слой связи Systems / GameEvents с выводом игроку:
+              UI, звуки, эффекты и т.д. (не только Canvas).
+  View = пассивный вывод (Panel / AudioSource / …), без бизнес-логики.
+  Model = runtime-данные и Systems.
+  Пример UI: RoomView → TowerPresenter → BuildingSystem.TryBuild;
+             ResourceChanged → ResourceListPresenter → ResourceListPanel.
+  Пример SFX: RoomBuilt → SfxPlayer → AudioSource.PlayOneShot.
 
 Разделение Definitions / Runtime
   Идея: баланс и типы (SO, не меняются в Play) отдельно от состояния сессии
@@ -26,10 +28,10 @@ MVP (Model — View — Presenter)
           roomIndex — int слота, не entity-id.
 
 Event Bus
-  Идея: системы (и сейчас behavior для mode-событий) публикуют факты;
-        UI подписывается, не наоборот.
-  Пример: GameEvents.RaiseResourceChanged → ResourceListPresenter обновляет строки;
-          RaiseProductionModeChanged(ModeId) → TowerPresenter обновляет overlay.
+  Идея: системы публикуют факты; Presenters (UI / SFX / …) подписываются.
+  Пример: GameEvents.RaiseRoomBuilt
+          → TowerPresenter (UI)
+          → SfxPlayer (звук).
 
 Config validation at boot
   Идея: битый контент не должен «тихо» жить в рантайме.

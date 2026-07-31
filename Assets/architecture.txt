@@ -1,7 +1,7 @@
 ================================================================================
 АРХИТЕКТУРА ПРОЕКТА — IDLE TOWER (по мотивам Idle Apocalypse)
 ================================================================================
-Версия: 1.13
+Версия: 1.14
 Статус: фазы 1–5 реализованы в Scripts; Play Mode на сцене; фаза 6 — backlog
 
 Согласовано / реализовано:
@@ -14,8 +14,9 @@
   [x] Типизированные Id: ResourceId, RoomId, ModeId; ScreenId / RoomUiId — enum
   [x] ConfigValidator.ValidateOrThrow при старте (до GameServices)
   [x] UI ресурсов: Header + модалка ResourceList (ResourceBar удалён)
+  [x] Presenter = слой вывода игроку (UI / SFX / VFX…); SfxPlayer — Presenter звука
   [ ] Raise GameEvents только из Systems — целевое правило; сейчас mode-события
-      Raise'ит ProductionRoomBehavior (выровнять с EventChannel / SFX, фаза 6)
+      Raise'ит ProductionRoomBehavior (выровнять позже)
 
 Ключевые решения:
   - Башня строго линейная (один столбец этажей снизу вверх), ветвления нет.
@@ -24,6 +25,7 @@
   - Ядро знает только: построить, кликнуть, тикнуть, сохранить. Детали — в behavior.
   - Тик-цикл: частота тиков настраивается (плавность UI); баланс задаётся только в секундах.
   - Контентные Id стабильны (сейв); DisplayName — для игрока. Autofill Id / ResolveId нет.
+  - Presenter в Idle Tower: связь Systems/фактов с выводом игроку (не только Canvas).
 
 Цель: расширяемая архитектура, в которой геймплей, UI и данные разделены.
 Новые комнаты, ресурсы и экраны добавляются через ScriptableObject и префабы
@@ -35,13 +37,21 @@
 ================================================================================
 
 1.1 Разделение слоёв (строгое, вариант 2)
-    Data → Systems → Presenters → Views
+    Data → Systems → Presenters → Views (и другие «выходы»: AudioSource, VFX…)
 
-    Systems   — игровая логика; никаких ссылок на Canvas, Button, TMP.
-    Presenters — единственный слой, который вызывает Systems и обновляет Views.
-    Views     — только отображение: ссылки на UI, SetText/Show/Hide, без бизнес-логики.
+    Systems    — игровая логика; никаких ссылок на Canvas, Button, TMP, AudioSource.
+    Presenters — слой связи Systems / GameEvents с выводом игроку:
+                 UI, звуки, эффекты и т.п. Единственные, кто зовёт Systems по командам
+                 игрока и кто подписывается на факты для презентации.
+    Views      — пассивный вывод UI: SetText/Show/Hide, клики наружу; без бизнес-логики.
+                 Для SFX/VFX «view» — AudioSource / ParticleSystem (управляет Presenter).
 
-    Правило: на каждую панель/экран — пара классов *Panel (View) + *Presenter.
+    В контексте Idle Tower слово Presenter НЕ ограничено Canvas:
+    - UI: *Presenter + *Panel (пара на панель/экран)
+    - звук: SfxPlayer (слушает факты → PlayOneShot)
+    - позже: VFX-presenters по тому же принципу
+
+    Правило для UI: на каждую панель/экран — пара *Panel (View) + *Presenter.
     Исключений для «простых» попапов нет — единообразие важнее экономии файлов.
 
 1.2 Конфиг через ScriptableObject
@@ -51,15 +61,15 @@
 
     Два канала (не смешивать):
     - Команды (клики): View → Presenter → System.Method()
-    - Факты (состояние): Raise* → Presenter → View
+    - Факты (состояние): Raise* → Presenter → View / Audio / VFX
 
     Реализация: Scripts/Core/Events/GameEvents.cs
     - public static event + public static void Raise*(...) для каждого события
     - Целевое правило: Raise только из Systems после изменения данных
     - Факт кода: ResourceChanged / RoomBuilt / GameTick — из Systems;
       ProductionModeChanged / OperationModeUnlocked — из ProductionRoomBehavior
-      (вынести в RoomBehaviorSystem или ослабить правило при EventChannel, фаза 6)
-    - Подписываются Presenters (часто пока попап/экран открыт)
+      (вынести в RoomBehaviorSystem или ослабить правило «только Systems»)
+    - Подписываются Presenters (UI и SfxPlayer; UI часто пока попап открыт)
 
     События (актуально):
     ┌──────────────────────────────┬────────────────────────────┬────────────────────────────┐
@@ -69,14 +79,16 @@
     │   (resource, newAmount)      │ Add / TrySpend / starting  │ (пока модалка открыта);    │
     │                              │                            │ RoomSelection /            │
     │                              │                            │ ProductionMode (пока open) │
-    │ RoomBuilt                    │ BuildingSystem             │ TowerPresenter             │
-    │   (roomIndex, room)          │ TryBuild успех             │                            │
+    │ RoomBuilt                    │ BuildingSystem             │ TowerPresenter (UI);       │
+    │   (roomIndex, room)          │ TryBuild успех             │ SfxPlayer → RoomBuilt      │
     │ GameTick                     │ GameTickSystem             │ TowerPresenter (overlay)   │
     │   (TickContext ctx)          │ каждый тик                 │                            │
     │ ProductionModeChanged        │ ProductionRoomBehavior     │ TowerPresenter →           │
-    │   (roomIndex, ModeId)        │ TrySetMode                 │ ProductionModePresenter    │
+    │   (roomIndex, ModeId)        │ TrySetMode                 │ ProductionModePresenter;   │
+    │                              │                            │ SfxPlayer → ModeChanged    │
     │ OperationModeUnlocked        │ ProductionRoomBehavior     │ TowerPresenter →           │
-    │   (roomIndex, ModeId)        │ TryUnlockMode              │ ProductionModePresenter    │
+    │   (roomIndex, ModeId)        │ TryUnlockMode (не OnBuilt) │ ProductionModePresenter;   │
+    │                              │                            │ SfxPlayer → ModeUnlocked   │
     └──────────────────────────────┴────────────────────────────┴────────────────────────────┘
 
     Отложено (TODO в коде):
@@ -89,14 +101,19 @@
 
     Расширение (фаза 6):
     1) IGameEvents — для unit-тестов без статики
-    2) EventChannel SO (п. 9) — звук/VFX из Inspector
+    2) Больше SFX/VFX-Presenter’ов на другие факты GameEvents
     3) Новое событие — только если ≥2 подписчика или слабая связность критична
     4) Не публиковать команды (BuildRoom, OpenPanel) — только факты состояния
     5) Аналитика: отдельный AnalyticsListener на GameEvents
     6) Оптимизация (п. 9.1): batch ResourceChanged, debounce отрисовки
 
-1.3.1 EventChannel — отложено (фаза 6, вместе со звуком)
-    Описание — раздел 9. Сейчас behavior дергает GameEvents напрямую для mode-событий.
+1.3.1 SFX-Presenter (масштабируемо)
+    SfxPlayer — Presenter звука: GameEvents → SfxId → AudioClip.
+    - SfxId enum — закрытый набор звуков
+    - bindings[] в Inspector — свои клипы (опционально; иначе procedural тест)
+    - Новый звук: SfxId + клип в bindings + одна строка подписки, если новый факт
+    - OperationModeUnlocked не вызывается при стартовом unlock в OnRoomBuilt → SFX только при покупке режима
+    SO-EventChannel не используем.
 
 1.4 Единая точка входа
     GameBootstrap: ConfigValidator.ValidateOrThrow → GameServices → MainTowerPresenter.
@@ -246,8 +263,10 @@ Scripts/
 │   ├── ScreenId.cs               — enum экранов
 │   ├── ResourceTextFormat.cs     — текст стоимостей / have/need для UI
 │   └── Events/
-│       └── GameEvents.cs         — статический bus
-│       (фаза 6: EventChannel.cs — см. раздел 9)
+│       └── GameEvents.cs         — статический bus (UI + SFX подписчики)
+│
+├── Audio/
+│   └── SfxPlayer.cs              — Presenter звука: RoomBuilt → PlayOneShot
 │
 ├── Data/
 │   ├── Definitions/
@@ -700,19 +719,14 @@ BuildingTreeConfig.AllRooms: room_lumbermill, room_quarry
 9. РАСШИРЕНИЕ В БУДУЩЕМ
 ================================================================================
 
-GameEvents / EventChannel (фаза 6, вместе со звуком):
-  Зачем EventChannel:
-    - ScriptableObject-«канал» на каждое событие (ResourceChangedChannel.asset)
-    - Компоненты в сцене (Audio, ParticleSystem) подписываются через Inspector
-    - GameEvents.Raise* дополнительно вызывает channel.Raise
+GameEvents / Presenters вывода (звук постройки — реализовано):
+  Поток:
+    BuildingSystem.TryBuild → GameEvents.RaiseRoomBuilt
+      → TowerPresenter (UI-Presenter)
+      → SfxPlayer (SFX-Presenter)
 
-  Пример (позже):
-    ResourceSystem.Add → GameEvents.RaiseResourceChanged
-      → ResourceListPresenter (код, если модалка открыта)
-      → ResourceChangedChannel.asset → SfxPlayer на сцене (Inspector)
-
-  Также: вынести Raise mode-событий из ProductionRoomBehavior в Systems
-  (или ослабить правило «Raise только из Systems» официально).
+  Presenter в Idle Tower = связь фактов/команд с выводом игроку (UI, звук, эффекты…).
+  SO-EventChannel не используем.
 
   ScreenChanged (отложено):
     - ScreenManager.Show(id) → RaiseScreenChanged
@@ -787,7 +801,7 @@ GameEvents / EventChannel (фаза 6, вместе со звуком):
 
 [x] Имена папок и классов — как в разделе 2 (актуальное дерево Scripts/)
 
-Статус: фазы 1–5 в коде; фаза 6 — backlog (Save, EventChannel/SFX, OpenUi, offline).
+Статус: фазы 1–5 + RoomBuilt SFX через GameEvents; backlog фазы 6 — Save, OpenUi, offline…
 
 ================================================================================
 12. ПОРЯДОК РЕАЛИЗАЦИИ
@@ -842,7 +856,7 @@ GameEvents / EventChannel (фаза 6, вместе со звуком):
 ────────────────────────────────────────────────────────────────────────────────
 
   SaveSystem (+ резолвер Id→SO), OpenUiRoomBehavior, ScreenChanged,
-  EventChannel + SfxId / звук, PassiveRoomBehavior,
+  больше SFX на других GameEvents, PassiveRoomBehavior,
   выравнивание Raise mode-событий, офлайн SimulateForSeconds,
   batch ResourceChanged; при Addressables — EqualityComparer по Id для SO
 

@@ -1,6 +1,5 @@
 using System;
 using IdleTower.Data.Definitions;
-using IdleTower.Rooms;
 using IdleTower.Rooms.Production;
 
 namespace IdleTower.Core.Events
