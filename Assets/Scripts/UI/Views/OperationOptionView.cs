@@ -1,4 +1,5 @@
 using System;
+using IdleTower.Rooms.Production;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -13,10 +14,10 @@ namespace IdleTower.UI.Views
         [SerializeField] private Button selectButton;
         [SerializeField] private CanvasGroup canvasGroup;
 
-        private int _modeIndex;
+        private ModeId _modeId;
 
-        public event Action<int> UnlockClicked;
-        public event Action<int> SelectClicked;
+        public event Action<ModeId> UnlockClicked;
+        public event Action<ModeId> SelectClicked;
 
         private void Awake()
         {
@@ -38,7 +39,7 @@ namespace IdleTower.UI.Views
 
         public void SetDisplay(OperationOptionDisplay display)
         {
-            _modeIndex = display.ModeIndex;
+            _modeId = display.ModeId;
 
             if (labelText != null)
             {
@@ -69,12 +70,12 @@ namespace IdleTower.UI.Views
 
         private void HandleUnlockClick()
         {
-            UnlockClicked?.Invoke(_modeIndex);
+            UnlockClicked?.Invoke(_modeId);
         }
 
         private void HandleSelectClick()
         {
-            SelectClicked?.Invoke(_modeIndex);
+            SelectClicked?.Invoke(_modeId);
         }
     }
 }

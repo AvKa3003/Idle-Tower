@@ -10,18 +10,30 @@ MVP (Model — View — Presenter)
   Идея: View только рисует; Presenter связывает клики с Systems и обновляет View
         по событиям. Model = runtime-данные и системы.
   Пример: RoomView (клик) → TowerPresenter → BuildingSystem.TryBuild;
-          GameEvents.ResourceChanged → ResourceBarPresenter → ResourceBarPanel.
+          GameEvents.ResourceChanged → ResourceListPresenter → ResourceListPanel
+          (пока модалка ресурсов открыта).
 
 Разделение Definitions / Runtime
   Идея: баланс и типы (SO, не меняются в Play) отдельно от состояния сессии
         (кошелёк, башня, таймеры).
   Пример: ResourceDefinition.asset (что такое «дерево») vs ResourceWallet
-          (сколько дерева сейчас).
+          (сколько дерева сейчас). Runtime-ключ кошелька — ссылка на SO;
+          в сейве — ResourceId.Value.
+
+Типизированные Id
+  Идея: не путать разные string-ключи; закрытые наборы — enum.
+  Пример: ModeId / ResourceId / RoomId (readonly struct); ScreenId, RoomUiId (enum);
+          roomIndex — int слота, не entity-id.
 
 Event Bus
-  Идея: системы публикуют факты «состояние изменилось»; UI подписывается,
-        не наоборот.
-  Пример: GameEvents.RaiseResourceChanged → ResourceBarPresenter обновляет цифры.
+  Идея: системы (и сейчас behavior для mode-событий) публикуют факты;
+        UI подписывается, не наоборот.
+  Пример: GameEvents.RaiseResourceChanged → ResourceListPresenter обновляет строки;
+          RaiseProductionModeChanged(ModeId) → TowerPresenter обновляет overlay.
+
+Config validation at boot
+  Идея: битый контент не должен «тихо» жить в рантайме.
+  Пример: ConfigValidator.ValidateOrThrow в GameBootstrap до GameServices.
 
 
 ================================================================================
@@ -30,7 +42,7 @@ GoF и близкие
 
 Strategy (Стратегия)
   Идея: один интерфейс, разные реализации; вызывающий код не знает деталей.
-  Пример: IRoomBehavior — ProductionRoomBehavior, OpenUiRoomBehavior, Passive…
+  Пример: IRoomBehavior — ProductionRoomBehavior (OpenUi/Passive — позже);
           RoomBehaviorSystem вызывает behavior.Tick(), не зная тип комнаты.
 
 Plugin (наш вариант Strategy + Unity)
@@ -45,8 +57,8 @@ Template Method (Шаблонный метод)
 
 Observer (Наблюдатель)
   Идея: издатель уведомляет подписчиков об изменении, не зная кто они.
-  Пример: GameEvents.GameTick, ResourceChanged, RoomBuilt;
-          Presenters подписываются в OnEnable, отписываются в OnDisable.
+  Пример: GameEvents.GameTick, ResourceChanged, RoomBuilt, ProductionModeChanged;
+          Presenters подписываются при открытии UI / Initialize, отписываются в OnDestroy.
 
 Facade (Фасад)
   Идея: простая точка входа к группе подсистем.
@@ -55,8 +67,8 @@ Facade (Фасад)
 
 DTO (Data Transfer Object)
   Идея: объект только с данными для передачи между слоями, без логики.
-  Пример: RoomStatusInfo (что показать на overlay), RoomClickResult (какой UI
-          открыть), TickContext (данные одного тика).
+  Пример: RoomStatusInfo, RoomClickResult, TickContext, OperationModeInfo,
+          ResourceAmountSave (сейв кошелька).
 
 Service Locator (лёгкий)
   Идея: общий реестр сервисов; код запрашивает зависимости из одного места.
@@ -64,11 +76,11 @@ Service Locator (лёгкий)
 
 Prototype (задел)
   Идея: копия объекта без разделения ссылок на вложенные коллекции.
-  Пример: ProductionBehaviorState.Clone() — копия ElapsedByMode; пока не вызывается.
+  Пример: ProductionBehaviorState.Clone() — копия ElapsedByMode.
 
 Memento (задел, фаза 6)
   Идея: сохранить и восстановить внутреннее состояние без раскрытия деталей.
-  Пример: behavior.SerializeState / DeserializeState + SaveSystem.
+  Пример: behavior.SerializeState / DeserializeState + будущий SaveSystem.
 
 
 ================================================================================

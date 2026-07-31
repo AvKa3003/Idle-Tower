@@ -4,6 +4,7 @@ using IdleTower.Core.Events;
 using IdleTower.Data.Runtime;
 using IdleTower.Rooms;
 using IdleTower.Rooms.Behaviors;
+using IdleTower.Rooms.Production;
 
 namespace IdleTower.Systems
 {
@@ -46,7 +47,7 @@ namespace IdleTower.Systems
             return context.TowerRoom.BuiltRoom.Behavior.OnRoomClicked(context);
         }
 
-        public bool TryUnlockMode(int roomIndex, int modeIndex)
+        public bool TryUnlockMode(int roomIndex, ModeId modeId)
         {
             if (!TryCreateContext(roomIndex, out var context))
                 return false;
@@ -54,10 +55,10 @@ namespace IdleTower.Systems
             if (context.TowerRoom.BuiltRoom?.Behavior is not ProductionRoomBehavior production)
                 return false;
 
-            return production.TryUnlockMode(context, modeIndex);
+            return production.TryUnlockMode(context, modeId);
         }
 
-        public bool TrySetMode(int roomIndex, int modeIndex)
+        public bool TrySetMode(int roomIndex, ModeId modeId)
         {
             if (!TryCreateContext(roomIndex, out var context))
                 return false;
@@ -65,7 +66,7 @@ namespace IdleTower.Systems
             if (context.TowerRoom.BuiltRoom?.Behavior is not ProductionRoomBehavior production)
                 return false;
 
-            return production.TrySetMode(context, modeIndex);
+            return production.TrySetMode(context, modeId);
         }
 
         public IReadOnlyList<OperationModeInfo> GetOperationModes(int roomIndex)

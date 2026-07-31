@@ -5,7 +5,7 @@ using UnityEngine;
 namespace IdleTower.Core
 {
     /// <summary>
-    /// Точка входа сцены: конфиги → GameServices → тик → MainTowerPresenter.
+    /// Точка входа сцены: валидация конфигов → GameServices → тик → MainTowerPresenter.
     /// </summary>
     public class GameBootstrap : MonoBehaviour
     {
@@ -51,38 +51,20 @@ namespace IdleTower.Core
                 return false;
             }
 
-            LogConfigWarnings(balanceConfig, buildingTreeConfig);
+            try
+            {
+                ConfigValidator.ValidateOrThrow(balanceConfig, buildingTreeConfig);
+            }
+            catch (System.Exception ex)
+            {
+                Debug.LogError(ex.Message, this);
+                throw;
+            }
 
             services = new GameServices(balanceConfig, buildingTreeConfig);
             services.InitializeNewGame();
             mainTowerPresenter.Initialize(services);
             return true;
-        }
-
-        private static void LogConfigWarnings(GameBalanceConfig balance, BuildingTreeConfig buildingTree)
-        {
-            if (balance.AllResources == null || balance.AllResources.Length == 0)
-                Debug.LogWarning("[GameBootstrap] GameBalanceConfig.AllResources пуст — модалка ресурсов будет пустой.");
-
-            var rooms = buildingTree.AllRooms;
-            if (rooms == null || rooms.Length == 0)
-            {
-                Debug.LogWarning("[GameBootstrap] BuildingTreeConfig.AllRooms пуст — в RoomSelection не будет вариантов.");
-                return;
-            }
-
-            for (var i = 0; i < rooms.Length; i++)
-            {
-                var room = rooms[i];
-                if (room == null)
-                {
-                    Debug.LogWarning($"[GameBootstrap] BuildingTreeConfig.AllRooms[{i}] = null.");
-                    continue;
-                }
-
-                if (room.Behavior == null)
-                    Debug.LogWarning($"[GameBootstrap] Room '{room.name}' без Behavior — постройка не сработает.");
-            }
         }
     }
 }

@@ -9,16 +9,8 @@ namespace IdleTower.Data.Definitions
         [SerializeField] private string displayName;
         [SerializeField] private Sprite icon;
 
-        public string Id => id;
+        public ResourceId Id => ResourceId.FromSerialized(id);
         public string DisplayName => displayName;
         public Sprite Icon => icon;
-
-#if UNITY_EDITOR
-        private void OnValidate()
-        {
-            if (string.IsNullOrWhiteSpace(id) && !string.IsNullOrWhiteSpace(name))
-                id = name.Trim().ToLowerInvariant().Replace(" ", "_");
-        }
-#endif
     }
 }

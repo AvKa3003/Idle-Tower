@@ -18,7 +18,7 @@ namespace IdleTower.Rooms.Production
         [SerializeField] private UnlockRule[] unlockRules;
         [SerializeField] private bool unlockedByDefault;
 
-        public string Id => id;
+        public ModeId Id => ModeId.FromSerialized(id);
         public string DisplayName => displayName;
         public Sprite Icon => icon;
         public ResourceCost[] OutputPerCycle => outputPerCycle ?? Array.Empty<ResourceCost>();

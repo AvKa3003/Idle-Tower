@@ -2,6 +2,7 @@ using IdleTower.Core;
 using IdleTower.Core.Events;
 using IdleTower.Data.Definitions;
 using IdleTower.Rooms;
+using IdleTower.Rooms.Production;
 using IdleTower.Tower;
 using IdleTower.UI.Presenters.Rooms;
 using UnityEngine;
@@ -110,13 +111,13 @@ namespace IdleTower.UI.Presenters
             RefreshAllRoomOverlays();
         }
 
-        private void OnProductionModeChanged(int roomIndex, int modeIndex)
+        private void OnProductionModeChanged(int roomIndex, ModeId modeId)
         {
             RefreshRoomOverlay(roomIndex);
             productionMode?.NotifyRoomModeChanged(roomIndex);
         }
 
-        private void OnOperationModeUnlocked(int roomIndex, int modeIndex)
+        private void OnOperationModeUnlocked(int roomIndex, ModeId modeId)
         {
             RefreshRoomOverlay(roomIndex);
             productionMode?.NotifyRoomModeChanged(roomIndex);

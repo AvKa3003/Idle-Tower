@@ -86,13 +86,13 @@ namespace IdleTower.UI.Presenters
         private OperationOptionDisplay BuildDisplay(OperationModeInfo info)
         {
             var mode = info.Mode;
-            var label = string.IsNullOrEmpty(mode.DisplayName) ? mode.Id : mode.DisplayName;
+            var label = string.IsNullOrEmpty(mode.DisplayName) ? mode.Id.Value : mode.DisplayName;
             var detail = BuildModeDetailText(mode, info);
 
             if (info.IsUnlocked)
             {
                 return new OperationOptionDisplay(
-                    info.ModeIndex,
+                    info.ModeId,
                     label,
                     detail,
                     info.IsActive,
@@ -104,7 +104,7 @@ namespace IdleTower.UI.Presenters
             if (!info.RulesMet)
             {
                 return new OperationOptionDisplay(
-                    info.ModeIndex,
+                    info.ModeId,
                     label,
                     detail,
                     isActive: false,
@@ -114,7 +114,7 @@ namespace IdleTower.UI.Presenters
             }
 
             return new OperationOptionDisplay(
-                info.ModeIndex,
+                info.ModeId,
                 label,
                 detail,
                 isActive: false,
@@ -146,12 +146,12 @@ namespace IdleTower.UI.Presenters
                 : $"Открыть: {unlockCost}";
         }
 
-        private void HandleUnlockClicked(int modeIndex)
+        private void HandleUnlockClicked(ModeId modeId)
         {
             if (_services == null || _roomIndex < 0)
                 return;
 
-            _services.RoomBehaviors.TryUnlockMode(_roomIndex, modeIndex);
+            _services.RoomBehaviors.TryUnlockMode(_roomIndex, modeId);
         }
 
         public void NotifyRoomModeChanged(int roomIndex)
@@ -160,12 +160,12 @@ namespace IdleTower.UI.Presenters
                 RefreshOptions();
         }
 
-        private void HandleSelectClicked(int modeIndex)
+        private void HandleSelectClicked(ModeId modeId)
         {
             if (_services == null || _roomIndex < 0)
                 return;
 
-            _services.RoomBehaviors.TrySetMode(_roomIndex, modeIndex);
+            _services.RoomBehaviors.TrySetMode(_roomIndex, modeId);
         }
 
         private void OnResourceChanged(ResourceDefinition resource, int newAmount)

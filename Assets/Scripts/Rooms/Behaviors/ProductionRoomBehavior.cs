@@ -22,15 +22,20 @@ namespace IdleTower.Rooms.Behaviors
         {
             var state = GetState(context);
             if (state == null)
-                return;
+                throw new InvalidOperationException(
+                    $"[ProductionRoomBehavior] '{name}': нет ProductionBehaviorState на этаже {context.RoomIndex}.");
+
+            if (Modes.Length == 0)
+                throw new InvalidOperationException($"[ProductionRoomBehavior] '{name}': Modes пуст.");
 
             for (var i = 0; i < Modes.Length; i++)
             {
-                if (i == 0 || Modes[i].UnlockedByDefault)
-                    state.UnlockMode(i);
+                var mode = Modes[i];
+                if (i == 0 || mode.UnlockedByDefault)
+                    state.UnlockMode(mode.Id);
             }
 
-            state.ActiveModeIndex = 0;
+            state.ActiveModeId = Modes[0].Id;
         }
 
         public override RoomClickResult OnRoomClicked(RoomBehaviorContext context)
@@ -44,13 +49,11 @@ namespace IdleTower.Rooms.Behaviors
         public override void Tick(RoomBehaviorContext context, TickContext tickContext)
         {
             var state = GetState(context);
-            if (state == null || Modes.Length == 0)
-                return;
+            if (state == null)
+                throw new InvalidOperationException(
+                    $"[ProductionRoomBehavior] '{name}': нет ProductionBehaviorState на этаже {context.RoomIndex}.");
 
-            var modeIndex = Mathf.Clamp(state.ActiveModeIndex, 0, Modes.Length - 1);
-            state.ActiveModeIndex = modeIndex;
-
-            var mode = Modes[modeIndex];
+            var mode = GetModeOrThrow(state.ActiveModeId);
             var duration = mode.CycleDuration.TotalSeconds;
             if (duration <= 0f)
                 return;
@@ -60,7 +63,7 @@ namespace IdleTower.Rooms.Behaviors
                 ? resources.CanAfford(mode.InputPerCycle)
                 : true;
 
-            var elapsed = state.ActiveElapsedSeconds;
+            var elapsed = state.GetElapsedSeconds(mode.Id);
             if (SimulationTimer.AdvanceCycle(ref elapsed, tickContext.TickDelta, duration, canAfford))
             {
                 if (mode.HasCraftInput)
@@ -69,11 +72,11 @@ namespace IdleTower.Rooms.Behaviors
                 resources.Add(mode.OutputPerCycle);
             }
 
-            state.ActiveElapsedSeconds = elapsed;
+            state.SetElapsedSeconds(mode.Id, elapsed);
         }
 
         public override RoomBehaviorState CreateDefaultState()
-            => new ProductionBehaviorState { ActiveModeIndex = 0 };
+            => new ProductionBehaviorState();
 
         public override string SerializeState(RoomBehaviorState state)
         {
@@ -96,21 +99,21 @@ namespace IdleTower.Rooms.Behaviors
         public override RoomStatusInfo GetRoomStatusInfo(RoomBehaviorContext context)
         {
             var state = GetState(context);
-            if (state == null || Modes.Length == 0)
-                return new RoomStatusInfo();
+            if (state == null)
+                throw new InvalidOperationException(
+                    $"[ProductionRoomBehavior] '{name}': нет ProductionBehaviorState на этаже {context.RoomIndex}.");
 
-            var modeIndex = Mathf.Clamp(state.ActiveModeIndex, 0, Modes.Length - 1);
-            var mode = Modes[modeIndex];
+            var mode = GetModeOrThrow(state.ActiveModeId);
             var duration = mode.CycleDuration.TotalSeconds;
             var resources = context.Services.Resources;
             var canAfford = mode.HasCraftInput
                 ? resources.CanAfford(mode.InputPerCycle)
                 : true;
-            var elapsed = state.ActiveElapsedSeconds;
+            var elapsed = state.GetElapsedSeconds(mode.Id);
 
             var info = new RoomStatusInfo
             {
-                ModeLabel = mode.DisplayName,
+                ModeLabel = string.IsNullOrEmpty(mode.DisplayName) ? mode.Id.Value : mode.DisplayName,
                 InputPerCycle = mode.InputPerCycle,
                 OutputPerCycle = mode.OutputPerCycle,
                 CycleSummary = ResourceTextFormat.FormatCycle(mode.InputPerCycle, mode.OutputPerCycle),
@@ -130,16 +133,15 @@ namespace IdleTower.Rooms.Behaviors
             return info;
         }
 
-        public bool TryUnlockMode(RoomBehaviorContext context, int modeIndex)
+        public bool TryUnlockMode(RoomBehaviorContext context, ModeId modeId)
         {
             var state = GetState(context);
-            if (state == null || modeIndex < 0 || modeIndex >= Modes.Length)
+            if (state == null || !TryGetMode(modeId, out var mode))
                 return false;
 
-            if (state.IsModeUnlocked(modeIndex))
+            if (state.IsModeUnlocked(mode.Id))
                 return false;
 
-            var mode = Modes[modeIndex];
             var unlockTree = context.Services.UnlockTree;
             if (!AreModeUnlockRulesMet(mode, unlockTree, context.Tower))
                 return false;
@@ -151,33 +153,34 @@ namespace IdleTower.Rooms.Behaviors
             if (!resources.TrySpend(mode.UnlockCost))
                 return false;
 
-            state.UnlockMode(modeIndex);
-            GameEvents.RaiseOperationModeUnlocked(context.RoomIndex, modeIndex);
+            state.UnlockMode(mode.Id);
+            GameEvents.RaiseOperationModeUnlocked(context.RoomIndex, mode.Id);
             return true;
         }
 
-        public bool TrySetMode(RoomBehaviorContext context, int modeIndex)
+        public bool TrySetMode(RoomBehaviorContext context, ModeId modeId)
         {
             var state = GetState(context);
-            if (state == null || modeIndex < 0 || modeIndex >= Modes.Length)
+            if (state == null || !TryGetMode(modeId, out var mode))
                 return false;
 
-            if (!state.IsModeUnlocked(modeIndex))
+            if (!state.IsModeUnlocked(mode.Id))
                 return false;
 
-            if (state.ActiveModeIndex == modeIndex)
+            if (state.ActiveModeId == mode.Id)
                 return true;
 
-            state.ActiveModeIndex = modeIndex;
-            GameEvents.RaiseProductionModeChanged(context.RoomIndex, modeIndex);
+            state.ActiveModeId = mode.Id;
+            GameEvents.RaiseProductionModeChanged(context.RoomIndex, mode.Id);
             return true;
         }
 
         public IReadOnlyList<OperationModeInfo> GetOperationModes(RoomBehaviorContext context)
         {
             var state = GetState(context);
-            if (state == null || Modes.Length == 0)
-                return Array.Empty<OperationModeInfo>();
+            if (state == null)
+                throw new InvalidOperationException(
+                    $"[ProductionRoomBehavior] '{name}': нет ProductionBehaviorState на этаже {context.RoomIndex}.");
 
             var unlockTree = context.Services.UnlockTree;
             var resources = context.Services.Resources;
@@ -187,20 +190,49 @@ namespace IdleTower.Rooms.Behaviors
             {
                 var mode = Modes[i];
                 var rulesMet = AreModeUnlockRulesMet(mode, unlockTree, context.Tower);
-                var isUnlocked = state.IsModeUnlocked(i);
+                var isUnlocked = state.IsModeUnlocked(mode.Id);
 
                 list.Add(new OperationModeInfo
                 {
-                    ModeIndex = i,
+                    ModeId = mode.Id,
                     Mode = mode,
                     IsUnlocked = isUnlocked,
-                    IsActive = state.ActiveModeIndex == i,
+                    IsActive = state.ActiveModeId == mode.Id,
                     RulesMet = rulesMet,
                     CanAffordUnlock = isUnlocked || (rulesMet && resources.CanAfford(mode.UnlockCost))
                 });
             }
 
             return list;
+        }
+
+        private OperationMode GetModeOrThrow(ModeId modeId)
+        {
+            if (!TryGetMode(modeId, out var mode))
+            {
+                throw new InvalidOperationException(
+                    $"[ProductionRoomBehavior] '{name}': режим '{modeId.Value}' не найден в Modes.");
+            }
+
+            return mode;
+        }
+
+        private bool TryGetMode(ModeId modeId, out OperationMode mode)
+        {
+            mode = null;
+            if (modeId.IsEmpty)
+                return false;
+
+            for (var i = 0; i < Modes.Length; i++)
+            {
+                if (Modes[i].Id != modeId)
+                    continue;
+
+                mode = Modes[i];
+                return true;
+            }
+
+            return false;
         }
 
         private static bool AreModeUnlockRulesMet(
@@ -226,7 +258,7 @@ namespace IdleTower.Rooms.Behaviors
 
             for (var i = 0; i < Modes.Length; i++)
             {
-                if (!state.IsModeUnlocked(i))
+                if (!state.IsModeUnlocked(Modes[i].Id))
                     return true;
             }
 
@@ -236,27 +268,32 @@ namespace IdleTower.Rooms.Behaviors
         [Serializable]
         private class ProductionStateDto
         {
-            public int activeModeIndex;
-            public int[] unlockedModeIndices = Array.Empty<int>();
-            public int[] elapsedModeIndices = Array.Empty<int>();
+            public string activeModeId;
+            public string[] unlockedModeIds = Array.Empty<string>();
+            public string[] elapsedModeIds = Array.Empty<string>();
             public float[] elapsedSeconds = Array.Empty<float>();
 
             public static ProductionStateDto FromState(ProductionBehaviorState state)
             {
+                var unlocked = state.UnlockedModeIds;
+                var unlockedIds = new string[unlocked.Count];
+                for (var i = 0; i < unlocked.Count; i++)
+                    unlockedIds[i] = unlocked[i].Value;
+
                 var dto = new ProductionStateDto
                 {
-                    activeModeIndex = state.ActiveModeIndex,
-                    unlockedModeIndices = state.UnlockedModeIndices.ToArray()
+                    activeModeId = state.ActiveModeId.Value,
+                    unlockedModeIds = unlockedIds
                 };
 
                 var elapsed = state.ElapsedByMode;
-                dto.elapsedModeIndices = new int[elapsed.Count];
+                dto.elapsedModeIds = new string[elapsed.Count];
                 dto.elapsedSeconds = new float[elapsed.Count];
 
                 var index = 0;
                 foreach (var pair in elapsed)
                 {
-                    dto.elapsedModeIndices[index] = pair.Key;
+                    dto.elapsedModeIds[index] = pair.Key.Value;
                     dto.elapsedSeconds[index] = pair.Value;
                     index++;
                 }
@@ -266,20 +303,25 @@ namespace IdleTower.Rooms.Behaviors
 
             public ProductionBehaviorState ToState()
             {
+                var unlocked = new List<ModeId>();
+                if (unlockedModeIds != null)
+                {
+                    for (var i = 0; i < unlockedModeIds.Length; i++)
+                        unlocked.Add(ModeId.FromSerialized(unlockedModeIds[i]));
+                }
+
                 var state = new ProductionBehaviorState
                 {
-                    ActiveModeIndex = activeModeIndex,
-                    UnlockedModeIndices = unlockedModeIndices != null
-                        ? new List<int>(unlockedModeIndices)
-                        : new List<int>()
+                    ActiveModeId = ModeId.FromSerialized(activeModeId),
+                    UnlockedModeIds = unlocked
                 };
 
-                if (elapsedModeIndices == null || elapsedSeconds == null)
+                if (elapsedModeIds == null || elapsedSeconds == null)
                     return state;
 
-                var count = Mathf.Min(elapsedModeIndices.Length, elapsedSeconds.Length);
+                var count = Mathf.Min(elapsedModeIds.Length, elapsedSeconds.Length);
                 for (var i = 0; i < count; i++)
-                    state.SetElapsedSeconds(elapsedModeIndices[i], elapsedSeconds[i]);
+                    state.SetElapsedSeconds(ModeId.FromSerialized(elapsedModeIds[i]), elapsedSeconds[i]);
 
                 return state;
             }

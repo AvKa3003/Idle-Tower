@@ -25,9 +25,10 @@ namespace IdleTower.Systems
 
             foreach (var entry in balance.StartingResources)
             {
-                if (entry.Resource == null || entry.Amount <= 0)
+                if (entry.Amount <= 0)
                     continue;
 
+                EnsureCostResource(entry, "StartingResources");
                 Wallet.SetAmount(entry.Resource, entry.Amount);
                 GameEvents.RaiseResourceChanged(entry.Resource, entry.Amount);
             }
@@ -40,9 +41,7 @@ namespace IdleTower.Systems
 
             foreach (var cost in costs)
             {
-                if (cost.Resource == null)
-                    continue;
-
+                EnsureCostResource(cost, "CanAfford");
                 if (Wallet.GetAmount(cost.Resource) < cost.Amount)
                     return false;
             }
@@ -60,7 +59,8 @@ namespace IdleTower.Systems
 
             foreach (var cost in costs)
             {
-                if (cost.Resource == null || cost.Amount <= 0)
+                EnsureCostResource(cost, "TrySpend");
+                if (cost.Amount <= 0)
                     continue;
 
                 var newAmount = Wallet.GetAmount(cost.Resource) - cost.Amount;
@@ -73,8 +73,11 @@ namespace IdleTower.Systems
 
         public void Add(ResourceDefinition resource, int amount)
         {
-            if (resource == null || amount == 0)
+            if (amount == 0)
                 return;
+
+            if (resource == null)
+                throw new ArgumentNullException(nameof(resource));
 
             Wallet.Add(resource, amount);
             GameEvents.RaiseResourceChanged(resource, Wallet.GetAmount(resource));
@@ -87,11 +90,18 @@ namespace IdleTower.Systems
 
             foreach (var output in outputs)
             {
-                if (output.Resource == null || output.Amount <= 0)
+                EnsureCostResource(output, "Add");
+                if (output.Amount <= 0)
                     continue;
 
                 Add(output.Resource, output.Amount);
             }
+        }
+
+        private static void EnsureCostResource(ResourceCost cost, string context)
+        {
+            if (cost.Resource == null)
+                throw new InvalidOperationException($"[ResourceSystem.{context}] ResourceCost.Resource = null.");
         }
     }
 }

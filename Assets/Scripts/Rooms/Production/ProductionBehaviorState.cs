@@ -5,40 +5,53 @@ namespace IdleTower.Rooms.Production
 {
     public class ProductionBehaviorState : RoomBehaviorState
     {
-        private readonly Dictionary<int, float> _elapsedByMode = new();
+        private readonly Dictionary<ModeId, float> _elapsedByMode = new();
 
-        public int ActiveModeIndex;
-        public List<int> UnlockedModeIndices = new();
+        public ModeId ActiveModeId;
+        public List<ModeId> UnlockedModeIds = new();
 
-        public float GetElapsedSeconds(int modeIndex)
-            => _elapsedByMode.TryGetValue(modeIndex, out var elapsed) ? elapsed : 0f;
+        public float GetElapsedSeconds(ModeId modeId)
+        {
+            if (modeId.IsEmpty)
+                return 0f;
 
-        public void SetElapsedSeconds(int modeIndex, float seconds)
-            => _elapsedByMode[modeIndex] = seconds < 0f ? 0f : seconds;
+            return _elapsedByMode.TryGetValue(modeId, out var elapsed) ? elapsed : 0f;
+        }
+
+        public void SetElapsedSeconds(ModeId modeId, float seconds)
+        {
+            if (modeId.IsEmpty)
+                return;
+
+            _elapsedByMode[modeId] = seconds < 0f ? 0f : seconds;
+        }
 
         public float ActiveElapsedSeconds
         {
-            get => GetElapsedSeconds(ActiveModeIndex);
-            set => SetElapsedSeconds(ActiveModeIndex, value);
+            get => GetElapsedSeconds(ActiveModeId);
+            set => SetElapsedSeconds(ActiveModeId, value);
         }
 
-        public IReadOnlyDictionary<int, float> ElapsedByMode => _elapsedByMode;
+        public IReadOnlyDictionary<ModeId, float> ElapsedByMode => _elapsedByMode;
 
-        public bool IsModeUnlocked(int modeIndex)
-            => UnlockedModeIndices.Contains(modeIndex);
+        public bool IsModeUnlocked(ModeId modeId)
+            => !modeId.IsEmpty && UnlockedModeIds.Contains(modeId);
 
-        public void UnlockMode(int modeIndex)
+        public void UnlockMode(ModeId modeId)
         {
-            if (!UnlockedModeIndices.Contains(modeIndex))
-                UnlockedModeIndices.Add(modeIndex);
+            if (modeId.IsEmpty)
+                return;
+
+            if (!UnlockedModeIds.Contains(modeId))
+                UnlockedModeIds.Add(modeId);
         }
 
         public override RoomBehaviorState Clone()
         {
             var clone = new ProductionBehaviorState
             {
-                ActiveModeIndex = ActiveModeIndex,
-                UnlockedModeIndices = new List<int>(UnlockedModeIndices)
+                ActiveModeId = ActiveModeId,
+                UnlockedModeIds = new List<ModeId>(UnlockedModeIds)
             };
 
             foreach (var pair in _elapsedByMode)

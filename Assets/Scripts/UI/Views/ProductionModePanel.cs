@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using IdleTower.Rooms.Production;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -14,8 +15,8 @@ namespace IdleTower.UI.Views
 
         private readonly List<OperationOptionView> _options = new();
 
-        public event Action<int> UnlockClicked;
-        public event Action<int> SelectClicked;
+        public event Action<ModeId> UnlockClicked;
+        public event Action<ModeId> SelectClicked;
         public event Action CloseClicked;
 
         private void Awake()
@@ -112,14 +113,14 @@ namespace IdleTower.UI.Views
             _options.Clear();
         }
 
-        private void HandleUnlockClicked(int modeIndex)
+        private void HandleUnlockClicked(ModeId modeId)
         {
-            UnlockClicked?.Invoke(modeIndex);
+            UnlockClicked?.Invoke(modeId);
         }
 
-        private void HandleSelectClicked(int modeIndex)
+        private void HandleSelectClicked(ModeId modeId)
         {
-            SelectClicked?.Invoke(modeIndex);
+            SelectClicked?.Invoke(modeId);
         }
 
         private void HandleCloseClick()
