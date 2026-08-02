@@ -12,7 +12,7 @@ namespace IdleTower.UI.Presenters
     ///
     /// View:        MainTowerScreen
     /// Systems:      —
-    /// Presenters:   Header, RoomSelection, ProductionMode, Tower
+    /// Presenters:   Header, RoomSelection, ProductionMode, Tower, OfflineResult
     /// GameEvents:   —
     /// </summary>
     public class MainTowerPresenter : MonoBehaviour
@@ -23,6 +23,7 @@ namespace IdleTower.UI.Presenters
         [SerializeField] private RoomSelectionPresenter roomSelection;
         [SerializeField] private ProductionModePresenter productionMode;
         [SerializeField] private TowerPresenter tower;
+        [SerializeField] private OfflineResultPresenter offlineResult;
 
         private bool _initialized;
 
@@ -36,13 +37,16 @@ namespace IdleTower.UI.Presenters
 
             roomSelection?.Initialize(services);
             productionMode?.Initialize(services);
-            header?.Initialize(services, roomSelection, productionMode);
+            offlineResult?.Initialize(services);
+            header?.Initialize(services, roomSelection, productionMode, offlineResult);
             tower?.Initialize(services);
 
             if (screenManager != null)
                 screenManager.Show(ScreenId.MainTower);
             else
                 mainTowerScreen?.Show();
+
+            offlineResult?.TryShowFromLastCatchUp();
 
             _initialized = true;
         }

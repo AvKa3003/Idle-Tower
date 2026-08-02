@@ -75,6 +75,40 @@ namespace IdleTower.Core
             return $"{duration.Seconds} с";
         }
 
+        /// <summary>Человекочитаемый интервал для офлайн-сводки (часы / минуты / секунды).</summary>
+        public static string FormatElapsedSeconds(float totalSeconds)
+        {
+            if (totalSeconds < 0f)
+                totalSeconds = 0f;
+
+            var total = (long)totalSeconds;
+            return FormatElapsedSeconds(total);
+        }
+
+        public static string FormatElapsedSeconds(long totalSeconds)
+        {
+            if (totalSeconds < 0)
+                totalSeconds = 0;
+
+            var hours = totalSeconds / 3600;
+            var minutes = (totalSeconds % 3600) / 60;
+            var seconds = totalSeconds % 60;
+
+            if (hours > 0 && minutes > 0)
+                return $"{hours} ч {minutes} мин";
+
+            if (hours > 0)
+                return $"{hours} ч";
+
+            if (minutes > 0 && seconds > 0)
+                return $"{minutes} мин {seconds} с";
+
+            if (minutes > 0)
+                return $"{minutes} мин";
+
+            return $"{seconds} с";
+        }
+
         public static string FormatModeDetail(ResourceCost[] input, ResourceCost[] output, GameDuration duration)
         {
             var cycle = FormatCycle(input, output);

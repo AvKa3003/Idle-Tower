@@ -15,8 +15,9 @@
   [x] ConfigValidator.ValidateOrThrow при старте (до GameServices)
   [x] UI ресурсов: Header + модалка ResourceList (ResourceBar удалён)
   [x] Presenter = слой вывода игроку (UI / SFX / VFX…); SfxPlayer — Presenter звука
-  [x] Офлайн: OfflineSimulationSystem после TryLoad, cap 2ч (фикс.), без UI-статистики;
-      savedUnixTimeUtc = watermark UTC (+0), не уменьшается при откате часов
+  [x] Офлайн: OfflineSimulationSystem после TryLoad, cap 2ч (фикс.);
+      savedUnixTimeUtc = watermark UTC (+0), не уменьшается при откате часов;
+      OfflineResultPanel после Load (сводка + дельты ресурсов)
   [ ] Raise GameEvents только из Systems — целевое правило; сейчас mode-события
       Raise'ит ProductionRoomBehavior (выровнять позже)
 
@@ -325,6 +326,8 @@ Scripts/
 │   │   ├── ResourceListPanel.cs
 │   │   ├── ResourceListRowView.cs
 │   │   ├── ResourceListRowDisplay.cs
+│   │   ├── OfflineResultPanel.cs
+│   │   ├── OfflineResultRowView.cs / OfflineResultRowDisplay.cs
 │   │   ├── RoomSelectionPanel.cs
 │   │   ├── RoomOptionView.cs / RoomOptionDisplay.cs
 │   │   ├── ProductionModePanel.cs
@@ -332,6 +335,7 @@ Scripts/
 │   └── Presenters/
 │       ├── HeaderPresenter.cs
 │       ├── ResourceListPresenter.cs
+│       ├── OfflineResultPresenter.cs
 │       ├── RoomSelectionPresenter.cs
 │       ├── TowerPresenter.cs
 │       ├── ProductionModePresenter.cs
@@ -570,7 +574,14 @@ Scripts/
     - savedUnixTimeUtc — watermark UTC (unix +0), max(now, previous); откат часов не уменьшает
     - Catch-up: если now ≤ watermark → 0; иначе now − watermark → clamp 2ч → SimulateForSeconds
     - После догона watermark = now; GameEvents.Suppress на время симуляции
-    - UI статистики офлайна пока нет; лимит позже от улучшений
+    - LastResult: real/simulated/wasCapped + дельты кошелька (до/после)
+    - UI: OfflineResultPresenter после MainTower Init → TryShowFromLastCatchUp (если Applied)
+    - Лимит позже от улучшений
+
+4.10 OfflineResult (UI)
+    - OfflineResultPanel + OfflineResultRowView + OfflineResultPresenter
+    - Сводка: «Вас не было» / «Начислено за» (+ пометка лимита); строки ±ресурс
+    - Показ только при Applied; Header «Ресурсы» закрывает попап
 
 
 ================================================================================
@@ -617,6 +628,7 @@ Presenter: команды → Systems; факты → GameEvents; обновля
 Обязательные пары (актуально):
   - HeaderPanel             + HeaderPresenter
   - ResourceListPanel       + ResourceListPresenter   (модалка; строки ResourceListRow*)
+  - OfflineResultPanel      + OfflineResultPresenter  (после Load; строки OfflineResultRow*)
   - RoomSelectionPanel      + RoomSelectionPresenter
   - ProductionModePanel     + ProductionModePresenter
   - MainTowerScreen         + MainTowerPresenter
@@ -624,8 +636,12 @@ Presenter: команды → Systems; факты → GameEvents; обновля
   - EmptyRoomView / RoomView — клики → TowerPresenter
 
 Поток ресурсов:
-  Header «Ресурсы» → закрыть RoomSelection/ProductionMode → ResourceList.Open
+  Header «Ресурсы» → закрыть RoomSelection/ProductionMode/OfflineResult → ResourceList.Open
   ResourceChanged обновляет список только пока модалка открыта.
+
+Офлайн-отчёт:
+  TryLoad → Offline.ApplyCatchUp → LastResult
+  MainTowerPresenter.Initialize → OfflineResult.TryShowFromLastCatchUp (если Applied)
 
 UI поведений:
   - Behavior → RoomClickResult.OpenUi (RoomUiId); TowerPresenter / RoomUiRouter
@@ -876,7 +892,7 @@ GameEvents / Presenters вывода (звук постройки — реали
 ФАЗА 6 — Backlog
 ────────────────────────────────────────────────────────────────────────────────
 
-  UI статистики офлайна; max offline от улучшений; OpenUiRoomBehavior, ScreenChanged,
+  max offline от улучшений; OpenUiRoomBehavior, ScreenChanged,
   больше SFX на других GameEvents, PassiveRoomBehavior,
   выравнивание Raise mode-событий,
   batch ResourceChanged; при Addressables — EqualityComparer по Id для SO

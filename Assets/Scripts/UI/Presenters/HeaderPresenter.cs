@@ -12,7 +12,7 @@ namespace IdleTower.UI.Presenters
     ///
     /// View:        HeaderPanel
     /// Systems:      —
-    /// Presenters:   ResourceList (вызывает); RoomSelection, ProductionMode (закрывает)
+    /// Presenters:   ResourceList (вызывает); RoomSelection, ProductionMode, OfflineResult (закрывает)
     /// GameEvents:   —
     /// </summary>
     public class HeaderPresenter : MonoBehaviour
@@ -22,15 +22,18 @@ namespace IdleTower.UI.Presenters
 
         private RoomSelectionPresenter _roomSelection;
         private ProductionModePresenter _productionMode;
+        private OfflineResultPresenter _offlineResult;
         private bool _subscribed;
 
         public void Initialize(
             GameServices services,
             RoomSelectionPresenter roomSelection,
-            ProductionModePresenter productionMode)
+            ProductionModePresenter productionMode,
+            OfflineResultPresenter offlineResult = null)
         {
             _roomSelection = roomSelection;
             _productionMode = productionMode;
+            _offlineResult = offlineResult;
             resourceList?.Initialize(services);
             Subscribe();
         }
@@ -62,6 +65,7 @@ namespace IdleTower.UI.Presenters
         {
             _roomSelection?.Close();
             _productionMode?.Close();
+            _offlineResult?.Close();
             resourceList?.Open();
         }
     }
