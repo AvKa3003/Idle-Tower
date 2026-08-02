@@ -1,7 +1,7 @@
 ================================================================================
 АРХИТЕКТУРА ПРОЕКТА — IDLE TOWER (по мотивам Idle Apocalypse)
 ================================================================================
-Версия: 1.14
+Версия: 1.15
 Статус: фазы 1–5 реализованы в Scripts; Play Mode на сцене; фаза 6 — backlog
 
 Согласовано / реализовано:
@@ -15,6 +15,8 @@
   [x] ConfigValidator.ValidateOrThrow при старте (до GameServices)
   [x] UI ресурсов: Header + модалка ResourceList (ResourceBar удалён)
   [x] Presenter = слой вывода игроку (UI / SFX / VFX…); SfxPlayer — Presenter звука
+  [x] Офлайн: OfflineSimulationSystem после TryLoad, cap 2ч (фикс.), без UI-статистики;
+      savedUnixTimeUtc = watermark UTC (+0), не уменьшается при откате часов
   [ ] Raise GameEvents только из Systems — целевое правило; сейчас mode-события
       Raise'ит ProductionRoomBehavior (выровнять позже)
 
@@ -562,8 +564,13 @@ Scripts/
     - behaviorStateJson у Production: ActiveModeId, UnlockedModeIds, ElapsedByMode (все режимы)
     - Пустой слот башни не сериализуется — добавляется при Load
     - Автосейв: GameBootstrap каждые ~60с (unscaled) + pause / focus lost / quit / destroy
-    - Старт: TryLoad → иначе InitializeNewGame
-    - savedUnixTimeUtc — задел под офлайн (SimulateForSeconds позже)
+    - Старт: TryLoad (+ офлайн) → иначе InitializeNewGame
+
+4.9 OfflineSimulationSystem
+    - savedUnixTimeUtc — watermark UTC (unix +0), max(now, previous); откат часов не уменьшает
+    - Catch-up: если now ≤ watermark → 0; иначе now − watermark → clamp 2ч → SimulateForSeconds
+    - После догона watermark = now; GameEvents.Suppress на время симуляции
+    - UI статистики офлайна пока нет; лимит позже от улучшений
 
 
 ================================================================================
@@ -572,9 +579,9 @@ Scripts/
 
 5.1 Старт игры
     GameBootstrap → ConfigValidator.ValidateOrThrow
-    → GameServices + InitializeNewGame (стартовые ресурсы, пустая башня)
+    → GameServices → TryLoad (Apply + Offline.ApplyCatchUp) или InitializeNewGame
     → MainTowerPresenter.Initialize → ScreenManager.Show(MainTower)
-    → TowerView: один EmptyRoomView
+    → TowerView отражает уже догнанное состояние башни/кошелька
 
 5.2 Клик по слоту постройки
     EmptyRoomView → TowerPresenter → RoomSelectionPresenter.Open(roomIndex)
@@ -869,13 +876,13 @@ GameEvents / Presenters вывода (звук постройки — реали
 ФАЗА 6 — Backlog
 ────────────────────────────────────────────────────────────────────────────────
 
-  офлайн SimulateForSeconds по savedUnixTimeUtc, OpenUiRoomBehavior, ScreenChanged,
+  UI статистики офлайна; max offline от улучшений; OpenUiRoomBehavior, ScreenChanged,
   больше SFX на других GameEvents, PassiveRoomBehavior,
-  выравнивание Raise mode-событий, офлайн SimulateForSeconds,
+  выравнивание Raise mode-событий,
   batch ResourceChanged; при Addressables — EqualityComparer по Id для SO
 
 ================================================================================
 13. СОГЛАСОВАНИЕ (архив)
 ================================================================================
 
-[x] Базовые решения согласованы. Документ v1.13 отражает текущий код.
+[x] Базовые решения согласованы. Документ v1.15 отражает текущий код.

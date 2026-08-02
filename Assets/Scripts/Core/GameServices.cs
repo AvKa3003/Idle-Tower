@@ -18,6 +18,7 @@ namespace IdleTower.Core
         public RoomBehaviorSystem RoomBehaviors { get; }
         public ProductionSystem Production { get; }
         public SaveSystem Save { get; }
+        public OfflineSimulationSystem Offline { get; }
 
         public GameServices(GameBalanceConfig balance, BuildingTreeConfig buildingTree)
         {
@@ -34,6 +35,7 @@ namespace IdleTower.Core
             Production = new ProductionSystem(this);
             Building = new BuildingSystem(this);
             Save = new SaveSystem(this);
+            Offline = new OfflineSimulationSystem(this);
 
             TickSystem.RegisterTickable(RoomBehaviors);
         }

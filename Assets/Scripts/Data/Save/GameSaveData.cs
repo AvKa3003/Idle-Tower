@@ -13,6 +13,10 @@ namespace IdleTower.Data.Save
         public int version = 1;
         public long currentTick;
         public float tickAccumulator;
+        /// <summary>
+        /// Watermark UTC (unix seconds, +0): максимум из «время записи» и ранее виденного.
+        /// Офлайн = nowUtc − это поле; при откате часов не уменьшается.
+        /// </summary>
         public long savedUnixTimeUtc;
         public ResourceAmountSave[] resources = Array.Empty<ResourceAmountSave>();
         public TowerRoomSave[] rooms = Array.Empty<TowerRoomSave>();

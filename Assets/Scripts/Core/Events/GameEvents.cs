@@ -6,6 +6,11 @@ namespace IdleTower.Core.Events
 {
     public static class GameEvents
     {
+        /// <summary>
+        /// Подавить Raise* (офлайн catch-up): тики идут, подписчики не дергаются.
+        /// </summary>
+        public static bool Suppress { get; set; }
+
         public static event Action<ResourceDefinition, int> ResourceChanged;
         public static event Action<int, RoomDefinition> RoomBuilt;
         public static event Action<TickContext> GameTick;
@@ -17,18 +22,33 @@ namespace IdleTower.Core.Events
         // public static void RaiseScreenChanged(ScreenId id) => ScreenChanged?.Invoke(id);
 
         public static void RaiseResourceChanged(ResourceDefinition resource, int newAmount)
-            => ResourceChanged?.Invoke(resource, newAmount);
+        {
+            if (Suppress) return;
+            ResourceChanged?.Invoke(resource, newAmount);
+        }
 
         public static void RaiseRoomBuilt(int roomIndex, RoomDefinition room)
-            => RoomBuilt?.Invoke(roomIndex, room);
+        {
+            if (Suppress) return;
+            RoomBuilt?.Invoke(roomIndex, room);
+        }
 
         public static void RaiseGameTick(TickContext context)
-            => GameTick?.Invoke(context);
+        {
+            if (Suppress) return;
+            GameTick?.Invoke(context);
+        }
 
         public static void RaiseProductionModeChanged(int roomIndex, ModeId modeId)
-            => ProductionModeChanged?.Invoke(roomIndex, modeId);
+        {
+            if (Suppress) return;
+            ProductionModeChanged?.Invoke(roomIndex, modeId);
+        }
 
         public static void RaiseOperationModeUnlocked(int roomIndex, ModeId modeId)
-            => OperationModeUnlocked?.Invoke(roomIndex, modeId);
+        {
+            if (Suppress) return;
+            OperationModeUnlocked?.Invoke(roomIndex, modeId);
+        }
     }
 }

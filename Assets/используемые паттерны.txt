@@ -82,7 +82,8 @@ Prototype (задел)
 
 Memento (задел, фаза 6)
   Идея: сохранить и восстановить внутреннее состояние без раскрытия деталей.
-  Пример: behavior.SerializeState / DeserializeState + будущий SaveSystem.
+  Пример: behavior.SerializeState / DeserializeState + SaveSystem.
+  OfflineSimulationSystem: catch-up тиков после Load по savedUnixTimeUtc.
 
 
 ================================================================================

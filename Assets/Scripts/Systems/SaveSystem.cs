@@ -22,6 +22,8 @@ namespace IdleTower.Systems
         private readonly GameServices _services;
         private readonly string _filePath;
         private float _lastSaveUnscaledTime = -999f;
+        /// <summary>Максимальный UTC unix, виденный runtime (не откатывается при сдвиге часов назад).</summary>
+        private long _maxObservedUnixTimeUtc;
 
         public SaveSystem(GameServices services)
         {
@@ -30,6 +32,9 @@ namespace IdleTower.Systems
             // GetFullPath приводит к единому виду для текущей ОС.
             _filePath = Path.GetFullPath(Path.Combine(Application.persistentDataPath, FileName));
         }
+
+        /// <summary>Текущий watermark UTC для офлайна (после Load/Save).</summary>
+        public long MaxObservedUnixTimeUtc => _maxObservedUnixTimeUtc;
 
         public string FilePath => _filePath;
 
@@ -63,7 +68,10 @@ namespace IdleTower.Systems
             }
         }
 
-        /// <summary>Загрузить в runtime. false — файла нет или ошибка (вызывающий делает NewGame).</summary>
+        /// <summary>
+        /// Загрузить в runtime + офлайн catch-up по watermark (savedUnixTimeUtc).
+        /// false — файла нет или ошибка (вызывающий делает NewGame).
+        /// </summary>
         public bool TryLoad()
         {
             if (!File.Exists(_filePath))
@@ -83,6 +91,8 @@ namespace IdleTower.Systems
                 }
 
                 Apply(data);
+                _maxObservedUnixTimeUtc = Math.Max(0L, data.savedUnixTimeUtc);
+                _services.Offline.ApplyCatchUp(ref _maxObservedUnixTimeUtc);
                 Debug.Log($"[SaveSystem] Загружено: {_filePath}");
                 return true;
             }
@@ -118,12 +128,16 @@ namespace IdleTower.Systems
 
             var resources = _services.Wallet.CaptureForSave();
 
+            var nowUnix = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+            // Watermark только вперёд: откат ОС-часов не затирает максимум.
+            _maxObservedUnixTimeUtc = Math.Max(_maxObservedUnixTimeUtc, nowUnix);
+
             return new GameSaveData
             {
                 version = CurrentVersion,
                 currentTick = (long)_services.TickSystem.CurrentTick,
                 tickAccumulator = _services.TickSystem.Accumulator,
-                savedUnixTimeUtc = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
+                savedUnixTimeUtc = _maxObservedUnixTimeUtc,
                 resources = resources.ToArray(),
                 rooms = built.ToArray()
             };
