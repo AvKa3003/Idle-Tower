@@ -17,6 +17,7 @@ namespace IdleTower.Core
         public BuildingSystem Building { get; }
         public RoomBehaviorSystem RoomBehaviors { get; }
         public ProductionSystem Production { get; }
+        public SaveSystem Save { get; }
 
         public GameServices(GameBalanceConfig balance, BuildingTreeConfig buildingTree)
         {
@@ -24,7 +25,6 @@ namespace IdleTower.Core
             BuildingTree = buildingTree;
             Wallet = new ResourceWallet();
 
-            // Инициализация runtime данных
             Tower = new TowerState();
             TickSystem = new GameTickSystem(this);
 
@@ -33,6 +33,7 @@ namespace IdleTower.Core
             RoomBehaviors = new RoomBehaviorSystem(this);
             Production = new ProductionSystem(this);
             Building = new BuildingSystem(this);
+            Save = new SaveSystem(this);
 
             TickSystem.RegisterTickable(RoomBehaviors);
         }
@@ -41,6 +42,7 @@ namespace IdleTower.Core
         {
             Wallet.Clear();
             Tower.ResetWithEmptyRoom();
+            TickSystem.RestoreFromSave(0, 0f);
             Resources.ApplyStartingResources();
         }
     }

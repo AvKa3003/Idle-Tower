@@ -285,6 +285,8 @@ Scripts/
 │       ├── TowerState.cs
 │       ├── TowerRoom.cs
 │       └── RoomBehaviorState.cs
+│   └── Save/
+│       └── GameSaveData.cs       — DTO JSON сейва
 │
 ├── Rooms/
 │   ├── IRoomBehavior.cs
@@ -307,9 +309,9 @@ Scripts/
 │   ├── UnlockTreeSystem.cs
 │   ├── RoomBehaviorSystem.cs     — Tick, OnBuilt, OnClick, Status
 │   ├── ProductionSystem.cs       — Try*Mode / GetOperationModes
+│   ├── SaveSystem.cs             — JSON save/load
 │   ├── OperationModeInfo.cs
 │   └── BuildResult.cs
-│       (фаза 6: SaveSystem.cs)
 │
 ├── UI/
 │   ├── ScreenManager.cs
@@ -502,7 +504,7 @@ Scripts/
     Порядок ITickable на тик (RegisterTickable):
     1) RoomBehaviorSystem
     2) (будущие: BuffSystem, QuestSystem…)
-    3) SaveSystem (позже)
+    3) (future ITickable…)
 
     ITickable vs Scripts/Systems/:
     - ITickable (Core) — только то, что вызывается каждый тик из GameTickSystem
@@ -553,7 +555,15 @@ Scripts/
 
 4.6 OpenUiRoomBehavior — фаза 6
 4.7 ScreenManager — без изменений по роли
-4.8 SaveSystem — фаза 6 (контракт wallet уже готов)
+4.8 SaveSystem
+    - JSON в Application.persistentDataPath/idle_tower_save.json
+    - Пишет: version, currentTick, tickAccumulator, savedUnixTimeUtc,
+      resources[] (ResourceId+amount), rooms[] (RoomId + behaviorStateJson)
+    - behaviorStateJson у Production: ActiveModeId, UnlockedModeIds, ElapsedByMode (все режимы)
+    - Пустой слот башни не сериализуется — добавляется при Load
+    - Автосейв: GameBootstrap каждые ~60с (unscaled) + pause / focus lost / quit / destroy
+    - Старт: TryLoad → иначе InitializeNewGame
+    - savedUnixTimeUtc — задел под офлайн (SimulateForSeconds позже)
 
 
 ================================================================================
@@ -859,7 +869,7 @@ GameEvents / Presenters вывода (звук постройки — реали
 ФАЗА 6 — Backlog
 ────────────────────────────────────────────────────────────────────────────────
 
-  SaveSystem (+ резолвер Id→SO), OpenUiRoomBehavior, ScreenChanged,
+  офлайн SimulateForSeconds по savedUnixTimeUtc, OpenUiRoomBehavior, ScreenChanged,
   больше SFX на других GameEvents, PassiveRoomBehavior,
   выравнивание Raise mode-событий, офлайн SimulateForSeconds,
   batch ResourceChanged; при Addressables — EqualityComparer по Id для SO

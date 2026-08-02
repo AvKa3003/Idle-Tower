@@ -18,6 +18,13 @@ namespace IdleTower.Core
             _services = services;
         }
 
+        /// <summary>Восстановление счётчика тиков после загрузки сейва.</summary>
+        public void RestoreFromSave(ulong currentTick, float accumulator)
+        {
+            _currentTick = currentTick;
+            _accumulator = accumulator < 0f ? 0f : accumulator;
+        }
+
         public void RegisterTickable(ITickable tickable)
         {
             if (tickable != null && !_tickables.Contains(tickable))

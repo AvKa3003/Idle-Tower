@@ -54,6 +54,29 @@ namespace IdleTower.Data.Runtime
             _rooms.Add(new TowerRoom());
         }
 
+        /// <summary>
+        /// Восстановление башни из сейва: только построенные этажи снизу вверх + пустой слот сверху.
+        /// </summary>
+        public void ReplaceWithBuiltRooms(IReadOnlyList<(RoomDefinition room, RoomBehaviorState state)> builtRooms)
+        {
+            _rooms.Clear();
+
+            if (builtRooms != null)
+            {
+                for (var i = 0; i < builtRooms.Count; i++)
+                {
+                    var entry = builtRooms[i];
+                    _rooms.Add(new TowerRoom
+                    {
+                        BuiltRoom = entry.room,
+                        State = entry.state
+                    });
+                }
+            }
+
+            _rooms.Add(new TowerRoom());
+        }
+
         public int BuiltRoomCount
         {
             get
