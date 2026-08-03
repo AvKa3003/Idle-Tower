@@ -37,7 +37,7 @@ MonoBehaviour:
       Seconds: 3
     inputPerCycle:
     - Resource: {fileID: 11400000, guid: b56467bb7bfbd0e429c51406d0a6f5e4, type: 2}
-      Amount: 5
+      Amount: 4
     unlockCost:
     - Resource: {fileID: 11400000, guid: 6f9a325df12a750439fe2fd353ca0c4f, type: 2}
       Amount: 2

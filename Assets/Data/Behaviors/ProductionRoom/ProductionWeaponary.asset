@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a019ad14704228144bac0cded42887ef, type: 3}
+  m_Name: ProductionWeaponary
+  m_EditorClassIdentifier: Assembly-CSharp::IdleTower.Rooms.Behaviors.ProductionRoomBehavior
+  modes:
+  - id: spaer
+    displayName: "\u041A\u043E\u043F\u044C\u0451"
+    icon: {fileID: 5018245360316724722, guid: 08ff3a0720591994da7676645743df16, type: 3}
+    outputPerCycle:
+    - Resource: {fileID: 11400000, guid: 70d18213541e7b7468d21553e1074335, type: 2}
+      Amount: 1
+    cycleDuration:
+      Minutes: 0
+      Seconds: 8
+    inputPerCycle:
+    - Resource: {fileID: 11400000, guid: 6f9a325df12a750439fe2fd353ca0c4f, type: 2}
+      Amount: 1
+    - Resource: {fileID: 11400000, guid: b56467bb7bfbd0e429c51406d0a6f5e4, type: 2}
+      Amount: 3
+    unlockCost: []
+    unlockRules:
+    - Type: 1
+      RequiredRoom: {fileID: 11400000, guid: d411cdca8f16c5f438f7a91fa467989f, type: 2}
+    - Type: 1
+      RequiredRoom: {fileID: 11400000, guid: 57b82393253bddc419a1b3dbac37abf4, type: 2}
+    unlockedByDefault: 1

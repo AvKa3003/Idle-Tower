@@ -35,6 +35,22 @@ namespace IdleTower.Systems
             return production.TrySetMode(context, modeId);
         }
 
+        public bool TryTogglePause(int roomIndex)
+        {
+            if (!TryGetProduction(roomIndex, out var production, out var context))
+                return false;
+
+            return production.TryTogglePause(context);
+        }
+
+        public bool IsPaused(int roomIndex)
+        {
+            if (!TryGetProduction(roomIndex, out var production, out var context))
+                return false;
+
+            return production.IsPaused(context);
+        }
+
         public IReadOnlyList<OperationModeInfo> GetOperationModes(int roomIndex)
         {
             if (!TryGetProduction(roomIndex, out var production, out var context))

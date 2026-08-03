@@ -8,17 +8,17 @@ using UnityEngine;
 namespace IdleTower.UI.Presenters
 {
     /// <summary>
-    /// ResourceListPresenter — модалка списка ресурсов (!IsUnit), название + количество.
+    /// UnitListPresenter — модалка списка юнитов (IsUnit), название + количество.
     ///
     /// Получает: Open/Close от HeaderPresenter; CloseClicked с панели; GameEvents.ResourceChanged
     /// Отправляет: ResourceListPanel.Open / RefreshRows, Hide
     ///
-    /// View:        ResourceListPanel
-    /// Systems:      Wallet (ключи = встреченные ресурсы)
+    /// View:        ResourceListPanel (отдельный инстанс UnitListPanel в иерархии)
+    /// Systems:      Wallet (ключи = встреченные юниты)
     /// Presenters:   — (вызывается из HeaderPresenter)
-    /// GameEvents:   ResourceChanged (слушает, пока попап открыт)
+    /// GameEvents:   ResourceChanged (пока попап открыт)
     /// </summary>
-    public class ResourceListPresenter : MonoBehaviour
+    public class UnitListPresenter : MonoBehaviour
     {
         [SerializeField] private ResourceListPanel panel;
 
@@ -66,27 +66,27 @@ namespace IdleTower.UI.Presenters
 
         private List<ResourceListRowDisplay> BuildDisplays()
         {
-            var resources = CollectDiscoveredNonUnits();
-            var displays = new List<ResourceListRowDisplay>(resources.Count);
+            var units = CollectDiscoveredUnits();
+            var displays = new List<ResourceListRowDisplay>(units.Count);
 
-            for (var i = 0; i < resources.Count; i++)
+            for (var i = 0; i < units.Count; i++)
             {
-                var resource = resources[i];
-                var name = string.IsNullOrEmpty(resource.DisplayName)
-                    ? resource.name
-                    : resource.DisplayName;
+                var unit = units[i];
+                var name = string.IsNullOrEmpty(unit.DisplayName)
+                    ? unit.name
+                    : unit.DisplayName;
 
                 displays.Add(new ResourceListRowDisplay(
-                    resource,
+                    unit,
                     name,
-                    resource.Icon,
-                    _services.Wallet.GetAmount(resource)));
+                    unit.Icon,
+                    _services.Wallet.GetAmount(unit)));
             }
 
             return displays;
         }
 
-        private List<ResourceDefinition> CollectDiscoveredNonUnits()
+        private List<ResourceDefinition> CollectDiscoveredUnits()
         {
             var list = new List<ResourceDefinition>();
             var amounts = _services?.Wallet?.Amounts;
@@ -96,7 +96,7 @@ namespace IdleTower.UI.Presenters
             foreach (var pair in amounts)
             {
                 var resource = pair.Key;
-                if (resource == null || resource.IsUnit)
+                if (resource == null || !resource.IsUnit)
                     continue;
 
                 list.Add(resource);
@@ -118,7 +118,7 @@ namespace IdleTower.UI.Presenters
             if (!_isOpen)
                 return;
 
-            if (resource != null && resource.IsUnit)
+            if (resource != null && !resource.IsUnit)
                 return;
 
             RefreshRows();

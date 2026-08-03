@@ -9,6 +9,7 @@ namespace IdleTower.Rooms.Production
 
         public ModeId ActiveModeId;
         public List<ModeId> UnlockedModeIds = new();
+        public bool IsPaused;
 
         public float GetElapsedSeconds(ModeId modeId)
         {
@@ -51,7 +52,8 @@ namespace IdleTower.Rooms.Production
             var clone = new ProductionBehaviorState
             {
                 ActiveModeId = ActiveModeId,
-                UnlockedModeIds = new List<ModeId>(UnlockedModeIds)
+                UnlockedModeIds = new List<ModeId>(UnlockedModeIds),
+                IsPaused = IsPaused
             };
 
             foreach (var pair in _elapsedByMode)

@@ -1,4 +1,6 @@
 using IdleTower.Core;
+using IdleTower.Core.Events;
+using IdleTower.Data.Definitions;
 using IdleTower.UI.Views;
 using UnityEngine;
 
@@ -7,23 +9,26 @@ namespace IdleTower.UI.Presenters
     /// <summary>
     /// HeaderPresenter — верхняя панель кнопок.
     ///
-    /// Получает: клик HeaderPanel.ResourcesClicked; ссылки RoomSelection/ProductionMode от MainTowerPresenter
-    /// Отправляет: Close чужих модалок; ResourceListPresenter.Open
+    /// Получает: клики HeaderPanel (ресурсы / юниты); ссылки RoomSelection/ProductionMode от MainTowerPresenter
+    /// Отправляет: Close чужих модалок; ResourceList / UnitList Open
     ///
     /// View:        HeaderPanel
-    /// Systems:      —
-    /// Presenters:   ResourceList (вызывает); RoomSelection, ProductionMode, OfflineResult (закрывает)
-    /// GameEvents:   —
+    /// Systems:      Wallet (видимость кнопки юнитов)
+    /// Presenters:   ResourceList, UnitList; RoomSelection, ProductionMode, OfflineResult (закрывает)
+    /// GameEvents:   ResourceChanged (кнопка юнитов)
     /// </summary>
     public class HeaderPresenter : MonoBehaviour
     {
         [SerializeField] private HeaderPanel panel;
         [SerializeField] private ResourceListPresenter resourceList;
+        [SerializeField] private UnitListPresenter unitList;
 
+        private GameServices _services;
         private RoomSelectionPresenter _roomSelection;
         private ProductionModePresenter _productionMode;
         private OfflineResultPresenter _offlineResult;
         private bool _subscribed;
+        private bool _gameEventsSubscribed;
 
         public void Initialize(
             GameServices services,
@@ -31,16 +36,21 @@ namespace IdleTower.UI.Presenters
             ProductionModePresenter productionMode,
             OfflineResultPresenter offlineResult = null)
         {
+            _services = services;
             _roomSelection = roomSelection;
             _productionMode = productionMode;
             _offlineResult = offlineResult;
             resourceList?.Initialize(services);
+            unitList?.Initialize(services);
             Subscribe();
+            SubscribeGameEvents();
+            RefreshUnitsButtonVisibility();
         }
 
         private void OnDestroy()
         {
             Unsubscribe();
+            UnsubscribeGameEvents();
         }
 
         private void Subscribe()
@@ -49,6 +59,7 @@ namespace IdleTower.UI.Presenters
                 return;
 
             panel.ResourcesClicked += HandleResourcesClicked;
+            panel.UnitsClicked += HandleUnitsClicked;
             _subscribed = true;
         }
 
@@ -58,15 +69,75 @@ namespace IdleTower.UI.Presenters
                 return;
 
             panel.ResourcesClicked -= HandleResourcesClicked;
+            panel.UnitsClicked -= HandleUnitsClicked;
             _subscribed = false;
         }
 
-        private void HandleResourcesClicked()
+        private void SubscribeGameEvents()
+        {
+            if (_gameEventsSubscribed)
+                return;
+
+            GameEvents.ResourceChanged += OnResourceChanged;
+            _gameEventsSubscribed = true;
+        }
+
+        private void UnsubscribeGameEvents()
+        {
+            if (!_gameEventsSubscribed)
+                return;
+
+            GameEvents.ResourceChanged -= OnResourceChanged;
+            _gameEventsSubscribed = false;
+        }
+
+        private void OnResourceChanged(ResourceDefinition resource, int newAmount)
+        {
+            if (resource == null || !resource.IsUnit)
+                return;
+
+            RefreshUnitsButtonVisibility();
+        }
+
+        private void RefreshUnitsButtonVisibility()
+        {
+            panel?.SetUnitsButtonVisible(HasDiscoveredUnit());
+        }
+
+        private bool HasDiscoveredUnit()
+        {
+            var amounts = _services?.Wallet?.Amounts;
+            if (amounts == null)
+                return false;
+
+            foreach (var pair in amounts)
+            {
+                if (pair.Key != null && pair.Key.IsUnit)
+                    return true;
+            }
+
+            return false;
+        }
+
+        private void CloseGameplayModals()
         {
             _roomSelection?.Close();
             _productionMode?.Close();
             _offlineResult?.Close();
+        }
+
+        private void HandleResourcesClicked()
+        {
+            CloseGameplayModals();
+            unitList?.Close();
             resourceList?.Open();
+        }
+
+        private void HandleUnitsClicked()
+        {
+            CloseGameplayModals();
+            resourceList?.Close();
+            unitList?.Open();
         }
     }
 }

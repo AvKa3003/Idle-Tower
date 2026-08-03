@@ -13,7 +13,7 @@ namespace IdleTower.UI.Presenters
     /// ProductionModePresenter — попап режимов производства (_roomIndex).
     ///
     /// Получает: OpenForRoom, NotifyRoomModeChanged от TowerPresenter; клики панели; GameEvents.ResourceChanged
-    /// Отправляет: ProductionModePanel.Open / RefreshOptions, Hide; TryUnlockMode, TrySetMode
+    /// Отправляет: ProductionModePanel.Open / RefreshOptions, Hide; TryUnlockMode, TrySetMode, TryTogglePause
     ///
     /// View:        ProductionModePanel
     /// Systems:      Production (чтение + TryUnlockMode, TrySetMode)
@@ -48,7 +48,7 @@ namespace IdleTower.UI.Presenters
                 return;
 
             _roomIndex = roomIndex;
-            panel.Open(BuildDisplays());
+            panel.Open(BuildDisplays(), _services.Production.IsPaused(roomIndex));
         }
 
         public void Close()
@@ -59,10 +59,11 @@ namespace IdleTower.UI.Presenters
 
         private void RefreshOptions()
         {
-            if (_roomIndex < 0)
+            if (_roomIndex < 0 || panel == null)
                 return;
 
             panel.RefreshOptions(BuildDisplays());
+            panel.SetPausedVisual(_services.Production.IsPaused(_roomIndex));
         }
 
         private List<OperationOptionDisplay> BuildDisplays()
@@ -168,6 +169,17 @@ namespace IdleTower.UI.Presenters
             _services.Production.TrySetMode(_roomIndex, modeId);
         }
 
+        private void HandlePauseClicked()
+        {
+            if (_services == null || _roomIndex < 0 || panel == null)
+                return;
+
+            if (!_services.Production.TryTogglePause(_roomIndex))
+                return;
+
+            panel.SetPausedVisual(_services.Production.IsPaused(_roomIndex));
+        }
+
         private void OnResourceChanged(ResourceDefinition resource, int newAmount)
         {
             if (_roomIndex < 0)
@@ -184,6 +196,7 @@ namespace IdleTower.UI.Presenters
             panel.UnlockClicked += HandleUnlockClicked;
             panel.SelectClicked += HandleSelectClicked;
             panel.CloseClicked += HandleCloseClicked;
+            panel.PauseClicked += HandlePauseClicked;
             _panelSubscribed = true;
         }
 
@@ -195,6 +208,7 @@ namespace IdleTower.UI.Presenters
             panel.UnlockClicked -= HandleUnlockClicked;
             panel.SelectClicked -= HandleSelectClicked;
             panel.CloseClicked -= HandleCloseClicked;
+            panel.PauseClicked -= HandlePauseClicked;
             _panelSubscribed = false;
         }
 

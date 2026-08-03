@@ -13,7 +13,7 @@
   [x] Линейная башня: один столбец, без ветвления
   [x] Типизированные Id: ResourceId, RoomId, ModeId; ScreenId / RoomUiId — enum
   [x] ConfigValidator.ValidateOrThrow при старте (до GameServices)
-  [x] UI ресурсов: Header + модалка ResourceList (ResourceBar удалён)
+  [x] UI ресурсов: Header + ResourceList (!IsUnit) + UnitList (IsUnit)
   [x] Presenter = слой вывода игроку (UI / SFX / VFX…); SfxPlayer — Presenter звука
   [x] Офлайн: OfflineSimulationSystem после TryLoad, cap 2ч (фикс.);
       savedUnixTimeUtc = watermark UTC (+0), не уменьшается при откате часов;
@@ -78,8 +78,9 @@
     ┌──────────────────────────────┬────────────────────────────┬────────────────────────────┐
     │ Событие                      │ Кто Raise                  │ Кто слушает                │
     ├──────────────────────────────┼────────────────────────────┼────────────────────────────┤
-    │ ResourceChanged              │ ResourceSystem             │ ResourceListPresenter      │
-    │   (resource, newAmount)      │ Add / TrySpend / starting  │ (пока модалка открыта);    │
+    │ ResourceChanged              │ ResourceSystem             │ ResourceListPresenter /    │
+    │   (resource, newAmount)      │ Add / TrySpend / starting  │ UnitListPresenter          │
+    │                              │                            │ (пока модалка открыта);    │
     │                              │                            │ RoomSelection /            │
     │                              │                            │ ProductionMode (пока open) │
     │ RoomBuilt                    │ BuildingSystem             │ TowerPresenter (UI);       │
@@ -100,7 +101,7 @@
     UI после действия игрока:
     - RoomSelectionPresenter: TryBuild → при успехе сам Hide()
     - Башня: RoomBuilt / GameTick; ресурсы в модалке: ResourceChanged (пока открыта)
-    - Header «Ресурсы» закрывает чужие модалки и открывает ResourceList
+    - Header «Ресурсы» / «Юниты» закрывают чужие модалки и открывают ResourceList / UnitList
 
     Расширение (фаза 6):
     1) IGameEvents — для unit-тестов без статики
@@ -335,6 +336,7 @@ Scripts/
 │   └── Presenters/
 │       ├── HeaderPresenter.cs
 │       ├── ResourceListPresenter.cs
+│       ├── UnitListPresenter.cs
 │       ├── OfflineResultPresenter.cs
 │       ├── RoomSelectionPresenter.cs
 │       ├── TowerPresenter.cs
@@ -382,8 +384,10 @@ Scripts/
     - Dictionary<ModeId, float> ElapsedByMode
     - ModeId ActiveModeId
     - List<ModeId> UnlockedModeIds
+    - bool IsPaused               — пауза этажа; Tick не крутит цикл; в сейве
     При TrySetMode: меняется только ActiveModeId; прогресс режимов независим.
     Tick / overlay: ElapsedByMode[ActiveModeId] (ActiveElapsedSeconds).
+    ProductionModePanel: кнопка паузы (иконка pause / play).
 
     RoomUiId (enum):
     - None
@@ -552,7 +556,7 @@ Scripts/
 4.5 ProductionRoomBehavior
     - OnRoomBuilt: unlock modes[0] (+ UnlockedByDefault); ActiveModeId = modes[0].Id
     - Tick: производство/крафт (п. 3.4); неизвестный ActiveModeId — exception
-    - OnRoomClicked: если modes.Length > 1 или есть locked → OpenUi = ProductionMode
+    - OnRoomClicked: всегда OpenUi = ProductionMode (даже при одном режиме)
     - SerializeState: ActiveModeId, UnlockedModeIds, ElapsedByMode (string Id в JSON)
 
 4.5.1 ConfigValidator (при старте, не система тика)
@@ -629,7 +633,8 @@ Presenter: команды → Systems; факты → GameEvents; обновля
 
 Обязательные пары (актуально):
   - HeaderPanel             + HeaderPresenter
-  - ResourceListPanel       + ResourceListPresenter   (модалка; строки ResourceListRow*)
+  - ResourceListPanel       + ResourceListPresenter   (!IsUnit; строки ResourceListRow*)
+  - ResourceListPanel       + UnitListPresenter       (IsUnit; тот же View-класс, другой GO)
   - OfflineResultPanel      + OfflineResultPresenter  (после Load; строки OfflineResultRow*)
   - RoomSelectionPanel      + RoomSelectionPresenter
   - ProductionModePanel     + ProductionModePresenter
@@ -637,9 +642,10 @@ Presenter: команды → Systems; факты → GameEvents; обновля
   - TowerView               + TowerPresenter
   - EmptyRoomView / RoomView — клики → TowerPresenter
 
-Поток ресурсов:
-  Header «Ресурсы» → закрыть RoomSelection/ProductionMode/OfflineResult → ResourceList.Open
-  ResourceChanged обновляет список только пока модалка открыта.
+Поток ресурсов / юнитов:
+  Header «Ресурсы» → закрыть чужие + UnitList → ResourceList.Open (!IsUnit)
+  Header «Юниты» → закрыть чужие + ResourceList → UnitList.Open (IsUnit)
+  ResourceChanged обновляет открытую модалку (с фильтром IsUnit)
 
 Офлайн-отчёт:
   TryLoad → Offline.ApplyCatchUp → LastResult

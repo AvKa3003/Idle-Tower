@@ -54,18 +54,47 @@ namespace IdleTower.UI.Views
 
             if (unlockButton != null)
             {
-                unlockButton.interactable = display.ShowUnlockButton && interactable;
                 unlockButton.gameObject.SetActive(display.ShowUnlockButton);
+                SetButtonInteractableImmediate(unlockButton, display.ShowUnlockButton && interactable);
             }
 
             if (selectButton != null)
             {
-                selectButton.interactable = display.ShowSelectButton && interactable;
                 selectButton.gameObject.SetActive(display.ShowSelectButton);
+                SetButtonInteractableImmediate(selectButton, display.ShowSelectButton && interactable);
             }
 
             if (canvasGroup != null)
                 canvasGroup.alpha = interactable ? 1f : 0.45f;
+        }
+
+        private static void SetButtonInteractableImmediate(Button button, bool interactable)
+        {
+            button.interactable = interactable;
+
+            // Color Tint иначе ~0.1с анимирует из Normal в Disabled — «мигание» кликабельности.
+            var graphic = button.targetGraphic;
+            if (graphic == null)
+                return;
+
+            var colors = button.colors;
+            var target = interactable ? colors.normalColor : colors.disabledColor;
+            graphic.CrossFadeColor(target, 0f, true, true);
+        }
+
+        public void RebuildLayout()
+        {
+            if (labelText != null)
+                labelText.ForceMeshUpdate();
+
+            if (detailText != null)
+            {
+                detailText.ForceMeshUpdate();
+                LayoutRebuilder.ForceRebuildLayoutImmediate(detailText.rectTransform);
+            }
+
+            if (transform is RectTransform rectTransform)
+                LayoutRebuilder.ForceRebuildLayoutImmediate(rectTransform);
         }
 
         private void HandleUnlockClick()

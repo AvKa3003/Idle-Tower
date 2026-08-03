@@ -19,6 +19,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 6f9a325df12a750439fe2fd353ca0c4f, type: 2}
   - {fileID: 11400000, guid: b56467bb7bfbd0e429c51406d0a6f5e4, type: 2}
   - {fileID: 11400000, guid: 13cb60f13b5682f46ba2d36e781cef6f, type: 2}
+  - {fileID: 11400000, guid: 70d18213541e7b7468d21553e1074335, type: 2}
   startingResources:
   - Resource: {fileID: 11400000, guid: 6057606f450efbc41814c3ad3ddb61b6, type: 2}
     Amount: 5

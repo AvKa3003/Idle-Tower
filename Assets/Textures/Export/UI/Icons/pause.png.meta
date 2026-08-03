@@ -1,10 +1,13 @@
 fileFormatVersion: 2
-guid: af4671a459998b7478fbdf24a24689e8
+guid: 2522c171723988f4dacb9054b6743eac
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 8494564294788764885
-    second: spearwarior_0
+      213: -8878088185706026076
+    second: pause_0
+  - first:
+      213: -175405258591694595
+    second: pause_1
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -126,13 +129,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: spearwarior_0
+      name: pause_0
       rect:
         serializedVersion: 2
-        x: 2
-        y: 4
-        width: 28
-        height: 25
+        x: 1
+        y: 0
+        width: 6
+        height: 16
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -141,8 +144,30 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 5d4d9905831c2e570800000000000000
-      internalID: 8494564294788764885
+      spriteID: 4ab666e45d1bac480800000000000000
+      internalID: -8878088185706026076
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: pause_1
+      rect:
+        serializedVersion: 2
+        x: 9
+        y: 0
+        width: 6
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: df018edb8d5d09df0800000000000000
+      internalID: -175405258591694595
       vertices: []
       indices: 
       edges: []
@@ -161,7 +186,8 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      spearwarior_0: 8494564294788764885
+      pause_0: -8878088185706026076
+      pause_1: -175405258591694595
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

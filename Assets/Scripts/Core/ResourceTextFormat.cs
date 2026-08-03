@@ -21,7 +21,7 @@ namespace IdleTower.Core
             Func<ResourceDefinition, int> getAmount)
         {
             var lines = CollectCostLinesWithBalance(costs, getAmount);
-            return string.Join(", ", lines);
+            return string.Join("\n", lines);
         }
 
         public static string FormatCycle(ResourceCost[] input, ResourceCost[] output)

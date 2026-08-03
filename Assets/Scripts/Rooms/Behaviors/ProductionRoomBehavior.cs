@@ -40,9 +40,6 @@ namespace IdleTower.Rooms.Behaviors
 
         public override RoomClickResult OnRoomClicked(RoomBehaviorContext context)
         {
-            if (Modes.Length <= 1 && !HasLockedModes(context))
-                return RoomClickResult.None;
-
             return new RoomClickResult(RoomUiId.ProductionMode);
         }
 
@@ -52,6 +49,9 @@ namespace IdleTower.Rooms.Behaviors
             if (state == null)
                 throw new InvalidOperationException(
                     $"[ProductionRoomBehavior] '{name}': нет ProductionBehaviorState на этаже {context.RoomIndex}.");
+
+            if (state.IsPaused)
+                return;
 
             var mode = GetModeOrThrow(state.ActiveModeId);
             var duration = mode.CycleDuration.TotalSeconds;
@@ -173,6 +173,22 @@ namespace IdleTower.Rooms.Behaviors
             return true;
         }
 
+        public bool TryTogglePause(RoomBehaviorContext context)
+        {
+            var state = GetState(context);
+            if (state == null)
+                return false;
+
+            state.IsPaused = !state.IsPaused;
+            return true;
+        }
+
+        public bool IsPaused(RoomBehaviorContext context)
+        {
+            var state = GetState(context);
+            return state != null && state.IsPaused;
+        }
+
         public IReadOnlyList<OperationModeInfo> GetOperationModes(RoomBehaviorContext context)
         {
             var state = GetState(context);
@@ -248,21 +264,6 @@ namespace IdleTower.Rooms.Behaviors
         private static ProductionBehaviorState GetState(RoomBehaviorContext context)
             => context.TowerRoom.State as ProductionBehaviorState;
 
-        private bool HasLockedModes(RoomBehaviorContext context)
-        {
-            var state = GetState(context);
-            if (state == null)
-                return false;
-
-            for (var i = 0; i < Modes.Length; i++)
-            {
-                if (!state.IsModeUnlocked(Modes[i].Id))
-                    return true;
-            }
-
-            return false;
-        }
-
         [Serializable]
         private class ProductionStateDto
         {
@@ -270,6 +271,7 @@ namespace IdleTower.Rooms.Behaviors
             public string[] unlockedModeIds = Array.Empty<string>();
             public string[] elapsedModeIds = Array.Empty<string>();
             public float[] elapsedSeconds = Array.Empty<float>();
+            public bool isPaused;
 
             public static ProductionStateDto FromState(ProductionBehaviorState state)
             {
@@ -281,7 +283,8 @@ namespace IdleTower.Rooms.Behaviors
                 var dto = new ProductionStateDto
                 {
                     activeModeId = state.ActiveModeId.Value,
-                    unlockedModeIds = unlockedIds
+                    unlockedModeIds = unlockedIds,
+                    isPaused = state.IsPaused
                 };
 
                 var elapsed = state.ElapsedByMode;
@@ -311,7 +314,8 @@ namespace IdleTower.Rooms.Behaviors
                 var state = new ProductionBehaviorState
                 {
                     ActiveModeId = ModeId.FromSerialized(activeModeId),
-                    UnlockedModeIds = unlocked
+                    UnlockedModeIds = unlocked,
+                    IsPaused = isPaused
                 };
 
                 if (elapsedModeIds == null || elapsedSeconds == null)
