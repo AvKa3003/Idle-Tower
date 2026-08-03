@@ -373,7 +373,6 @@ Scripts/
     RoomStatusInfo:
     - Sprite OutputIcon
     - string ModeLabel
-    - int AmountPerCycle
     - ResourceCost[] InputPerCycle, OutputPerCycle
     - string CycleSummary
     - float Progress01, ElapsedSeconds, CycleTotalSeconds

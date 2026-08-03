@@ -11,19 +11,8 @@ namespace IdleTower.Core
 
         public static string FormatCosts(ResourceCost[] costs)
         {
-            if (costs == null || costs.Length == 0)
-                return string.Empty;
-
-            var parts = new List<string>(costs.Length);
-            foreach (var cost in costs)
-            {
-                if (cost.Resource == null || cost.Amount <= 0)
-                    continue;
-
-                parts.Add($"{GetResourceName(cost.Resource)} x{cost.Amount}");
-            }
-
-            return string.Join(", ", parts);
+            var lines = CollectCostLines(costs);
+            return string.Join(", ", lines);
         }
 
         /// <summary>TMP rich text: «Дерево 2/5» зелёным или красным.</summary>
@@ -31,34 +20,15 @@ namespace IdleTower.Core
             ResourceCost[] costs,
             Func<ResourceDefinition, int> getAmount)
         {
-            if (costs == null || costs.Length == 0 || getAmount == null)
-                return string.Empty;
-
-            var parts = new List<string>(costs.Length);
-            foreach (var cost in costs)
-            {
-                if (cost.Resource == null || cost.Amount <= 0)
-                    continue;
-
-                var have = getAmount(cost.Resource);
-                var need = cost.Amount;
-                var color = have >= need ? AffordableColor : MissingColor;
-                var name = GetResourceName(cost.Resource);
-                parts.Add($"<color={color}>{name} {have}/{need}</color>");
-            }
-
-            return string.Join(", ", parts);
+            var lines = CollectCostLinesWithBalance(costs, getAmount);
+            return string.Join(", ", lines);
         }
 
         public static string FormatCycle(ResourceCost[] input, ResourceCost[] output)
         {
-            var inputLabel = FormatCosts(input);
-            var outputLabel = FormatCosts(output);
-
-            if (!string.IsNullOrEmpty(inputLabel) && !string.IsNullOrEmpty(outputLabel))
-                return $"{inputLabel} → {outputLabel}";
-
-            return outputLabel;
+            var inputLines = CollectCostLines(input);
+            var outputLines = CollectCostLines(output);
+            return JoinCycleLines(inputLines, outputLines);
         }
 
         public static string FormatDuration(GameDuration duration)
@@ -119,7 +89,7 @@ namespace IdleTower.Core
             if (string.IsNullOrEmpty(time))
                 return cycle;
 
-            return $"{cycle} · {time}";
+            return $"{cycle}\n{time}";
         }
 
         public static string FormatModeDetailWithBalance(
@@ -128,17 +98,9 @@ namespace IdleTower.Core
             GameDuration duration,
             Func<ResourceDefinition, int> getAmount)
         {
-            var inputLabel = FormatCostsWithBalance(input, getAmount);
-            var outputLabel = FormatCosts(output);
-            string cycle;
-
-            if (!string.IsNullOrEmpty(inputLabel) && !string.IsNullOrEmpty(outputLabel))
-                cycle = $"{inputLabel} → {outputLabel}";
-            else if (!string.IsNullOrEmpty(inputLabel))
-                cycle = inputLabel;
-            else
-                cycle = outputLabel;
-
+            var cycle = JoinCycleLines(
+                CollectCostLinesWithBalance(input, getAmount),
+                CollectCostLines(output));
             var time = FormatDuration(duration);
 
             if (string.IsNullOrEmpty(cycle))
@@ -147,7 +109,77 @@ namespace IdleTower.Core
             if (string.IsNullOrEmpty(time))
                 return cycle;
 
-            return $"{cycle} · {time}";
+            return $"{cycle}\n{time}";
+        }
+
+        private static string JoinCycleLines(List<string> inputLines, List<string> outputLines)
+        {
+            if (inputLines == null)
+                inputLines = new List<string>();
+            if (outputLines == null)
+                outputLines = new List<string>();
+
+            var lines = new List<string>(inputLines.Count + outputLines.Count);
+
+            if (inputLines.Count > 0)
+            {
+                for (var i = 0; i < inputLines.Count; i++)
+                {
+                    var isLastInput = i == inputLines.Count - 1;
+                    if (isLastInput && outputLines.Count > 0)
+                        lines.Add($"{inputLines[i]} →");
+                    else
+                        lines.Add(inputLines[i]);
+                }
+
+                lines.AddRange(outputLines);
+            }
+            else
+            {
+                lines.AddRange(outputLines);
+            }
+
+            return string.Join("\n", lines);
+        }
+
+        private static List<string> CollectCostLines(ResourceCost[] costs)
+        {
+            var lines = new List<string>();
+            if (costs == null)
+                return lines;
+
+            foreach (var cost in costs)
+            {
+                if (cost.Resource == null || cost.Amount <= 0)
+                    continue;
+
+                lines.Add($"{GetResourceName(cost.Resource)} x{cost.Amount}");
+            }
+
+            return lines;
+        }
+
+        private static List<string> CollectCostLinesWithBalance(
+            ResourceCost[] costs,
+            Func<ResourceDefinition, int> getAmount)
+        {
+            var lines = new List<string>();
+            if (costs == null || getAmount == null)
+                return lines;
+
+            foreach (var cost in costs)
+            {
+                if (cost.Resource == null || cost.Amount <= 0)
+                    continue;
+
+                var have = getAmount(cost.Resource);
+                var need = cost.Amount;
+                var color = have >= need ? AffordableColor : MissingColor;
+                var name = GetResourceName(cost.Resource);
+                lines.Add($"<color={color}>{name} {have}/{need}</color>");
+            }
+
+            return lines;
         }
 
         private static string GetResourceName(ResourceDefinition resource)

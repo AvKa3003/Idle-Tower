@@ -124,11 +124,9 @@ namespace IdleTower.Rooms.Behaviors
             };
 
             var outputs = mode.OutputPerCycle;
-            if (outputs.Length > 0 && outputs[0].Resource != null)
-            {
+            info.OutputIcon = mode.Icon;
+            if (info.OutputIcon == null && outputs.Length > 0 && outputs[0].Resource != null)
                 info.OutputIcon = outputs[0].Resource.Icon;
-                info.AmountPerCycle = outputs[0].Amount;
-            }
 
             return info;
         }
