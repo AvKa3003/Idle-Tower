@@ -36,7 +36,6 @@ namespace IdleTower.UI.Presenters
             UnsubscribePanel();
         }
 
-        /// <summary>Показать, если был реальный догон (Applied). Иначе ничего.</summary>
         public void TryShowFromLastCatchUp()
         {
             if (panel == null || _services?.Offline == null)
@@ -54,7 +53,8 @@ namespace IdleTower.UI.Presenters
             if (panel == null || result == null || !result.Applied)
                 return;
 
-            panel.Open(BuildSummary(result), BuildRows(result));
+            BuildRowLists(result, out var resources, out var units);
+            panel.Open(BuildSummary(result), resources, units);
         }
 
         public void Close()
@@ -76,10 +76,14 @@ namespace IdleTower.UI.Presenters
             return $"Вас не было: {away}\nНачислено за: {credited}";
         }
 
-        private static List<OfflineResultRowDisplay> BuildRows(OfflineCatchUpResult result)
+        private static void BuildRowLists(
+            OfflineCatchUpResult result,
+            out List<OfflineResultRowDisplay> resources,
+            out List<OfflineResultRowDisplay> units)
         {
             var deltas = result.ResourceDeltas;
-            var rows = new List<OfflineResultRowDisplay>(deltas.Count);
+            resources = new List<OfflineResultRowDisplay>();
+            units = new List<OfflineResultRowDisplay>();
 
             for (var i = 0; i < deltas.Count; i++)
             {
@@ -92,14 +96,17 @@ namespace IdleTower.UI.Presenters
                     ? resource.name
                     : resource.DisplayName;
 
-                rows.Add(new OfflineResultRowDisplay(
+                var display = new OfflineResultRowDisplay(
                     resource,
                     name,
                     resource.Icon,
-                    entry.Delta));
-            }
+                    entry.Delta);
 
-            return rows;
+                if (resource.IsUnit)
+                    units.Add(display);
+                else
+                    resources.Add(display);
+            }
         }
 
         private void SubscribePanel()

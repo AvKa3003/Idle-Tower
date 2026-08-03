@@ -4,7 +4,6 @@ using IdleTower.Data.Definitions;
 
 namespace IdleTower.Systems
 {
-    /// <summary>Изменение одного ресурса за офлайн-догон (после − до).</summary>
     public readonly struct OfflineResourceDelta
     {
         public ResourceDefinition Resource { get; }
@@ -17,7 +16,6 @@ namespace IdleTower.Systems
         }
     }
 
-    /// <summary>Итог OfflineSimulationSystem.ApplyCatchUp (для UI / логов).</summary>
     public sealed class OfflineCatchUpResult
     {
         public static OfflineCatchUpResult None { get; } = new OfflineCatchUpResult(

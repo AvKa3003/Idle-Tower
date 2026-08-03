@@ -22,7 +22,6 @@ namespace IdleTower.Systems
         private readonly GameServices _services;
         private readonly string _filePath;
         private float _lastSaveUnscaledTime = -999f;
-        /// <summary>Максимальный UTC unix, виденный runtime (не откатывается при сдвиге часов назад).</summary>
         private long _maxObservedUnixTimeUtc;
 
         public SaveSystem(GameServices services)
@@ -33,7 +32,6 @@ namespace IdleTower.Systems
             _filePath = Path.GetFullPath(Path.Combine(Application.persistentDataPath, FileName));
         }
 
-        /// <summary>Текущий watermark UTC для офлайна (после Load/Save).</summary>
         public long MaxObservedUnixTimeUtc => _maxObservedUnixTimeUtc;
 
         public string FilePath => _filePath;

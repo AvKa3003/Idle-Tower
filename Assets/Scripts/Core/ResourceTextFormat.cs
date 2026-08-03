@@ -75,7 +75,6 @@ namespace IdleTower.Core
             return $"{duration.Seconds} с";
         }
 
-        /// <summary>Человекочитаемый интервал для офлайн-сводки (часы / минуты / секунды).</summary>
         public static string FormatElapsedSeconds(float totalSeconds)
         {
             if (totalSeconds < 0f)

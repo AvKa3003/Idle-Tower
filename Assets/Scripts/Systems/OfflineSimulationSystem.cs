@@ -16,7 +16,6 @@ namespace IdleTower.Systems
     /// </summary>
     public class OfflineSimulationSystem
     {
-        /// <summary>Максимум симулируемого отсутствия (сек). Пока константа.</summary>
         public const float FixedMaxOfflineSeconds = 2f * 60f * 60f;
 
         private readonly GameServices _services;
@@ -27,7 +26,6 @@ namespace IdleTower.Systems
             LastResult = OfflineCatchUpResult.None;
         }
 
-        /// <summary>Последний итог ApplyCatchUp (после TryLoad). UI читает и показывает.</summary>
         public OfflineCatchUpResult LastResult { get; private set; }
 
         /// <summary>

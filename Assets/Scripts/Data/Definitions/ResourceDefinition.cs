@@ -9,8 +9,11 @@ namespace IdleTower.Data.Definitions
         [SerializeField] private string displayName;
         [SerializeField] private Sprite icon;
 
+        [SerializeField] private bool isUnit;
+
         public ResourceId Id => ResourceId.FromSerialized(id);
         public string DisplayName => displayName;
         public Sprite Icon => icon;
+        public bool IsUnit => isUnit;
     }
 }

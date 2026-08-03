@@ -273,7 +273,7 @@ Scripts/
 │
 ├── Data/
 │   ├── Definitions/
-│   │   ├── ResourceDefinition.cs — ResourceId, displayName, icon
+│   │   ├── ResourceDefinition.cs — ResourceId, displayName, icon, isUnit
 │   │   ├── ResourceId.cs         — readonly struct Id ресурса
 │   │   ├── RoomDefinition.cs     — RoomId, prefab, cost, behavior, unlockRules
 │   │   ├── RoomId.cs             — readonly struct Id комнаты
@@ -356,6 +356,8 @@ Scripts/
     - ResourceId Id                  — typed; в ассете string, в API ResourceId
     - string DisplayName
     - Sprite Icon
+    - bool IsUnit                    — юнит = тот же ресурс в Wallet; пока только
+                                       отдельный список в OfflineResultPanel
 
 3.2 IRoomBehavior / RoomBehaviorBase (ScriptableObject)
     Контракт — ядро вызывает только эти методы; внутри — любая логика:
@@ -580,7 +582,8 @@ Scripts/
 
 4.10 OfflineResult (UI)
     - OfflineResultPanel + OfflineResultRowView + OfflineResultPresenter
-    - Сводка: «Вас не было» / «Начислено за» (+ пометка лимита); строки ±ресурс
+    - Сводка: «Вас не было» / «Начислено за» (+ пометка лимита)
+    - Два списка: обычные ресурсы (!IsUnit) и юниты (IsUnit); пустая секция скрывается
     - Показ только при Applied; Header «Ресурсы» закрывает попап
 
 

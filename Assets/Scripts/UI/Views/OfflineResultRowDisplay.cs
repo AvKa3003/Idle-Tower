@@ -3,7 +3,6 @@ using UnityEngine;
 
 namespace IdleTower.UI.Views
 {
-    /// <summary>DTO строки офлайн-отчёта: ресурс и дельта кошелька.</summary>
     public readonly struct OfflineResultRowDisplay
     {
         public ResourceDefinition Resource { get; }

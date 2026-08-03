@@ -2,20 +2,31 @@ using System;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace IdleTower.UI.Views
 {
-    /// <summary>Модалка итогов офлайн-симуляции: сводка + строки дельт ресурсов.</summary>
     public class OfflineResultPanel : MonoBehaviour
     {
         [SerializeField] private GameObject root;
         [SerializeField] private TextMeshProUGUI summaryText;
-        [SerializeField] private Transform rowsRoot;
+
+        [Header("Обычные ресурсы")]
+        [FormerlySerializedAs("rowsRoot")]
+        [SerializeField] private Transform resourceRowsRoot;
+        [SerializeField] private GameObject resourcesSectionRoot;
+
+        [Header("Юниты (отдельная секция / окно)")]
+        [SerializeField] private Transform unitRowsRoot;
+        [SerializeField] private GameObject unitsSectionRoot;
+
+        [Header("Общее")]
         [SerializeField] private OfflineResultRowView rowPrefab;
         [SerializeField] private Button closeButton;
 
-        private readonly List<OfflineResultRowView> _rows = new();
+        private readonly List<OfflineResultRowView> _resourceRows = new();
+        private readonly List<OfflineResultRowView> _unitRows = new();
 
         public event Action CloseClicked;
 
@@ -39,10 +50,14 @@ namespace IdleTower.UI.Views
             if (root != null)
                 root.SetActive(false);
 
-            ClearRows();
+            ClearRows(_resourceRows);
+            ClearRows(_unitRows);
         }
 
-        public void Open(string summary, IReadOnlyList<OfflineResultRowDisplay> displays)
+        public void Open(
+            string summary,
+            IReadOnlyList<OfflineResultRowDisplay> resourceDisplays,
+            IReadOnlyList<OfflineResultRowDisplay> unitDisplays)
         {
             if (summaryText != null)
                 summaryText.text = summary ?? string.Empty;
@@ -50,59 +65,76 @@ namespace IdleTower.UI.Views
             if (root != null)
                 root.SetActive(false);
 
-            RefreshRows(displays);
+            RefreshList(
+                resourceDisplays,
+                resourceRowsRoot,
+                _resourceRows,
+                resourcesSectionRoot);
+
+            RefreshList(
+                unitDisplays,
+                unitRowsRoot,
+                _unitRows,
+                unitsSectionRoot);
 
             if (root != null)
                 root.SetActive(true);
         }
 
-        public void RefreshRows(IReadOnlyList<OfflineResultRowDisplay> displays)
+        private void RefreshList(
+            IReadOnlyList<OfflineResultRowDisplay> displays,
+            Transform rowsParent,
+            List<OfflineResultRowView> rows,
+            GameObject sectionRoot)
         {
-            if (displays == null || rowPrefab == null)
+            var hasRows = displays != null && displays.Count > 0 && rowPrefab != null && rowsParent != null;
+
+            if (sectionRoot != null)
+                sectionRoot.SetActive(hasRows);
+
+            if (!hasRows)
             {
-                ClearRows();
+                ClearRows(rows);
                 return;
             }
 
-            if (_rows.Count != displays.Count)
+            if (rows.Count != displays.Count)
             {
-                SetRows(displays);
+                SetRows(displays, rowsParent, rows);
                 return;
             }
 
             for (var i = 0; i < displays.Count; i++)
             {
-                if (_rows[i] != null)
-                    _rows[i].SetDisplay(displays[i]);
+                if (rows[i] != null)
+                    rows[i].SetDisplay(displays[i]);
             }
         }
 
-        private void SetRows(IReadOnlyList<OfflineResultRowDisplay> displays)
+        private void SetRows(
+            IReadOnlyList<OfflineResultRowDisplay> displays,
+            Transform parent,
+            List<OfflineResultRowView> rows)
         {
-            ClearRows();
-
-            if (displays == null || rowPrefab == null)
-                return;
-
-            var parent = rowsRoot != null ? rowsRoot : transform;
+            ClearRows(rows);
 
             for (var i = 0; i < displays.Count; i++)
             {
                 var row = Instantiate(rowPrefab, parent);
                 row.SetDisplay(displays[i]);
-                _rows.Add(row);
+                rows.Add(row);
             }
         }
 
-        private void ClearRows()
+        private static void ClearRows(List<OfflineResultRowView> rows)
         {
-            for (var i = 0; i < _rows.Count; i++)
+            for (var i = 0; i < rows.Count; i++)
             {
-                if (_rows[i] != null)
-                    Destroy(_rows[i].gameObject);
+                if (rows[i] != null)
+                    Destroy(rows[i].gameObject);
             }
 
-            _rows.Clear();
+            rows.Clear();
         }
 
         private void HandleCloseClick()

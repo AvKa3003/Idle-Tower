@@ -6,9 +6,6 @@ namespace IdleTower.Core.Events
 {
     public static class GameEvents
     {
-        /// <summary>
-        /// Подавить Raise* (офлайн catch-up): тики идут, подписчики не дергаются.
-        /// </summary>
         public static bool Suppress { get; set; }
 
         public static event Action<ResourceDefinition, int> ResourceChanged;
