@@ -272,9 +272,12 @@ Scripts/
 ├── Audio/
 │   └── SfxPlayer.cs              — Presenter звука: RoomBuilt → PlayOneShot
 │
+├── Editor/
+│   └── ResourceDefinitionEditor.cs — Strength в Inspector только при IsUnit
+│
 ├── Data/
 │   ├── Definitions/
-│   │   ├── ResourceDefinition.cs — ResourceId, displayName, icon, isUnit
+│   │   ├── ResourceDefinition.cs — ResourceId, displayName, icon, isUnit, strength
 │   │   ├── ResourceId.cs         — readonly struct Id ресурса
 │   │   ├── RoomDefinition.cs     — RoomId, prefab, cost, behavior, unlockRules
 │   │   ├── RoomId.cs             — readonly struct Id комнаты
@@ -360,6 +363,10 @@ Scripts/
     - Sprite Icon
     - bool IsUnit                    — юнит = тот же ресурс в Wallet; пока только
                                        отдельный список в OfflineResultPanel
+    - int Strength                   — сила для набегов; в Inspector только при
+                                       IsUnit (ResourceDefinitionEditor); при снятии
+                                       галочки значение в ассете не стирается
+    - ConfigValidator: Strength >= 0; при IsUnit — Strength >= 1
 
 3.2 IRoomBehavior / RoomBehaviorBase (ScriptableObject)
     Контракт — ядро вызывает только эти методы; внутри — любая логика:

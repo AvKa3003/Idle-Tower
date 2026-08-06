@@ -230,7 +230,7 @@
 ЭТАП A2 (желательно рядом с A или после) — Editor для карты
   См. §8. Можно отложить, пока клеткам мало и правки руками в MapConfig.
 
-ЭТАП B — Strength + PropertyDrawer (hide if !IsUnit) + Validator
+ЭТАП B — Strength + PropertyDrawer (hide if !IsUnit) + Validator [готово]
 
 ЭТАП C — Raid MVP
   1 рейд на клетку, списание юнитов, play/pause, тик+офлайн,

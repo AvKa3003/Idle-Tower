@@ -56,6 +56,7 @@ namespace IdleTower.Core
                 }
 
                 ValidateResourceId(resource, $"GameBalanceConfig.AllResources[{i}]", seenIds, errors);
+                ValidateResourceStrength(resource, $"GameBalanceConfig.AllResources[{i}]", errors);
             }
 
             ValidateCosts(balance.StartingResources, "GameBalanceConfig.StartingResources", seenIds, errors, allowEmptyArray: true);
@@ -251,6 +252,25 @@ namespace IdleTower.Core
             var id = resource.Id.Value;
             if (!seenIds.Add(id))
                 errors.Add($"{path} ('{resource.name}'): дубликат Resource.Id '{id}'.");
+        }
+
+        private static void ValidateResourceStrength(
+            ResourceDefinition resource,
+            string path,
+            List<string> errors)
+        {
+            if (resource.Strength < 0)
+            {
+                errors.Add(
+                    $"{path} ('{resource.name}'): Strength < 0.");
+                return;
+            }
+
+            if (resource.IsUnit && resource.Strength < 1)
+            {
+                errors.Add(
+                    $"{path} ('{resource.name}'): IsUnit=true, но Strength < 1.");
+            }
         }
 
         private static HashSet<string> CollectResourceIds(GameBalanceConfig balance)

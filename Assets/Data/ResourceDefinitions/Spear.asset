@@ -16,3 +16,4 @@ MonoBehaviour:
   displayName: "\u0411\u043E\u043C\u0436 \u0441 \u043A\u043E\u043F\u044C\u0435\u043C"
   icon: {fileID: 8494564294788764885, guid: af4671a459998b7478fbdf24a24689e8, type: 3}
   isUnit: 1
+  strength: 1

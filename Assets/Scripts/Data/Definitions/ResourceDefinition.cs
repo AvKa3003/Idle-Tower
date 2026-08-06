@@ -10,10 +10,14 @@ namespace IdleTower.Data.Definitions
         [SerializeField] private Sprite icon;
 
         [SerializeField] private bool isUnit;
+        [SerializeField] private int strength;
 
         public ResourceId Id => ResourceId.FromSerialized(id);
         public string DisplayName => displayName;
         public Sprite Icon => icon;
         public bool IsUnit => isUnit;
+
+        /// <summary>Сила юнита для набегов. Имеет смысл при IsUnit; значение в ассете не стирается при снятии галочки.</summary>
+        public int Strength => strength;
     }
 }
