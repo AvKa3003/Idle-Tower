@@ -1,4 +1,4 @@
-================================================================================
+﻿================================================================================
 АРХИТЕКТУРА ПРОЕКТА — IDLE TOWER (по мотивам Idle Apocalypse)
 ================================================================================
 Версия: 1.16
@@ -345,29 +345,35 @@ Scripts/
 │   │   ├── MainTowerScreen.cs
 │   │   └── MapScreen.cs
 │   ├── Views/
-│   │   ├── HeaderPanel.cs        — ресурсы / юниты / карта
-│   │   ├── MapView.cs / MapCellView.cs
-│   │   ├── MapStubPanel.cs
-│   │   ├── ResourceListPanel.cs
-│   │   ├── ResourceListRowView.cs
-│   │   ├── ResourceListRowDisplay.cs
-│   │   ├── OfflineResultPanel.cs
-│   │   ├── OfflineResultRowView.cs / OfflineResultRowDisplay.cs
-│   │   ├── RoomSelectionPanel.cs
-│   │   ├── RoomOptionView.cs / RoomOptionDisplay.cs
-│   │   ├── ProductionModePanel.cs
-│   │   └── OperationOptionView.cs / OperationOptionDisplay.cs
+│   │   ├── Common/
+│   │   │   └── HeaderPanel.cs
+│   │   ├── Map/
+│   │   │   ├── MapView.cs / MapCellView.cs
+│   │   │   └── MapStubPanel.cs
+│   │   ├── Tower/
+│   │   │   ├── RoomSelectionPanel.cs
+│   │   │   ├── RoomOptionView.cs / RoomOptionDisplay.cs
+│   │   │   ├── ProductionModePanel.cs
+│   │   │   └── OperationOptionView.cs / OperationOptionDisplay.cs
+│   │   └── Shared/
+│   │       ├── ResourceListPanel.cs
+│   │       ├── ResourceListRowView.cs / ResourceListRowDisplay.cs
+│   │       └── OfflineResultPanel.cs / OfflineResultRow*
 │   └── Presenters/
-│       ├── HeaderPresenter.cs
-│       ├── MapPresenter.cs
-│       ├── ResourceListPresenter.cs
-│       ├── UnitListPresenter.cs
-│       ├── OfflineResultPresenter.cs
-│       ├── RoomSelectionPresenter.cs
-│       ├── TowerPresenter.cs
-│       ├── ProductionModePresenter.cs
-│       ├── UiRootPresenter.cs
-│       └── Rooms/RoomUiRouter.cs
+│       ├── Common/
+│       │   ├── UiRootPresenter.cs
+│       │   └── HeaderPresenter.cs
+│       ├── Map/
+│       │   └── MapPresenter.cs
+│       ├── Tower/
+│       │   ├── TowerPresenter.cs
+│       │   ├── RoomSelectionPresenter.cs
+│       │   ├── ProductionModePresenter.cs
+│       │   └── RoomUiRouter.cs
+│       └── Shared/
+│           ├── ResourceListPresenter.cs
+│           ├── UnitListPresenter.cs
+│           └── OfflineResultPresenter.cs
 │
 └── Tower/
     ├── TowerView.cs
