@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 066563a943e05b24cab232bc2bc04a54, type: 3}
+  m_Name: HomeCell
+  m_EditorClassIdentifier: Assembly-CSharp::IdleTower.Data.Definitions.MapCellDefinition
+  id: home
+  displayName: "\u0414\u043E\u043C"
+  sprite: {fileID: 6182606708524468135, guid: 78dcfe2b367ea274fb5d01ca7196b2bc, type: 3}
+  behavior: {fileID: 11400000, guid: c3c5e831c8d373e46bcf903c7ef6ff14, type: 2}

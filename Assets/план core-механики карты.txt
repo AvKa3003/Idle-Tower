@@ -220,7 +220,7 @@
 6. ЭТАПЫ (= отдельные запросы)
 ================================================================================
 
-ЭТАП A — Каркас экрана + ручная карта (минимум клеток)
+ЭТАП A — Каркас экрана + ручная карта (минимум клеток) [готово]
   ScreenId.Map, MapScreen/Presenter/View/CellView
   MapConfig: дом + 4 соседа (заглушки) + Decorative пример
   Home → башня; Decorative без клика; соседи → заглушка UI
@@ -321,7 +321,7 @@
 ================================================================================
 
 MapCellBehavior
-  MapCellUiId OnDecideUi(ctx)
+  MapCellClickAction OnDecideAction(ctx)
   MapCellClickResult OnClicked(ctx)
   void OnTick(ctx, TickContext)
   void OnBecameInteractive(ctx) / OnCaptured(ctx)

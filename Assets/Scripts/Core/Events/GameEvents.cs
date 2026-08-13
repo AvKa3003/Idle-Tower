@@ -13,10 +13,7 @@ namespace IdleTower.Core.Events
         public static event Action<TickContext> GameTick;
         public static event Action<int, ModeId> ProductionModeChanged;
         public static event Action<int, ModeId> OperationModeUnlocked;
-
-        // TODO: второй экран — раскомментировать и вызывать из ScreenManager.Show
-        // public static event Action<ScreenId> ScreenChanged;
-        // public static void RaiseScreenChanged(ScreenId id) => ScreenChanged?.Invoke(id);
+        public static event Action<ScreenId> ScreenChanged;
 
         public static void RaiseResourceChanged(ResourceDefinition resource, int newAmount)
         {
@@ -46,6 +43,12 @@ namespace IdleTower.Core.Events
         {
             if (Suppress) return;
             OperationModeUnlocked?.Invoke(roomIndex, modeId);
+        }
+
+        public static void RaiseScreenChanged(ScreenId id)
+        {
+            if (Suppress) return;
+            ScreenChanged?.Invoke(id);
         }
     }
 }

@@ -14,7 +14,8 @@ namespace IdleTower.Core
 
         [SerializeField] private GameBalanceConfig balanceConfig;
         [SerializeField] private BuildingTreeConfig buildingTreeConfig;
-        [SerializeField] private MainTowerPresenter mainTowerPresenter;
+        [SerializeField] private MapConfig mapConfig;
+        [SerializeField] private UiRootPresenter uiRootPresenter;
 
         [Tooltip("Интервал автосохранения в секундах (реальное время).")]
         [Min(5f)]
@@ -83,7 +84,6 @@ namespace IdleTower.Core
             if (!_bootstrapped || _services?.Save == null)
                 return;
 
-            // force: всегда писать при уходе; minInterval режет двойной pause+focus
             if (_services.Save.TrySave(force: true, minIntervalSeconds: 0.75f))
                 Debug.Log($"[GameBootstrap] Save on {reason}");
         }
@@ -92,21 +92,22 @@ namespace IdleTower.Core
         {
             services = null;
 
-            if (balanceConfig == null || buildingTreeConfig == null)
+            if (balanceConfig == null || buildingTreeConfig == null || mapConfig == null)
             {
-                Debug.LogError("[GameBootstrap] Назначьте GameBalanceConfig и BuildingTreeConfig в Inspector.");
+                Debug.LogError(
+                    "[GameBootstrap] Назначьте GameBalanceConfig, BuildingTreeConfig и MapConfig в Inspector.");
                 return false;
             }
 
-            if (mainTowerPresenter == null)
+            if (uiRootPresenter == null)
             {
-                Debug.LogError("[GameBootstrap] Назначьте MainTowerPresenter (UI_Root) в Inspector.");
+                Debug.LogError("[GameBootstrap] Назначьте UiRootPresenter (UI_Root) в Inspector.");
                 return false;
             }
 
             try
             {
-                ConfigValidator.ValidateOrThrow(balanceConfig, buildingTreeConfig);
+                ConfigValidator.ValidateOrThrow(balanceConfig, buildingTreeConfig, mapConfig);
             }
             catch (System.Exception ex)
             {
@@ -114,12 +115,12 @@ namespace IdleTower.Core
                 throw;
             }
 
-            services = new GameServices(balanceConfig, buildingTreeConfig);
+            services = new GameServices(balanceConfig, buildingTreeConfig, mapConfig);
 
             if (!services.Save.TryLoad())
                 services.InitializeNewGame();
 
-            mainTowerPresenter.Initialize(services);
+            uiRootPresenter.Initialize(services);
             return true;
         }
     }

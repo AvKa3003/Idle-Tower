@@ -1,15 +1,20 @@
 using System;
 using System.Collections.Generic;
 using IdleTower.Data.Definitions;
+using IdleTower.Map;
 using IdleTower.Rooms.Behaviors;
 using IdleTower.Rooms.Production;
+using UnityEngine;
 
 namespace IdleTower.Core
 {
     /// <summary>Жёсткая проверка конфигов перед стартом игры. При ошибке — исключение.</summary>
     public static class ConfigValidator
     {
-        public static void ValidateOrThrow(GameBalanceConfig balance, BuildingTreeConfig buildingTree)
+        public static void ValidateOrThrow(
+            GameBalanceConfig balance,
+            BuildingTreeConfig buildingTree,
+            MapConfig mapConfig = null)
         {
             var errors = new List<string>();
 
@@ -22,6 +27,11 @@ namespace IdleTower.Core
                 errors.Add("BuildingTreeConfig не назначен.");
             else
                 ValidateBuildingTree(buildingTree, balance, errors);
+
+            if (mapConfig == null)
+                errors.Add("MapConfig не назначен.");
+            else
+                ValidateMap(mapConfig, errors);
 
             if (errors.Count == 0)
                 return;
@@ -130,6 +140,74 @@ namespace IdleTower.Core
                             $"RequiredRoom '{rule.RequiredRoom.name}' нет в AllRooms.");
                     }
                 }
+            }
+        }
+
+        private static void ValidateMap(MapConfig mapConfig, List<string> errors)
+        {
+            if (mapConfig.InteractionRadius < 0)
+                errors.Add("MapConfig.InteractionRadius < 0.");
+
+            if (mapConfig.VisionRadius < mapConfig.InteractionRadius)
+            {
+                errors.Add(
+                    "MapConfig.VisionRadius < InteractionRadius " +
+                    "(видимость должна быть не меньше интеракции).");
+            }
+
+            var entries = mapConfig.Entries;
+            if (entries == null || entries.Length == 0)
+            {
+                errors.Add("MapConfig.Entries пуст.");
+                return;
+            }
+
+            var coords = new HashSet<Vector2Int>();
+            var homeFound = false;
+
+            for (var i = 0; i < entries.Length; i++)
+            {
+                var entry = entries[i];
+                var path = $"MapConfig.Entries[{i}]";
+
+                if (!coords.Add(entry.Coord))
+                    errors.Add($"{path}: дубликат Coord {entry.Coord}.");
+
+                if (entry.Coord == mapConfig.HomeCoord)
+                    homeFound = true;
+
+                var cell = entry.Cell;
+                if (cell == null)
+                {
+                    errors.Add($"{path}.Cell = null.");
+                    continue;
+                }
+
+                if (cell.Id.IsEmpty)
+                    errors.Add($"{path} ('{cell.name}'): пустой Cell.Id.");
+
+                if (cell.Behavior == null)
+                    errors.Add($"{path} ('{cell.name}'): Behavior не назначен.");
+            }
+
+            if (!homeFound)
+                errors.Add($"MapConfig: нет Entries с Coord == HomeCoord {mapConfig.HomeCoord}.");
+
+            MapCellDefinition homeCell = null;
+            for (var i = 0; i < entries.Length; i++)
+            {
+                if (entries[i].Coord == mapConfig.HomeCoord)
+                {
+                    homeCell = entries[i].Cell;
+                    break;
+                }
+            }
+
+            if (homeCell?.Behavior != null && !homeCell.Behavior.RevealsNeighborsWhenInteractive)
+            {
+                errors.Add(
+                    "MapConfig: клетка HomeCoord должна распахивать соседей " +
+                    "(HomeMapCellBehavior / RevealsNeighborsWhenInteractive).");
             }
         }
 

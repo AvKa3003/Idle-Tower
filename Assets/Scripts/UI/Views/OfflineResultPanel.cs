@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace IdleTower.UI.Views
@@ -13,7 +12,6 @@ namespace IdleTower.UI.Views
         [SerializeField] private TextMeshProUGUI summaryText;
 
         [Header("Обычные ресурсы")]
-        [FormerlySerializedAs("rowsRoot")]
         [SerializeField] private Transform resourceRowsRoot;
         [SerializeField] private GameObject resourcesSectionRoot;
 

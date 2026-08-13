@@ -4,6 +4,7 @@ namespace IdleTower.Core
     public enum ScreenId
     {
         MainTower = 0,
-        Shop = 1
+        Shop = 1,
+        Map = 2
     }
 }

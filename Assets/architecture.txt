@@ -1,8 +1,8 @@
 ================================================================================
 АРХИТЕКТУРА ПРОЕКТА — IDLE TOWER (по мотивам Idle Apocalypse)
 ================================================================================
-Версия: 1.15
-Статус: фазы 1–5 реализованы в Scripts; Play Mode на сцене; фаза 6 — backlog
+Версия: 1.16
+Статус: фазы 1–5 + сейв/офлайн + карта этап A (экран/presence/stub); рейды — backlog
 
 Согласовано / реализовано:
   [x] Строгое разделение Systems / Presenters / Views (вариант 2)
@@ -93,15 +93,15 @@
     │ OperationModeUnlocked        │ ProductionRoomBehavior     │ TowerPresenter →           │
     │   (roomIndex, ModeId)        │ TryUnlockMode (не OnBuilt) │ ProductionModePresenter;   │
     │                              │                            │ SfxPlayer → ModeUnlocked   │
+    │ ScreenChanged                │ ScreenManager.Show         │ (пока нет; SFX later)      │
+    │   (ScreenId id)              │                            │                            │
     └──────────────────────────────┴────────────────────────────┴────────────────────────────┘
-
-    Отложено (TODO в коде):
-    - ScreenChanged(ScreenId id) — при 2+ экранах; Raise из ScreenManager.Show
 
     UI после действия игрока:
     - RoomSelectionPresenter: TryBuild → при успехе сам Hide()
     - Башня: RoomBuilt / GameTick; ресурсы в модалке: ResourceChanged (пока открыта)
-    - Header «Ресурсы» / «Юниты» закрывают чужие модалки и открывают ResourceList / UnitList
+    - Header «Ресурсы» / «Юниты» / «Карта»; карта → MapPresenter.OpenMap
+      (дом на карте / кнопка «назад» → MainTower)
 
     Расширение (фаза 6):
     1) IGameEvents — для unit-тестов без статики
@@ -120,7 +120,7 @@
     SO-EventChannel не используем.
 
 1.4 Единая точка входа
-    GameBootstrap: ConfigValidator.ValidateOrThrow → GameServices → MainTowerPresenter.
+    GameBootstrap: ConfigValidator.ValidateOrThrow → GameServices → UiRootPresenter.
     При ошибке конфига — LogError + exception, игра не стартует (enabled = false).
 
 1.5 Состояние игры отделено от отображения
@@ -258,13 +258,13 @@
 
 Scripts/
 ├── Core/
-│   ├── GameBootstrap.cs          — валидация → GameServices → тик → MainTowerPresenter
+│   ├── GameBootstrap.cs          — валидация → GameServices → тик → UiRootPresenter
 │   ├── GameServices.cs           — доступ к системам и runtime-состоянию
 │   ├── GameTickSystem.cs         — аккумулятор времени, вызов тиков
-│   ├── ConfigValidator.cs        — ValidateOrThrow(balance, buildingTree) при старте
+│   ├── ConfigValidator.cs        — ValidateOrThrow(balance, buildingTree, map) при старте
 │   ├── ITickable.cs              — OnTick(TickContext)
 │   ├── TickContext.cs
-│   ├── ScreenId.cs               — enum экранов
+│   ├── ScreenId.cs               — MainTower, Shop, Map
 │   ├── ResourceTextFormat.cs     — текст стоимостей / have/need для UI
 │   └── Events/
 │       └── GameEvents.cs         — статический bus (UI + SFX подписчики)
@@ -281,6 +281,9 @@ Scripts/
 │   │   ├── ResourceId.cs         — readonly struct Id ресурса
 │   │   ├── RoomDefinition.cs     — RoomId, prefab, cost, behavior, unlockRules
 │   │   ├── RoomId.cs             — readonly struct Id комнаты
+│   │   ├── MapConfig.cs          — homeCoord, радиусы, neighborMode, entries
+│   │   ├── MapCellDefinition.cs  — id, sprite, behavior
+│   │   ├── MapCellId.cs
 │   │   ├── BuildingTreeConfig.cs
 │   │   ├── GameBalanceConfig.cs  — TPS, AllResources, StartingResources, MaxCatchUp
 │   │   ├── GameDuration.cs
@@ -291,9 +294,23 @@ Scripts/
 │       ├── ResourceWallet.cs     — Dictionary<ResourceDefinition,int>; сейв по ResourceId
 │       ├── TowerState.cs
 │       ├── TowerRoom.cs
-│       └── RoomBehaviorState.cs
+│       ├── RoomBehaviorState.cs
+│       ├── MapState.cs
+│       ├── MapCellRuntime.cs
+│       └── MapCellRuntimeState.cs
 │   └── Save/
 │       └── GameSaveData.cs       — DTO JSON сейва
+│
+├── Map/
+│   ├── MapNeighborMode.cs        — Four / Nine
+│   ├── MapPresence.cs            — Fog / VisibleOnly / Interactive
+│   ├── MapCellClickAction.cs / MapCellClickResult.cs
+│   ├── MapCellBehaviorBase.cs
+│   ├── MapCellBehaviorContext.cs
+│   └── Behaviors/
+│       ├── HomeMapCellBehavior.cs
+│       ├── DecorativeMapCellBehavior.cs  — revealsNeighbors галочка
+│       └── StubMapCellBehavior.cs        — заглушка UI этапа A
 │
 ├── Rooms/
 │   ├── IRoomBehavior.cs
@@ -316,6 +333,7 @@ Scripts/
 │   ├── UnlockTreeSystem.cs
 │   ├── RoomBehaviorSystem.cs     — Tick, OnBuilt, OnClick, Status
 │   ├── ProductionSystem.cs       — Try*Mode / GetOperationModes
+│   ├── MapSystem.cs              — presence + клики клеток (рейды later)
 │   ├── SaveSystem.cs             — JSON save/load
 │   ├── OperationModeInfo.cs
 │   └── BuildResult.cs
@@ -324,9 +342,12 @@ Scripts/
 │   ├── ScreenManager.cs
 │   ├── IScreen.cs
 │   ├── Screens/
-│   │   └── MainTowerScreen.cs
+│   │   ├── MainTowerScreen.cs
+│   │   └── MapScreen.cs
 │   ├── Views/
-│   │   ├── HeaderPanel.cs
+│   │   ├── HeaderPanel.cs        — ресурсы / юниты / карта
+│   │   ├── MapView.cs / MapCellView.cs
+│   │   ├── MapStubPanel.cs
 │   │   ├── ResourceListPanel.cs
 │   │   ├── ResourceListRowView.cs
 │   │   ├── ResourceListRowDisplay.cs
@@ -338,13 +359,14 @@ Scripts/
 │   │   └── OperationOptionView.cs / OperationOptionDisplay.cs
 │   └── Presenters/
 │       ├── HeaderPresenter.cs
+│       ├── MapPresenter.cs
 │       ├── ResourceListPresenter.cs
 │       ├── UnitListPresenter.cs
 │       ├── OfflineResultPresenter.cs
 │       ├── RoomSelectionPresenter.cs
 │       ├── TowerPresenter.cs
 │       ├── ProductionModePresenter.cs
-│       ├── MainTowerPresenter.cs
+│       ├── UiRootPresenter.cs
 │       └── Rooms/RoomUiRouter.cs
 │
 └── Tower/
@@ -367,6 +389,13 @@ Scripts/
                                        IsUnit (ResourceDefinitionEditor); при снятии
                                        галочки значение в ассете не стирается
     - ConfigValidator: Strength >= 0; при IsUnit — Strength >= 1
+
+3.1.1 Карта (этап A)
+    MapConfig: homeCoord, interactionRadius, visionRadius, neighborMode, entries[]
+    MapCellDefinition: id, displayName, sprite, behavior
+    MapPresence (runtime, не в сейве): Fog | VisibleOnly | Interactive
+    Behaviors: Home (→ башня), Decorative (без клика, опц. revealsNeighbors),
+               Stub (заглушка UI до рейда)
 
 3.2 IRoomBehavior / RoomBehaviorBase (ScriptableObject)
     Контракт — ядро вызывает только эти методы; внутри — любая логика:
@@ -604,7 +633,7 @@ Scripts/
 5.1 Старт игры
     GameBootstrap → ConfigValidator.ValidateOrThrow
     → GameServices → TryLoad (Apply + Offline.ApplyCatchUp) или InitializeNewGame
-    → MainTowerPresenter.Initialize → ScreenManager.Show(MainTower)
+    → UiRootPresenter.Initialize → ScreenManager.Show(MainTower)
     → TowerView отражает уже догнанное состояние башни/кошелька
 
 5.2 Клик по слоту постройки
@@ -645,8 +674,10 @@ Presenter: команды → Systems; факты → GameEvents; обновля
   - OfflineResultPanel      + OfflineResultPresenter  (после Load; строки OfflineResultRow*)
   - RoomSelectionPanel      + RoomSelectionPresenter
   - ProductionModePanel     + ProductionModePresenter
-  - MainTowerScreen         + MainTowerPresenter
-  - TowerView               + TowerPresenter
+  - UiRootPresenter (GO UI_Root) — общий bootstrap UI / ScreenManager / init presenters
+  - MainTowerScreen         — IScreen экрана башни (не путать с UiRoot)
+  - MapScreen               + MapPresenter
+  - TowerView               + TowerPresenter          (GO Tower)
   - EmptyRoomView / RoomView — клики → TowerPresenter
 
 Поток ресурсов / юнитов:
@@ -656,7 +687,7 @@ Presenter: команды → Systems; факты → GameEvents; обновля
 
 Офлайн-отчёт:
   TryLoad → Offline.ApplyCatchUp → LastResult
-  MainTowerPresenter.Initialize → OfflineResult.TryShowFromLastCatchUp (если Applied)
+  UiRootPresenter.Initialize → OfflineResult.TryShowFromLastCatchUp (если Applied)
 
 UI поведений:
   - Behavior → RoomClickResult.OpenUi (RoomUiId); TowerPresenter / RoomUiRouter
@@ -849,11 +880,41 @@ GameEvents / Presenters вывода (звук постройки — реали
    RoomSelectionPanel, ProductionModePanel
 7. Префабы: EmptyRoom, RoomView, RoomOption, OperationOption, ResourceListRow
 8. TowerView на сцене: spacing, prefab слота
-9. Назначить ссылки в Inspector (GameBootstrap: Balance, BuildingTree, MainTowerPresenter)
+9. Назначить ссылки в Inspector (GameBootstrap: Balance, BuildingTree, UiRootPresenter)
+
+——— ЭКРАН КАРТЫ (этап A) ———
+10. Папка Assets/Data/Map (или Data/MapCells)
+11. Create → IdleTower → Map Cell Behavior:
+    - Home
+    - Stub (соседи-заглушки)
+    - Decorative (галочка revealsNeighbors по желанию)
+12. Create → IdleTower → Map Cell Definition:
+    - HomeCell (behavior Home, спрайт дома)
+    - StubCell (behavior Stub) — можно один ассет на 4 клетки
+    - DecorativeCell (behavior Decorative)
+13. Create → IdleTower → Map Config:
+    - HomeCoord = (0,0)
+    - InteractionRadius = 1, VisionRadius = 2, NeighborMode = Four
+    - Entries:
+        (0,0) HomeCell
+        (1,0) ( -1,0) (0,1) (0,-1) → StubCell
+        (2,0) или (1,1) → DecorativeCell (при Vision=2 будет VisibleOnly
+         если дальше interaction; или поставь на соседнюю клетку вместо Stub)
+14. Canvas:
+    - GO MapScreen + MapScreen (root, кнопка «В башню»)
+    - дочерний MapView (cellsRoot, cellPrefab, fogSprite, cellSize/spacing)
+      Fog клетки видны со спрайтом fogSprite (назначить в Inspector)
+    - префаб MapCellView: Image + Button (+ CanvasGroup опционально)
+    - MapStubPanel: title/body TMP + Close
+    - MapPresenter: ссылки на MapScreen, MapView, MapStubPanel
+15. HeaderPanel: кнопка Map → поле mapButton
+16. UiRootPresenter: поле Map → MapPresenter
+17. GameBootstrap: поле Map Config → созданный MapConfig
+18. MapScreen по умолчанию выключен (Hide); старт — MainTower
 
 [x] Имена папок и классов — как в разделе 2 (актуальное дерево Scripts/)
 
-Статус: фазы 1–5 + RoomBuilt SFX через GameEvents; backlog фазы 6 — Save, OpenUi, offline…
+Статус: фазы 1–5 + офлайн/сейв + экран карты (этап A scaffold); рейды — следующие этапы
 
 ================================================================================
 12. ПОРЯДОК РЕАЛИЗАЦИИ
@@ -899,7 +960,7 @@ GameEvents / Presenters вывода (звук постройки — реали
 ФАЗА 5 — Сборка и запуск [готово в коде + ассеты на сцене]
 ────────────────────────────────────────────────────────────────────────────────
 
-  GameBootstrap: ValidateOrThrow + wiring MainTowerPresenter
+  GameBootstrap: ValidateOrThrow + wiring UiRootPresenter
   Ассеты: ресурсы, production behaviors, комнаты, Balance, BuildingTree
   Play Mode: постройка, производство, режимы, ResourceList
 

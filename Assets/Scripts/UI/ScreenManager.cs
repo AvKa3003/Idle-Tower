@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using IdleTower.Core;
+using IdleTower.Core.Events;
 using UnityEngine;
 
 namespace IdleTower.UI
@@ -23,6 +24,8 @@ namespace IdleTower.UI
 
             if (_screens.TryGetValue(id, out var screen))
                 screen.Show();
+
+            GameEvents.RaiseScreenChanged(id);
         }
 
         public void Hide(ScreenId id)

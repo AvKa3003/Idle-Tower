@@ -9,7 +9,7 @@ namespace IdleTower.UI.Presenters
     /// <summary>
     /// OfflineResultPresenter — модалка итогов офлайн-догона после Load.
     ///
-    /// Получает: TryShowFromLastCatchUp от MainTowerPresenter; CloseClicked с панели
+    /// Получает: TryShowFromLastCatchUp от UiRootPresenter; CloseClicked с панели
     /// Отправляет: OfflineResultPanel.Open / Hide
     ///
     /// View:        OfflineResultPanel

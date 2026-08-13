@@ -5,17 +5,19 @@ using UnityEngine;
 namespace IdleTower.UI.Presenters
 {
     /// <summary>
-    /// MainTowerPresenter — bootstrap главного экрана.
+    /// UiRootPresenter — общий bootstrap UI (GO UI_Root).
+    /// Регистрирует экраны, инициализирует presenters, стартовый Show.
+    ///
+    /// Не логика башни: за башню отвечают MainTowerScreen + TowerPresenter (GO Tower).
     ///
     /// Получает: GameServices от GameBootstrap
     /// Отправляет: Initialize(services) дочерним presenters; Show MainTowerScreen
     ///
-    /// View:        MainTowerScreen
-    /// Systems:      —
-    /// Presenters:   Header, RoomSelection, ProductionMode, Tower, OfflineResult
+    /// Screens:      MainTowerScreen, MapScreen (через MapPresenter)
+    /// Presenters:   Header, RoomSelection, ProductionMode, Tower, OfflineResult, Map
     /// GameEvents:   —
     /// </summary>
-    public class MainTowerPresenter : MonoBehaviour
+    public class UiRootPresenter : MonoBehaviour
     {
         [SerializeField] private ScreenManager screenManager;
         [SerializeField] private MainTowerScreen mainTowerScreen;
@@ -24,6 +26,7 @@ namespace IdleTower.UI.Presenters
         [SerializeField] private ProductionModePresenter productionMode;
         [SerializeField] private TowerPresenter tower;
         [SerializeField] private OfflineResultPresenter offlineResult;
+        [SerializeField] private MapPresenter map;
 
         private bool _initialized;
 
@@ -38,7 +41,8 @@ namespace IdleTower.UI.Presenters
             roomSelection?.Initialize(services);
             productionMode?.Initialize(services);
             offlineResult?.Initialize(services);
-            header?.Initialize(services, roomSelection, productionMode, offlineResult);
+            map?.Initialize(services, screenManager);
+            header?.Initialize(services, roomSelection, productionMode, offlineResult, map);
             tower?.Initialize(services);
 
             if (screenManager != null)

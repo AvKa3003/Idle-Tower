@@ -9,12 +9,12 @@ namespace IdleTower.UI.Presenters
     /// <summary>
     /// HeaderPresenter — верхняя панель кнопок.
     ///
-    /// Получает: клики HeaderPanel (ресурсы / юниты); ссылки RoomSelection/ProductionMode от MainTowerPresenter
-    /// Отправляет: Close чужих модалок; ResourceList / UnitList Open
+    /// Получает: клики HeaderPanel (ресурсы / юниты / карта); ссылки RoomSelection/ProductionMode от UiRootPresenter
+    /// Отправляет: Close чужих модалок; ResourceList / UnitList Open; MapPresenter.OpenMap
     ///
     /// View:        HeaderPanel
     /// Systems:      Wallet (видимость кнопки юнитов)
-    /// Presenters:   ResourceList, UnitList; RoomSelection, ProductionMode, OfflineResult (закрывает)
+    /// Presenters:   ResourceList, UnitList, Map; RoomSelection, ProductionMode, OfflineResult (закрывает)
     /// GameEvents:   ResourceChanged (кнопка юнитов)
     /// </summary>
     public class HeaderPresenter : MonoBehaviour
@@ -27,6 +27,7 @@ namespace IdleTower.UI.Presenters
         private RoomSelectionPresenter _roomSelection;
         private ProductionModePresenter _productionMode;
         private OfflineResultPresenter _offlineResult;
+        private MapPresenter _map;
         private bool _subscribed;
         private bool _gameEventsSubscribed;
 
@@ -34,12 +35,14 @@ namespace IdleTower.UI.Presenters
             GameServices services,
             RoomSelectionPresenter roomSelection,
             ProductionModePresenter productionMode,
-            OfflineResultPresenter offlineResult = null)
+            OfflineResultPresenter offlineResult = null,
+            MapPresenter map = null)
         {
             _services = services;
             _roomSelection = roomSelection;
             _productionMode = productionMode;
             _offlineResult = offlineResult;
+            _map = map;
             resourceList?.Initialize(services);
             unitList?.Initialize(services);
             Subscribe();
@@ -60,6 +63,7 @@ namespace IdleTower.UI.Presenters
 
             panel.ResourcesClicked += HandleResourcesClicked;
             panel.UnitsClicked += HandleUnitsClicked;
+            panel.MapClicked += HandleMapClicked;
             _subscribed = true;
         }
 
@@ -70,6 +74,7 @@ namespace IdleTower.UI.Presenters
 
             panel.ResourcesClicked -= HandleResourcesClicked;
             panel.UnitsClicked -= HandleUnitsClicked;
+            panel.MapClicked -= HandleMapClicked;
             _subscribed = false;
         }
 
@@ -138,6 +143,14 @@ namespace IdleTower.UI.Presenters
             CloseGameplayModals();
             resourceList?.Close();
             unitList?.Open();
+        }
+
+        private void HandleMapClicked()
+        {
+            CloseGameplayModals();
+            resourceList?.Close();
+            unitList?.Close();
+            _map?.OpenMap();
         }
     }
 }

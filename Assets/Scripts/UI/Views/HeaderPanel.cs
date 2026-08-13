@@ -8,9 +8,11 @@ namespace IdleTower.UI.Views
     {
         [SerializeField] private Button resourcesButton;
         [SerializeField] private Button unitsButton;
+        [SerializeField] private Button mapButton;
 
         public event Action ResourcesClicked;
         public event Action UnitsClicked;
+        public event Action MapClicked;
 
         private void Awake()
         {
@@ -19,6 +21,9 @@ namespace IdleTower.UI.Views
 
             if (unitsButton != null)
                 unitsButton.onClick.AddListener(HandleUnitsClick);
+
+            if (mapButton != null)
+                mapButton.onClick.AddListener(HandleMapClick);
         }
 
         private void OnDestroy()
@@ -28,6 +33,9 @@ namespace IdleTower.UI.Views
 
             if (unitsButton != null)
                 unitsButton.onClick.RemoveListener(HandleUnitsClick);
+
+            if (mapButton != null)
+                mapButton.onClick.RemoveListener(HandleMapClick);
         }
 
         public void SetUnitsButtonVisible(bool visible)
@@ -44,6 +52,11 @@ namespace IdleTower.UI.Views
         private void HandleUnitsClick()
         {
             UnitsClicked?.Invoke();
+        }
+
+        private void HandleMapClick()
+        {
+            MapClicked?.Invoke();
         }
     }
 }

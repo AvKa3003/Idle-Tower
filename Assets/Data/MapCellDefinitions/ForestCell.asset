@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 066563a943e05b24cab232bc2bc04a54, type: 3}
+  m_Name: ForestCell
+  m_EditorClassIdentifier: Assembly-CSharp::IdleTower.Data.Definitions.MapCellDefinition
+  id: forest
+  displayName: "\u041B\u0435\u0441"
+  sprite: {fileID: -30984205135474821, guid: 769d7c3f711f92048b08441dd403e227, type: 3}
+  behavior: {fileID: 11400000, guid: 4946e0f7c11ea4543bfa45896bf533e7, type: 2}
