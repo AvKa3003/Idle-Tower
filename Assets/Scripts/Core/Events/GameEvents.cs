@@ -14,6 +14,7 @@ namespace IdleTower.Core.Events
         public static event Action<int, ModeId> ProductionModeChanged;
         public static event Action<int, ModeId> OperationModeUnlocked;
         public static event Action<ScreenId> ScreenChanged;
+        public static event Action MapPresenceChanged;
 
         public static void RaiseResourceChanged(ResourceDefinition resource, int newAmount)
         {
@@ -49,6 +50,12 @@ namespace IdleTower.Core.Events
         {
             if (Suppress) return;
             ScreenChanged?.Invoke(id);
+        }
+
+        public static void RaiseMapPresenceChanged()
+        {
+            if (Suppress) return;
+            MapPresenceChanged?.Invoke();
         }
     }
 }

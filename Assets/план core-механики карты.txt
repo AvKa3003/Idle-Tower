@@ -41,18 +41,27 @@
   - Декоративная / скрытая → клика нет (или клик игнорируется).
 
 1.3 Набег (до захвата)
-  - Требования: мин. конкретные юниты + общая сила (добивка любыми юнитами).
-  - Юниты СПИСЫВАЮТСЯ СРАЗУ И НАВСЕГДА при старте набега.
+  - Требования конфига: мин. конкретные юниты + общая сила (добивка любыми
+    юнитами в СОСТАВЕ, который выбрал игрок — без автоподбора).
+  - Игрок в UI клетки задаёт количество каждого юнита → состав СОХРАНЯЕТСЯ
+    на клетке (PlannedArmy). Этот же состав уходит в каждый следующий рейд.
+  - Юниты СПИСЫВАЮТСЯ СРАЗУ И НАВСЕГДА при старте набега (ровно PlannedArmy).
   - Длительность в секундах; прогресс через GameTickSystem / ITickable
     (как ProductionRoom); офлайн catch-up тот же SimulateForSeconds.
-  - На клетке: Play / Pause. Pause — только запрет НОВЫХ набегов;
-    уже идущий набег не стопается.
+  - Play / Pause:
+      • Play всегда доступен (даже если юнитов в кошельке не хватает).
+      • В режиме Play: как только в кошельке хватает на сохранённый состав
+        и состав удовлетворяет требованиям — автостарт рейда; после
+        завершения снова ждём накопления и шлём тот же состав.
+      • Pause — только запрет НОВЫХ набегов; уже идущий не стопается.
+      • Любое изменение состава → автоматически Pause, пока игрок снова
+        не нажмёт Play.
   - На клетку одновременно только ОДИН набег.
   - Если Play у нескольких клеток в одном тике — порядок детерминированный
-    по мировой сетке (напр. y возрастает, внутри ряда x возрастает;
-    или наоборот — зафиксировать в коде один раз).
+    по мировой сетке (y, затем x).
   - Лимит завершённых набегов (до захвата) → Captured → открытие соседей
-    (reveal availability).
+    (reveal availability). RaidFarm при захвате стартует на Pause
+    (игрок сам включает Play после проверки farm-цены).
 
 1.4 После захвата
   - Dead / «завершена»: без геймплея; меняется текстура/вид.
@@ -84,6 +93,8 @@
   [x] Параллель на клетку: ровно 1 активный набег.
   [x] Несколько Play: сортировка клеток по координатам сетки, по порядку
       попытка автостарта в одном тике.
+  [x] Состав армии: ручной выбор в UI, сохранение на клетке, повтор того же
+      состава; Play всегда; смена состава → Pause; без TryBuildAutoArmy.
   [x] RaidFarm после захвата: без лимита рейдов.
   [x] Таймеры рейдов и пассива: тики + офлайн как production.
   [x] Карта: ручная авторская, не генерация.
@@ -205,15 +216,16 @@
     - mapPresence: Fog | VisibleOnly | Interactive
       // runtime-кэш; НЕ в сейве; RecomputeMapPresence()
     - behaviorState (JSON или поля): pause, completedRaids, activeRaid?,
-      lootClaimed, passiveElapsed, phase…
+      plannedArmy[], lootClaimed, passiveElapsed, phase…
       // в сейве — только behaviorState (+ то, что нельзя вывести)
 
 5.3 Systems
   MapSystem : ITickable
     Tick: (1) прогресс активных рейдов/пассива
-          (2) автостарт: список Interactive+Play клеток, sort by (y,x), TryStart
-    TryTogglePause, TryClaimLoot, RecomputeMapPresence, GetInfo…
-  RaidArmyHelper — CanAfford, BuildAutoArmy, TrySpend (permanent)
+          (2) автостарт: Interactive+Play+состав ок+кошелёк хватает,
+              sort (y,x), Spend(PlannedArmy)+Start
+    TryTogglePause, TrySetPlannedArmyUnit, TryClaimLoot, RecomputeMapPresence…
+  RaidArmyHelper — MeetsConfig, CanAfford, CalcStrength, TrySpend (permanent)
 
 
 ================================================================================
@@ -232,11 +244,11 @@
 
 ЭТАП B — Strength + PropertyDrawer (hide if !IsUnit) + Validator [готово]
 
-ЭТАП C — Raid MVP
-  1 рейд на клетку, списание юнитов, play/pause, тик+офлайн,
+ЭТАП C — Raid MVP [в коде; состав армии — ручной]
+  1 рейд на клетку, PlannedArmy + play/pause, тик+офлайн,
   maxRaids → capture → RecomputeMapPresence
-  автостарт с сортировкой по сетке
-  (+ CustomEditor PostCaptureMode можно здесь или мини-шагом)
+  автостарт сохранённого состава (sort y,x); смена состава → Pause
+  (+ CustomEditor PostCaptureMode)
 
 ЭТАП D — Сейв карты
   Сохраняем behaviorState клеток (pause, рейды, lootClaimed…).

@@ -11,7 +11,7 @@ namespace IdleTower.Map
 
         GoToMainTower = 1,
 
-        /// <summary>Заглушка-панель до рейда/лута (этап A).</summary>
-        OpenStub = 2
+        /// <summary>Панель набега.</summary>
+        OpenRaid = 2
     }
 }

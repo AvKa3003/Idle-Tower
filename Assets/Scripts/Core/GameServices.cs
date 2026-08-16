@@ -46,6 +46,7 @@ namespace IdleTower.Core
             Offline = new OfflineSimulationSystem(this);
 
             TickSystem.RegisterTickable(RoomBehaviors);
+            TickSystem.RegisterTickable(Map);
         }
 
         public void InitializeNewGame()

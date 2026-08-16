@@ -1,5 +1,10 @@
+using System.Collections.Generic;
 using IdleTower.Core;
+using IdleTower.Core.Events;
+using IdleTower.Data.Definitions;
 using IdleTower.Map;
+using IdleTower.Map.Raid;
+using IdleTower.Systems;
 using IdleTower.UI.Screens;
 using IdleTower.UI.Views;
 using UnityEngine;
@@ -7,24 +12,31 @@ using UnityEngine;
 namespace IdleTower.UI.Presenters
 {
     /// <summary>
-    /// MapPresenter — экран карты.
+    /// MapPresenter — экран карты + панель Raid.
     ///
-    /// Получает: клики MapView / MapScreen / MapStubPanel
-    /// Отправляет: MapSystem.TryClick; ScreenManager; панели / feedback по Action
+    /// Получает: клики MapView / MapScreen / Raid (pause, close, ± армии);
+    ///           OpenMap от Header; GameEvents (GameTick, ResourceChanged, MapPresenceChanged);
+    ///           чтение Map (displays, RaidCellInfo)
+    /// Отправляет: MapSystem.TryClick / TryTogglePause / TrySetPlannedArmyUnit;
+    ///             ScreenManager Show Map/MainTower; MapView.Sync; Raid SetDisplay
     ///
-    /// View:        MapScreen, MapView, MapStubPanel
+    /// View:        MapScreen, MapView, MapRaidPanel
     /// Systems:      Map
-    /// GameEvents:   —
+    /// Presenters:   Header (вызывает OpenMap)
+    /// GameEvents:   GameTick, ResourceChanged, MapPresenceChanged (слушает)
     /// </summary>
     public class MapPresenter : MonoBehaviour
     {
         [SerializeField] private MapScreen mapScreen;
         [SerializeField] private MapView mapView;
-        [SerializeField] private MapStubPanel stubPanel;
+        [SerializeField] private MapRaidPanel raidPanel;
 
         private GameServices _services;
         private ScreenManager _screenManager;
+        private Vector2Int _raidCoord;
+        private bool _raidOpen;
         private bool _subscribed;
+        private bool _gameEventsSubscribed;
         private bool _initialized;
 
         public void Initialize(GameServices services, ScreenManager screenManager)
@@ -39,6 +51,7 @@ namespace IdleTower.UI.Presenters
                 _screenManager.Register(mapScreen);
 
             Subscribe();
+            SubscribeGameEvents();
             RefreshView();
             _initialized = true;
         }
@@ -46,18 +59,19 @@ namespace IdleTower.UI.Presenters
         private void OnDestroy()
         {
             Unsubscribe();
+            UnsubscribeGameEvents();
         }
 
         public void OpenMap()
         {
-            stubPanel?.Hide();
+            ClosePanels();
             RefreshView();
             _screenManager?.Show(ScreenId.Map);
         }
 
         public void OpenMainTower()
         {
-            stubPanel?.Hide();
+            ClosePanels();
             _screenManager?.Show(ScreenId.MainTower);
         }
 
@@ -72,8 +86,12 @@ namespace IdleTower.UI.Presenters
             if (mapScreen != null)
                 mapScreen.BackToTowerClicked += HandleBackToTowerClicked;
 
-            if (stubPanel != null)
-                stubPanel.Closed += HandleStubClosed;
+            if (raidPanel != null)
+            {
+                raidPanel.PauseClicked += HandleRaidPauseClicked;
+                raidPanel.Closed += HandleRaidClosed;
+                raidPanel.ArmyAmountDeltaClicked += HandleRaidArmyDelta;
+            }
 
             _subscribed = true;
         }
@@ -89,10 +107,53 @@ namespace IdleTower.UI.Presenters
             if (mapScreen != null)
                 mapScreen.BackToTowerClicked -= HandleBackToTowerClicked;
 
-            if (stubPanel != null)
-                stubPanel.Closed -= HandleStubClosed;
+            if (raidPanel != null)
+            {
+                raidPanel.PauseClicked -= HandleRaidPauseClicked;
+                raidPanel.Closed -= HandleRaidClosed;
+                raidPanel.ArmyAmountDeltaClicked -= HandleRaidArmyDelta;
+            }
 
             _subscribed = false;
+        }
+
+        private void SubscribeGameEvents()
+        {
+            if (_gameEventsSubscribed)
+                return;
+
+            GameEvents.GameTick += OnGameTick;
+            GameEvents.ResourceChanged += OnResourceChanged;
+            GameEvents.MapPresenceChanged += OnMapPresenceChanged;
+            _gameEventsSubscribed = true;
+        }
+
+        private void UnsubscribeGameEvents()
+        {
+            if (!_gameEventsSubscribed)
+                return;
+
+            GameEvents.GameTick -= OnGameTick;
+            GameEvents.ResourceChanged -= OnResourceChanged;
+            GameEvents.MapPresenceChanged -= OnMapPresenceChanged;
+            _gameEventsSubscribed = false;
+        }
+
+        private void OnGameTick(TickContext context)
+        {
+            if (_raidOpen)
+                RefreshRaidPanel();
+        }
+
+        private void OnResourceChanged(ResourceDefinition resource, int amount)
+        {
+            if (_raidOpen)
+                RefreshRaidPanel();
+        }
+
+        private void OnMapPresenceChanged()
+        {
+            RefreshView();
         }
 
         private void RefreshView()
@@ -108,8 +169,34 @@ namespace IdleTower.UI.Presenters
             OpenMainTower();
         }
 
-        private void HandleStubClosed()
+        private void HandleRaidClosed()
         {
+            _raidOpen = false;
+        }
+
+        private void HandleRaidPauseClicked()
+        {
+            if (_services?.Map == null || !_raidOpen)
+                return;
+
+            if (_services.Map.TryTogglePause(_raidCoord))
+                RefreshRaidPanel();
+        }
+
+        private void HandleRaidArmyDelta(ResourceDefinition unit, int delta)
+        {
+            if (_services?.Map == null || !_raidOpen || unit == null || delta == 0)
+                return;
+
+            if (!_services.Map.TryGetRaidInfo(_raidCoord, out var info))
+                return;
+
+            var current = RaidArmyHelper.GetAmount(info.PlannedArmy, unit);
+            var next = Mathf.Max(0, current + delta);
+            if (!_services.Map.TrySetPlannedArmyUnit(_raidCoord, unit, next))
+                return;
+
+            RefreshRaidPanel();
         }
 
         private void HandleCellClicked(Vector2Int coord)
@@ -124,8 +211,8 @@ namespace IdleTower.UI.Presenters
                     OpenMainTower();
                     break;
 
-                case MapCellClickAction.OpenStub:
-                    OpenStub(coord);
+                case MapCellClickAction.OpenRaid:
+                    OpenRaid(coord);
                     break;
 
                 case MapCellClickAction.None:
@@ -134,18 +221,158 @@ namespace IdleTower.UI.Presenters
             }
         }
 
-        private void OpenStub(Vector2Int coord)
+        private void OpenRaid(Vector2Int coord)
         {
-            var title = "Клетка";
-            var body = "Заглушка. Рейд / лут появятся на следующих этапах.";
+            _raidCoord = coord;
+            _raidOpen = true;
+            raidPanel?.Open();
+            RefreshRaidPanel();
+        }
 
-            if (_services.Map.TryGetCellDisplay(coord, out var info) && info.Definition != null)
+        private void RefreshRaidPanel()
+        {
+            if (raidPanel == null || _services?.Map == null || !_raidOpen)
+                return;
+
+            if (!_services.Map.TryGetRaidInfo(_raidCoord, out var info))
             {
-                if (!string.IsNullOrWhiteSpace(info.Definition.DisplayName))
-                    title = info.Definition.DisplayName;
+                raidPanel.Hide();
+                _raidOpen = false;
+                return;
             }
 
-            stubPanel?.Open(title, body);
+            raidPanel.SetDisplay(BuildRaidDisplay(info));
+            raidPanel.SetArmyRows(BuildArmyRows(info));
+        }
+
+        private MapRaidPanelDisplay BuildRaidDisplay(RaidCellInfo info)
+        {
+            var status = BuildStatus(info);
+            var requirements = BuildRequirements(info);
+            var rewards = "Награда за рейд:\n" + ResourceTextFormat.FormatCosts(info.Rewards);
+            if (string.IsNullOrWhiteSpace(ResourceTextFormat.FormatCosts(info.Rewards)))
+                rewards = "Награда за рейд: —";
+
+            var progressLabel = info.HasActiveRaid
+                ? $"{ResourceTextFormat.FormatElapsedSeconds(info.ElapsedSeconds)} / {ResourceTextFormat.FormatDuration(GameDuration.FromSeconds(info.DurationSeconds))}"
+                : ResourceTextFormat.FormatDuration(GameDuration.FromSeconds(info.DurationSeconds));
+
+            return new MapRaidPanelDisplay
+            {
+                Title = info.Title,
+                Status = status,
+                Requirements = requirements,
+                Rewards = rewards,
+                ProgressLabel = progressLabel,
+                Progress01 = info.Progress01,
+                IsPaused = info.IsPaused,
+                PauseInteractable = info.Phase == RaidCellPhase.PreCapture
+                    || (info.Phase == RaidCellPhase.Captured
+                        && info.PostCaptureMode == PostCaptureMode.RaidFarm)
+            };
+        }
+
+        private List<MapRaidArmyRowDisplay> BuildArmyRows(RaidCellInfo info)
+        {
+            var rows = new List<MapRaidArmyRowDisplay>();
+            var all = _services.Balance?.AllResources;
+            if (all == null)
+                return rows;
+
+            for (var i = 0; i < all.Length; i++)
+            {
+                var resource = all[i];
+                if (resource == null || !resource.IsUnit)
+                    continue;
+
+                rows.Add(new MapRaidArmyRowDisplay
+                {
+                    Resource = resource,
+                    Icon = resource.Icon,
+                    Name = string.IsNullOrWhiteSpace(resource.DisplayName)
+                        ? resource.name
+                        : resource.DisplayName,
+                    PlannedAmount = RaidArmyHelper.GetAmount(info.PlannedArmy, resource),
+                    WalletAmount = _services.Wallet.GetAmount(resource),
+                    StrengthPerUnit = resource.Strength
+                });
+            }
+
+            return rows;
+        }
+
+        private static string BuildStatus(RaidCellInfo info)
+        {
+            if (info.Phase == RaidCellPhase.Captured
+                && info.PostCaptureMode != PostCaptureMode.RaidFarm)
+                return "Захвачено";
+
+            if (info.HasActiveRaid)
+                return info.IsPaused
+                    ? $"Набег… (пауза новых) {info.CompletedRaids}/{info.MaxCompletedRaids}"
+                    : $"Набег… {info.CompletedRaids}/{info.MaxCompletedRaids}";
+
+            if (info.IsPaused)
+                return $"Пауза {info.CompletedRaids}/{info.MaxCompletedRaids}";
+
+            if (info.CanStartNow)
+                return $"Готов к набегу {info.CompletedRaids}/{info.MaxCompletedRaids}";
+
+            if (!info.MeetsRequirements)
+                return $"Состав не подходит {info.CompletedRaids}/{info.MaxCompletedRaids}";
+
+            return $"Ждём юнитов {info.CompletedRaids}/{info.MaxCompletedRaids}";
+        }
+
+        private string BuildRequirements(RaidCellInfo info)
+        {
+            var units = FormatRequiredUnitsForRaid(info);
+            if (string.IsNullOrEmpty(units))
+                units = "Обязательные юниты: —";
+            else
+                units = "Обязательные юниты:\n" + units;
+
+            var strengthLine =
+                $"Сила: нужно {info.RequiredStrength}, в составе {info.PlannedArmyStrength}"
+                + (info.MeetsRequirements ? " (хватает)" : " (мало)");
+
+            return units + "\n" + strengthLine;
+        }
+
+        /// <summary>Выбрано / нужно (в кошельке).</summary>
+        private string FormatRequiredUnitsForRaid(RaidCellInfo info)
+        {
+            var required = info.RequiredUnits;
+            if (required == null || required.Length == 0)
+                return string.Empty;
+
+            const string okColor = "#1B7A3D";
+            const string badColor = "#E74C3C";
+            var lines = new List<string>();
+
+            for (var i = 0; i < required.Length; i++)
+            {
+                var cost = required[i];
+                if (cost.Resource == null || cost.Amount <= 0)
+                    continue;
+
+                var selected = RaidArmyHelper.GetAmount(info.PlannedArmy, cost.Resource);
+                var need = cost.Amount;
+                var inWallet = _services.Wallet.GetAmount(cost.Resource);
+                var name = string.IsNullOrWhiteSpace(cost.Resource.DisplayName)
+                    ? cost.Resource.name
+                    : cost.Resource.DisplayName;
+                var color = selected >= need ? okColor : badColor;
+                lines.Add($"<color={color}>{name} {selected}/{need} ({inWallet})</color>");
+            }
+
+            return string.Join("\n", lines);
+        }
+
+        private void ClosePanels()
+        {
+            raidPanel?.Hide();
+            _raidOpen = false;
         }
     }
 }

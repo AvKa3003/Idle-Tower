@@ -1,8 +1,8 @@
-﻿================================================================================
+================================================================================
 АРХИТЕКТУРА ПРОЕКТА — IDLE TOWER (по мотивам Idle Apocalypse)
 ================================================================================
-Версия: 1.16
-Статус: фазы 1–5 + сейв/офлайн + карта этап A (экран/presence/stub); рейды — backlog
+Версия: 1.17
+Статус: фазы 1–5 + сейв/офлайн + карта A/B + Raid MVP (C); сейв карты/Farm/Passive — backlog
 
 Согласовано / реализовано:
   [x] Строгое разделение Systems / Presenters / Views (вариант 2)
@@ -273,7 +273,8 @@ Scripts/
 │   └── SfxPlayer.cs              — Presenter звука: RoomBuilt → PlayOneShot
 │
 ├── Editor/
-│   └── ResourceDefinitionEditor.cs — Strength в Inspector только при IsUnit
+│   ├── ResourceDefinitionEditor.cs — Strength только при IsUnit
+│   └── RaidMapCellBehaviorEditor.cs — поля PostCaptureMode
 │
 ├── Data/
 │   ├── Definitions/
@@ -302,15 +303,16 @@ Scripts/
 │       └── GameSaveData.cs       — DTO JSON сейва
 │
 ├── Map/
-│   ├── MapNeighborMode.cs        — Four / Nine
-│   ├── MapPresence.cs            — Fog / VisibleOnly / Interactive
+│   ├── MapNeighborMode.cs / MapPresence.cs / PostCaptureMode.cs / RaidCellPhase.cs
 │   ├── MapCellClickAction.cs / MapCellClickResult.cs
-│   ├── MapCellBehaviorBase.cs
-│   ├── MapCellBehaviorContext.cs
-│   └── Behaviors/
-│       ├── HomeMapCellBehavior.cs
-│       ├── DecorativeMapCellBehavior.cs  — revealsNeighbors галочка
-│       └── StubMapCellBehavior.cs        — заглушка UI этапа A
+│   ├── MapCellBehaviorBase.cs / MapCellBehaviorContext.cs
+│   ├── Behaviors/
+│   │   ├── HomeMapCellBehavior.cs
+│   │   ├── DecorativeMapCellBehavior.cs
+│   │   └── RaidMapCellBehavior.cs
+│   └── Raid/
+│       ├── RaidArmyHelper.cs
+│       └── RaidCellInfo.cs
 │
 ├── Rooms/
 │   ├── IRoomBehavior.cs
@@ -349,7 +351,7 @@ Scripts/
 │   │   │   └── HeaderPanel.cs
 │   │   ├── Map/
 │   │   │   ├── MapView.cs / MapCellView.cs
-│   │   │   └── MapStubPanel.cs
+│   │   │   └── MapRaidPanel.cs (+ MapRaidArmyRow*)
 │   │   ├── Tower/
 │   │   │   ├── RoomSelectionPanel.cs
 │   │   │   ├── RoomOptionView.cs / RoomOptionDisplay.cs
@@ -396,12 +398,15 @@ Scripts/
                                        галочки значение в ассете не стирается
     - ConfigValidator: Strength >= 0; при IsUnit — Strength >= 1
 
-3.1.1 Карта (этап A)
+3.1.1 Карта (этап A + C)
     MapConfig: homeCoord, interactionRadius, visionRadius, neighborMode, entries[]
     MapCellDefinition: id, displayName, sprite, behavior
     MapPresence (runtime, не в сейве): Fog | VisibleOnly | Interactive
-    Behaviors: Home (→ башня), Decorative (без клика, опц. revealsNeighbors),
-               Stub (заглушка UI до рейда)
+    Behaviors: Home, Decorative, Raid (preCapture + maxRaids + PostCaptureMode)
+    Raid: PlannedArmy (ручной состав, сохраняется); списание при старте;
+          Play всегда (ждёт накопления); смена состава → Pause;
+          MapSystem ITickable (прогресс + автостарт состава sort y,x);
+          Captured → reveal; RaidFarm при захвате на Pause
 
 3.2 IRoomBehavior / RoomBehaviorBase (ScriptableObject)
     Контракт — ядро вызывает только эти методы; внутри — любая логика:
@@ -892,35 +897,44 @@ GameEvents / Presenters вывода (звук постройки — реали
 10. Папка Assets/Data/Map (или Data/MapCells)
 11. Create → IdleTower → Map Cell Behavior:
     - Home
-    - Stub (соседи-заглушки)
+    - Raid (лагеря / интерактивные клетки)
     - Decorative (галочка revealsNeighbors по желанию)
 12. Create → IdleTower → Map Cell Definition:
     - HomeCell (behavior Home, спрайт дома)
-    - StubCell (behavior Stub) — можно один ассет на 4 клетки
+    - RaidCell (behavior Raid) — соседи / лагеря
     - DecorativeCell (behavior Decorative)
 13. Create → IdleTower → Map Config:
     - HomeCoord = (0,0)
     - InteractionRadius = 1, VisionRadius = 2, NeighborMode = Four
     - Entries:
         (0,0) HomeCell
-        (1,0) ( -1,0) (0,1) (0,-1) → StubCell
+        (1,0) ( -1,0) (0,1) (0,-1) → RaidCell
         (2,0) или (1,1) → DecorativeCell (при Vision=2 будет VisibleOnly
-         если дальше interaction; или поставь на соседнюю клетку вместо Stub)
+         если дальше interaction)
 14. Canvas:
     - GO MapScreen + MapScreen (root, кнопка «В башню»)
     - дочерний MapView (cellsRoot, cellPrefab, fogSprite, cellSize/spacing)
       Fog клетки видны со спрайтом fogSprite (назначить в Inspector)
     - префаб MapCellView: Image + Button (+ CanvasGroup опционально)
-    - MapStubPanel: title/body TMP + Close
-    - MapPresenter: ссылки на MapScreen, MapView, MapStubPanel
+    - MapRaidPanel + MapPresenter: MapScreen, MapView, MapRaidPanel
 15. HeaderPanel: кнопка Map → поле mapButton
 16. UiRootPresenter: поле Map → MapPresenter
 17. GameBootstrap: поле Map Config → созданный MapConfig
 18. MapScreen по умолчанию выключен (Hide); старт — MainTower
 
+——— РЕЙД (этап C) ———
+19. Create → IdleTower → Map Cell Behavior → Raid
+    PreCapture: RequiredUnits (IsUnit), RequiredStrength, Duration, Rewards
+    MaxCompletedRaids ≥ 1; PostCaptureMode = Dead (Farm/Passive later)
+20. На MapCellDefinition лагеря: Behavior → Raid
+21. Canvas MapScreen: MapRaidPanel (title/status/requirements/rewards/progress/pause/close + army rows)
+22. MapPresenter: поле Raid Panel → MapRaidPanel
+23. Play: сохранённый состав + Play ждёт накопления; смена состава → Pause;
+    capture → соседи; RaidFarm при захвате на Pause
+
 [x] Имена папок и классов — как в разделе 2 (актуальное дерево Scripts/)
 
-Статус: фазы 1–5 + офлайн/сейв + экран карты (этап A scaffold); рейды — следующие этапы
+Статус: фазы 1–5 + офлайн/сейв + карта A/B + Raid MVP C; сейв карты D / Farm E / Passive F — дальше
 
 ================================================================================
 12. ПОРЯДОК РЕАЛИЗАЦИИ

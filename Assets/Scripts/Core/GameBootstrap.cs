@@ -112,7 +112,7 @@ namespace IdleTower.Core
             catch (System.Exception ex)
             {
                 Debug.LogError(ex.Message, this);
-                throw;
+                return false;
             }
 
             services = new GameServices(balanceConfig, buildingTreeConfig, mapConfig);

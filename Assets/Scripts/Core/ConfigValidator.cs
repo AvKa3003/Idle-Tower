@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using IdleTower.Data.Definitions;
 using IdleTower.Map;
+using IdleTower.Map.Behaviors;
 using IdleTower.Rooms.Behaviors;
 using IdleTower.Rooms.Production;
 using UnityEngine;
@@ -31,7 +32,7 @@ namespace IdleTower.Core
             if (mapConfig == null)
                 errors.Add("MapConfig не назначен.");
             else
-                ValidateMap(mapConfig, errors);
+                ValidateMap(mapConfig, balance, errors);
 
             if (errors.Count == 0)
                 return;
@@ -143,7 +144,10 @@ namespace IdleTower.Core
             }
         }
 
-        private static void ValidateMap(MapConfig mapConfig, List<string> errors)
+        private static void ValidateMap(
+            MapConfig mapConfig,
+            GameBalanceConfig balance,
+            List<string> errors)
         {
             if (mapConfig.InteractionRadius < 0)
                 errors.Add("MapConfig.InteractionRadius < 0.");
@@ -162,6 +166,7 @@ namespace IdleTower.Core
                 return;
             }
 
+            var knownResourceIds = CollectResourceIds(balance);
             var coords = new HashSet<Vector2Int>();
             var homeFound = false;
 
@@ -188,6 +193,8 @@ namespace IdleTower.Core
 
                 if (cell.Behavior == null)
                     errors.Add($"{path} ('{cell.name}'): Behavior не назначен.");
+                else if (cell.Behavior is RaidMapCellBehavior raid)
+                    ValidateRaidMapCellBehavior(raid, knownResourceIds, errors);
             }
 
             if (!homeFound)
@@ -203,11 +210,80 @@ namespace IdleTower.Core
                 }
             }
 
-            if (homeCell?.Behavior != null && !homeCell.Behavior.RevealsNeighborsWhenInteractive)
+            if (homeCell?.Behavior != null && homeCell.Behavior is not HomeMapCellBehavior)
             {
                 errors.Add(
-                    "MapConfig: клетка HomeCoord должна распахивать соседей " +
-                    "(HomeMapCellBehavior / RevealsNeighborsWhenInteractive).");
+                    "MapConfig: клетка HomeCoord должна иметь HomeMapCellBehavior.");
+            }
+        }
+
+        private static void ValidateRaidMapCellBehavior(
+            RaidMapCellBehavior raid,
+            HashSet<string> knownResourceIds,
+            List<string> errors)
+        {
+            var path = $"RaidMapCellBehavior '{raid.name}'";
+            if (raid.MaxCompletedRaids < 1)
+                errors.Add($"{path}: MaxCompletedRaids < 1.");
+
+            ValidateRaidConfig(raid.PreCapture, $"{path}.PreCapture", knownResourceIds, errors);
+        }
+
+        private static void ValidateRaidConfig(
+            RaidConfig config,
+            string path,
+            HashSet<string> knownResourceIds,
+            List<string> errors)
+        {
+            if (config == null)
+            {
+                errors.Add($"{path} = null.");
+                return;
+            }
+
+            if (config.Duration.TotalSeconds <= 0f)
+                errors.Add($"{path}: Duration должен быть > 0.");
+
+            if (config.RequiredStrength < 0)
+                errors.Add($"{path}: RequiredStrength < 0.");
+
+            ValidateRaidCosts(config.RequiredUnits, $"{path}.RequiredUnits", knownResourceIds, errors, requireUnit: true);
+            ValidateRaidCosts(config.Rewards, $"{path}.Rewards", knownResourceIds, errors, requireUnit: false);
+        }
+
+        private static void ValidateRaidCosts(
+            ResourceCost[] costs,
+            string path,
+            HashSet<string> knownResourceIds,
+            List<string> errors,
+            bool requireUnit)
+        {
+            if (costs == null)
+                return;
+
+            for (var i = 0; i < costs.Length; i++)
+            {
+                var cost = costs[i];
+                var itemPath = $"{path}[{i}]";
+                if (cost.Resource == null)
+                {
+                    errors.Add($"{itemPath}: Resource = null.");
+                    continue;
+                }
+
+                if (cost.Resource.Id.IsEmpty
+                    || (knownResourceIds != null
+                        && knownResourceIds.Count > 0
+                        && !knownResourceIds.Contains(cost.Resource.Id.Value)))
+                {
+                    errors.Add($"{itemPath}: ресурс не в GameBalanceConfig.AllResources.");
+                }
+
+                if (cost.Amount < 0)
+                    errors.Add($"{itemPath}: Amount < 0.");
+
+                if (requireUnit && !cost.Resource.IsUnit)
+                    errors.Add($"{itemPath}: RequiredUnits должен быть IsUnit.");
             }
         }
 

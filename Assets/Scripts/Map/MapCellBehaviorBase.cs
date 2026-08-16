@@ -6,8 +6,15 @@ namespace IdleTower.Map
 {
     public abstract class MapCellBehaviorBase : ScriptableObject
     {
-        /// <summary>Распахивает ли клетка frontier, когда сама Interactive.</summary>
+        /// <summary>Распахивает ли клетка frontier, когда сама Interactive (без runtime).</summary>
         public abstract bool RevealsNeighborsWhenInteractive { get; }
+
+        /// <summary>Учёт runtime (например Captured у рейда).</summary>
+        public virtual bool ShouldRevealNeighbors(MapCellRuntime runtime)
+            => RevealsNeighborsWhenInteractive;
+
+        /// <summary>Спрайт вместо Definition.Sprite; null — брать из definition.</summary>
+        public virtual Sprite GetDisplaySprite(MapCellRuntime runtime) => null;
 
         [SerializeField] private bool hasFunctionalClick = true;
 

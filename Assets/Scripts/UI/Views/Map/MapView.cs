@@ -32,7 +32,7 @@ namespace IdleTower.UI.Views
             foreach (var info in displays)
             {
                 var isFog = info.Presence == MapPresence.Fog;
-                var sprite = isFog ? fogSprite : info.Definition.Sprite;
+                var sprite = isFog ? fogSprite : (info.Sprite != null ? info.Sprite : info.Definition.Sprite);
 
                 var cell = Instantiate(cellPrefab, parent);
                 cell.Setup(

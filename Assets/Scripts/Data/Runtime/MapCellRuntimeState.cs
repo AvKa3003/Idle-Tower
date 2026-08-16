@@ -1,7 +1,7 @@
 namespace IdleTower.Data.Runtime
 {
-    /// <summary>Runtime-состояние behavior клетки. На этапе A пустое; позже JSON рейда/лута.</summary>
-    public sealed class MapCellRuntimeState
+    /// <summary>Runtime-состояние behavior клетки. Подклассы — у конкретных behaviors.</summary>
+    public class MapCellRuntimeState
     {
         public static MapCellRuntimeState Empty { get; } = new();
     }

@@ -54,7 +54,7 @@ MonoBehaviour:
   - Coord: {x: 3, y: 1}
     Cell: {fileID: 11400000, guid: 2aa14af92765da748b60133c95bf6468, type: 2}
   - Coord: {x: 4, y: 0}
-    Cell: {fileID: 11400000, guid: e7e4f9c271529b4479864d417c2384cb, type: 2}
+    Cell: {fileID: 11400000, guid: 2aa14af92765da748b60133c95bf6468, type: 2}
   - Coord: {x: 5, y: 0}
     Cell: {fileID: 11400000, guid: e7e4f9c271529b4479864d417c2384cb, type: 2}
   - Coord: {x: 6, y: 0}
