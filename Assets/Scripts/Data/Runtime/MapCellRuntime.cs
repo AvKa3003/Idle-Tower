@@ -9,10 +9,19 @@ namespace IdleTower.Data.Runtime
         public MapPresence Presence { get; set; }
         public MapCellRuntimeState BehaviorState { get; set; }
 
-        public MapCellRuntime(MapCellDefinition definition, MapCellRuntimeState behaviorState)
+        /// <summary>Per-entry конфиг с MapConfig (Raid и др.).</summary>
+        public MapCellSiteConfig Site { get; }
+
+        public RaidSiteConfig RaidSite => Site?.Raid;
+
+        public MapCellRuntime(
+            MapCellDefinition definition,
+            MapCellRuntimeState behaviorState,
+            MapCellSiteConfig site = null)
         {
             Definition = definition;
             BehaviorState = behaviorState ?? MapCellRuntimeState.Empty;
+            Site = site;
             Presence = MapPresence.Fog;
         }
     }

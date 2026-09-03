@@ -21,9 +21,12 @@ namespace IdleTower.Data.Definitions
     }
 
     [Serializable]
-    public struct MapConfigEntry
+    public class MapConfigEntry
     {
         public Vector2Int Coord;
         public MapCellDefinition Cell;
+
+        [Tooltip("Данные экземпляра клетки (Raid / позже другие типы).")]
+        public MapCellSiteConfig Site;
     }
 }

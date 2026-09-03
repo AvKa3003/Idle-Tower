@@ -183,29 +183,33 @@
     - interactionRadius   // обычно 1
     - visionRadius        // > interaction; видимость без клика; дальше Fog
     - neighborMode        // 4 или 9 (или общий Neighbors)
-    - entries[]: { Vector2Int coord, MapCellDefinition cell }
+    - entries[]: { Vector2Int coord, MapCellDefinition cell, MapCellSiteConfig site }
+
+  MapCellSiteConfig (per-entry, не Behavior SO)
+    - Raid: RaidSiteConfig          // если Behavior = Raid
+    - (позже OneShot / др. секции)
+
+  RaidSiteConfig
+    - preCapture: RaidConfig
+    - maxCompletedRaids
+    - postCaptureMode + farmConfig / passiveInterval+rewards / capturedSprite
+    - GetActiveRaidConfig(state) — Farm/Passive геймплей позже
 
   MapCellDefinition
-    - CellId, DisplayName, Sprite (или набор спрайтов по состоянию)
-    - MapCellBehavior behavior
+    - CellId, DisplayName, Sprite
+    - MapCellBehavior behavior      // тип; один Raid SO на много клеток
 
   MapCellBehavior (базовый SO)
     - HomeMapCellBehavior
-    - DecorativeMapCellBehavior     — без интеракции
-        revealsNeighbors: bool      // дорога=true, река=false; автор в SO/Editor
-    - RaidMapCellBehavior
-        preCapture: RaidConfig + maxCompletedRaids (>0)
-        postCaptureMode: Dead | RaidFarm | Passive
-        // Inspector: ниже только поля выбранного mode (CustomEditor)
-        farmConfig: RaidConfig           // RaidFarm, без лимита рейдов
-        passiveInterval + passiveRewards // Passive
-        // Dead: смена спрайта / нет UI
+    - DecorativeMapCellBehavior
+        revealsNeighbors: bool
+    - RaidMapCellBehavior           // без баланса; баланс в Site.Raid
     - OneShotLootMapCellBehavior
         loot: ResourceCost[]; sprites pending/claimed
 
   RaidConfig
     - requiredUnits[], requiredStrength, duration, rewards
-    - для preCapture: рядом maxCompletedRaids
+    - для preCapture: рядом maxCompletedRaids (в RaidSiteConfig)
     - для farm (PostCaptureMode.RaidFarm): лимита нет
 
   ResourceDefinition
@@ -244,11 +248,11 @@
 
 ЭТАП B — Strength + PropertyDrawer (hide if !IsUnit) + Validator [готово]
 
-ЭТАП C — Raid MVP [в коде; состав армии — ручной]
-  1 рейд на клетку, PlannedArmy + play/pause, тик+офлайн,
+ЭТАП C — Raid MVP [в коде; состав армии — ручной; баланс в MapConfig.Site.Raid]
+  1 рейд на клетку, PlannedArmy + play/pause, тик,
   maxRaids → capture → RecomputeMapPresence
   автостарт сохранённого состава (sort y,x); смена состава → Pause
-  (+ CustomEditor PostCaptureMode)
+  RaidMapCellBehavior = тип; RaidSiteConfig на Entry
 
 ЭТАП D — Сейв карты
   Сохраняем behaviorState клеток (pause, рейды, lootClaimed…).

@@ -193,8 +193,8 @@ namespace IdleTower.Core
 
                 if (cell.Behavior == null)
                     errors.Add($"{path} ('{cell.name}'): Behavior не назначен.");
-                else if (cell.Behavior is RaidMapCellBehavior raid)
-                    ValidateRaidMapCellBehavior(raid, knownResourceIds, errors);
+                else if (cell.Behavior is RaidMapCellBehavior)
+                    ValidateRaidMapEntry(entries[i], path, knownResourceIds, errors);
             }
 
             if (!homeFound)
@@ -217,16 +217,26 @@ namespace IdleTower.Core
             }
         }
 
-        private static void ValidateRaidMapCellBehavior(
-            RaidMapCellBehavior raid,
+        private static void ValidateRaidMapEntry(
+            MapConfigEntry entry,
+            string path,
             HashSet<string> knownResourceIds,
             List<string> errors)
         {
-            var path = $"RaidMapCellBehavior '{raid.name}'";
-            if (raid.MaxCompletedRaids < 1)
-                errors.Add($"{path}: MaxCompletedRaids < 1.");
+            var raid = entry.Site?.Raid;
+            if (raid == null)
+            {
+                errors.Add($"{path}: Behavior = Raid, но Site.Raid не заполнен.");
+                return;
+            }
 
-            ValidateRaidConfig(raid.PreCapture, $"{path}.PreCapture", knownResourceIds, errors);
+            var raidPath = $"{path}.Site.Raid";
+            if (raid.MaxCompletedRaids < 1)
+                errors.Add($"{raidPath}: MaxCompletedRaids < 1.");
+
+            ValidateRaidConfig(raid.PreCapture, $"{raidPath}.PreCapture", knownResourceIds, errors);
+
+            // Farm/Passive — поля заложены; полная валидация на этапах E/F.
         }
 
         private static void ValidateRaidConfig(

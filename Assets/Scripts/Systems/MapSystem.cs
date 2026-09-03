@@ -108,10 +108,10 @@ namespace IdleTower.Systems
 
         public bool TryTogglePause(Vector2Int coord)
         {
-            if (!TryGetRaid(coord, out var behavior, out var state))
+            if (!TryGetRaid(coord, out _, out var state, out var site))
                 return false;
 
-            if (!AllowsPlayPause(behavior, state))
+            if (!AllowsPlayPause(state, site))
                 return false;
 
             // Play всегда доступен (даже без юнитов в кошельке) — только снимает паузу.
@@ -125,10 +125,10 @@ namespace IdleTower.Systems
             if (unit == null || !unit.IsUnit)
                 return false;
 
-            if (!TryGetRaid(coord, out var behavior, out var state))
+            if (!TryGetRaid(coord, out _, out var state, out var site))
                 return false;
 
-            if (!AllowsPlayPause(behavior, state))
+            if (!AllowsPlayPause(state, site))
                 return false;
 
             var next = Math.Max(0, amount);
@@ -139,10 +139,10 @@ namespace IdleTower.Systems
 
         public bool TryStartRaidIfPossible(Vector2Int coord)
         {
-            if (!TryGetRaid(coord, out var behavior, out var state))
+            if (!TryGetRaid(coord, out _, out var state, out var site))
                 return false;
 
-            if (!CanStartRaid(coord, behavior, state, out var config, out var army))
+            if (!CanStartRaid(coord, state, site, out _, out var army))
                 return false;
 
             if (!RaidArmyHelper.TrySpendArmy(_services.Resources, army))
@@ -156,10 +156,12 @@ namespace IdleTower.Systems
         public bool TryGetRaidInfo(Vector2Int coord, out RaidCellInfo info)
         {
             info = default;
-            if (!TryGetRaid(coord, out var behavior, out var state))
+            if (!TryGetRaid(coord, out _, out var state, out var site))
                 return false;
 
-            var config = behavior.GetActiveRaidConfig(state) ?? behavior.PreCapture;
+            var config = site != null
+                ? site.GetActiveRaidConfig(state) ?? site.PreCapture
+                : null;
             var duration = config != null ? Mathf.Max(0f, config.Duration.TotalSeconds) : 0f;
             var elapsed = state.HasActiveRaid ? state.ActiveElapsedSeconds : 0f;
             var progress = duration > 0f ? Mathf.Clamp01(elapsed / duration) : 0f;
@@ -167,7 +169,7 @@ namespace IdleTower.Systems
             var planned = RaidArmyHelper.CloneNonEmpty(state.PlannedArmy);
             var plannedStrength = RaidArmyHelper.CalcStrength(planned);
             var meets = config != null && RaidArmyHelper.MeetsConfigRequirements(config, planned);
-            var canStart = CanStartRaid(coord, behavior, state, out _, out _);
+            var canStart = CanStartRaid(coord, state, site, out _, out _);
 
             info = new RaidCellInfo(
                 coord,
@@ -176,7 +178,7 @@ namespace IdleTower.Systems
                 state.IsPaused,
                 state.HasActiveRaid,
                 state.CompletedRaids,
-                behavior.MaxCompletedRaids,
+                site != null ? site.MaxCompletedRaids : 1,
                 progress,
                 elapsed,
                 duration,
@@ -187,7 +189,7 @@ namespace IdleTower.Systems
                 meets,
                 config?.Rewards ?? Array.Empty<ResourceCost>(),
                 canStart,
-                behavior.PostCaptureMode);
+                site != null ? site.PostCaptureMode : PostCaptureMode.Dead);
             return true;
 
             string runtimeTitle(Vector2Int c)
@@ -245,14 +247,13 @@ namespace IdleTower.Systems
 
             foreach (var pair in State.Cells)
             {
-                if (!TryGetRaidRuntime(pair.Value, out var behavior, out var state))
+                if (!TryGetRaidRuntime(pair.Value, out _, out var state, out var site))
                     continue;
 
                 if (!state.HasActiveRaid)
                     continue;
 
-                // В случае ошибки в данных - исправляем ошибку
-                var config = behavior.GetActiveRaidConfig(state);
+                var config = site != null ? site.GetActiveRaidConfig(state) : null;
                 if (config == null)
                 {
                     state.HasActiveRaid = false;
@@ -266,7 +267,7 @@ namespace IdleTower.Systems
                 if (state.ActiveElapsedSeconds < duration)
                     continue;
 
-                CompleteRaid(pair.Key, behavior, state, config, ref presenceDirty);
+                CompleteRaid(pair.Key, state, site, config, ref presenceDirty);
             }
 
             return presenceDirty;
@@ -274,8 +275,8 @@ namespace IdleTower.Systems
 
         private void CompleteRaid(
             Vector2Int coord,
-            RaidMapCellBehavior behavior,
             RaidMapCellBehaviorState state,
+            RaidSiteConfig site,
             RaidConfig config,
             ref bool presenceDirty)
         {
@@ -289,12 +290,13 @@ namespace IdleTower.Systems
                 return;
 
             state.CompletedRaids++;
-            if (state.CompletedRaids < behavior.MaxCompletedRaids)
+            var maxRaids = site != null ? site.MaxCompletedRaids : 1;
+            if (state.CompletedRaids < maxRaids)
                 return;
 
             state.Phase = RaidCellPhase.Captured;
             // Farm иначе сразу автостартует и может съесть армию/ресурсы без согласия игрока.
-            state.IsPaused = behavior.PostCaptureMode == PostCaptureMode.RaidFarm;
+            state.IsPaused = site != null && site.PostCaptureMode == PostCaptureMode.RaidFarm;
             presenceDirty = true;
         }
 
@@ -307,10 +309,10 @@ namespace IdleTower.Systems
                 if (pair.Value.Presence != MapPresence.Interactive)
                     continue;
 
-                if (!TryGetRaidRuntime(pair.Value, out var behavior, out var state))
+                if (!TryGetRaidRuntime(pair.Value, out _, out var state, out var site))
                     continue;
 
-                if (!CanStartRaid(pair.Key, behavior, state, out _, out _))
+                if (!CanStartRaid(pair.Key, state, site, out _, out _))
                     continue;
 
                 _autostartBuffer.Add(pair.Key);
@@ -330,13 +332,16 @@ namespace IdleTower.Systems
 
         private bool CanStartRaid(
             Vector2Int coord,
-            RaidMapCellBehavior behavior,
             RaidMapCellBehaviorState state,
+            RaidSiteConfig site,
             out RaidConfig config,
             out ResourceCost[] army)
         {
             config = null;
             army = Array.Empty<ResourceCost>();
+
+            if (site == null)
+                return false;
 
             if (!State.TryGet(coord, out var runtime))
                 return false;
@@ -347,11 +352,11 @@ namespace IdleTower.Systems
             if (state.IsPaused || state.HasActiveRaid)
                 return false;
 
-            config = behavior.GetActiveRaidConfig(state);
+            config = site.GetActiveRaidConfig(state);
             if (config == null)
                 return false;
 
-            if (!state.IsCaptured && state.CompletedRaids >= behavior.MaxCompletedRaids)
+            if (!state.IsCaptured && state.CompletedRaids >= site.MaxCompletedRaids)
                 return false;
 
             army = RaidArmyHelper.CloneNonEmpty(state.PlannedArmy);
@@ -361,38 +366,42 @@ namespace IdleTower.Systems
             return RaidArmyHelper.CanAffordArmy(_services.Wallet, army);
         }
 
-        private static bool AllowsPlayPause(RaidMapCellBehavior behavior, RaidMapCellBehaviorState state)
+        private static bool AllowsPlayPause(RaidMapCellBehaviorState state, RaidSiteConfig site)
         {
-            if (behavior == null || state == null)
+            if (state == null)
                 return false;
 
             if (!state.IsCaptured)
                 return true;
 
-            return behavior.PostCaptureMode == PostCaptureMode.RaidFarm;
+            return site != null && site.PostCaptureMode == PostCaptureMode.RaidFarm;
         }
 
         private bool TryGetRaid(
             Vector2Int coord,
             out RaidMapCellBehavior behavior,
-            out RaidMapCellBehaviorState state)
+            out RaidMapCellBehaviorState state,
+            out RaidSiteConfig site)
         {
             behavior = null;
             state = null;
+            site = null;
 
             if (!State.TryGet(coord, out var runtime))
                 return false;
 
-            return TryGetRaidRuntime(runtime, out behavior, out state);
+            return TryGetRaidRuntime(runtime, out behavior, out state, out site);
         }
 
         private static bool TryGetRaidRuntime(
             MapCellRuntime runtime,
             out RaidMapCellBehavior behavior,
-            out RaidMapCellBehaviorState state)
+            out RaidMapCellBehaviorState state,
+            out RaidSiteConfig site)
         {
             behavior = runtime?.Definition?.Behavior as RaidMapCellBehavior;
             state = runtime?.BehaviorState as RaidMapCellBehaviorState;
+            site = runtime?.RaidSite;
             if (behavior == null)
                 return false;
 

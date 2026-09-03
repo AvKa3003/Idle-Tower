@@ -402,11 +402,10 @@ Scripts/
     MapConfig: homeCoord, interactionRadius, visionRadius, neighborMode, entries[]
     MapCellDefinition: id, displayName, sprite, behavior
     MapPresence (runtime, не в сейве): Fog | VisibleOnly | Interactive
-    Behaviors: Home, Decorative, Raid (preCapture + maxRaids + PostCaptureMode)
-    Raid: PlannedArmy (ручной состав, сохраняется); списание при старте;
-          Play всегда (ждёт накопления); смена состава → Pause;
-          MapSystem ITickable (прогресс + автостарт состава sort y,x);
-          Captured → reveal; RaidFarm при захвате на Pause
+    Behaviors: Home, Decorative, Raid (тип; баланс в MapConfig.Entry.Site.Raid)
+    Raid: PlannedArmy; списание при старте; Play ждёт накопления;
+          MapSystem ITickable; Captured → reveal; RaidFarm пауза при захвате
+          (Farm/Passive геймплей — E/F)
 
 3.2 IRoomBehavior / RoomBehaviorBase (ScriptableObject)
     Контракт — ядро вызывает только эти методы; внутри — любая логика:

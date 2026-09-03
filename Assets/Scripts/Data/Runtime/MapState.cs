@@ -34,7 +34,7 @@ namespace IdleTower.Data.Runtime
                     ? behavior.CreateDefaultState()
                     : MapCellRuntimeState.Empty;
 
-                _cells[entry.Coord] = new MapCellRuntime(entry.Cell, state);
+                _cells[entry.Coord] = new MapCellRuntime(entry.Cell, state, entry.Site);
             }
         }
 
