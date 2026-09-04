@@ -28,76 +28,8 @@ namespace IdleTower.Systems
 
         public OfflineCatchUpResult LastResult { get; private set; }
 
-        /// <summary>
-        /// Симулирует интервал (watermark → now), clamp по FixedMaxOfflineSeconds.
-        /// При now ≤ watermark — без симуляции.
-        /// После догона watermark = now (учтённый wall-time; сверх cap не копится).
-        /// GameEvents подавляются на время симуляции.
-        /// </summary>
-        public OfflineCatchUpResult ApplyCatchUp(ref long maxObservedUnixTimeUtc)
-        {
-            if (maxObservedUnixTimeUtc < 0)
-                maxObservedUnixTimeUtc = 0;
-
-            var nowUnix = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-
-            if (nowUnix < maxObservedUnixTimeUtc)
-            {
-                Debug.Log(
-                    $"[OfflineSimulation] clock behind watermark " +
-                    $"(now={nowUnix}, max={maxObservedUnixTimeUtc}) — skip catch-up");
-                LastResult = new OfflineCatchUpResult(
-                    applied: false,
-                    clockBehindWatermark: true,
-                    realElapsedSeconds: 0,
-                    simulatedSeconds: 0f,
-                    wasCapped: false,
-                    resourceDeltas: Array.Empty<OfflineResourceDelta>());
-                return LastResult;
-            }
-
-            if (nowUnix == maxObservedUnixTimeUtc)
-            {
-                LastResult = OfflineCatchUpResult.None;
-                return LastResult;
-            }
-
-            var realElapsed = nowUnix - maxObservedUnixTimeUtc;
-            var simulated = Mathf.Min((float)realElapsed, FixedMaxOfflineSeconds);
-            var wasCapped = realElapsed > FixedMaxOfflineSeconds;
-
-            var before = SnapshotWallet(_services.Wallet);
-
-            GameEvents.Suppress = true;
-            try
-            {
-                _services.TickSystem.SimulateForSeconds(simulated);
-            }
-            finally
-            {
-                GameEvents.Suppress = false;
-            }
-
-            maxObservedUnixTimeUtc = nowUnix;
-
-            var deltas = BuildDeltas(before, _services.Wallet);
-            LastResult = new OfflineCatchUpResult(
-                applied: true,
-                clockBehindWatermark: false,
-                realElapsedSeconds: realElapsed,
-                simulatedSeconds: simulated,
-                wasCapped: wasCapped,
-                resourceDeltas: deltas);
-
-            Debug.Log(
-                $"[OfflineSimulation] real={realElapsed}s, simulated={simulated:F1}s " +
-                $"(cap={FixedMaxOfflineSeconds:F0}s), watermark→{maxObservedUnixTimeUtc}, " +
-                $"deltas={deltas.Count}");
-
-            return LastResult;
-        }
-
-        private static Dictionary<ResourceDefinition, int> SnapshotWallet(ResourceWallet wallet)
+        /// <summary>Снимок кошелька для дельты (вызвать до миграции карты на Load).</summary>
+        public static Dictionary<ResourceDefinition, int> SnapshotWallet(ResourceWallet wallet)
         {
             var snapshot = new Dictionary<ResourceDefinition, int>();
             if (wallet == null)
@@ -107,6 +39,82 @@ namespace IdleTower.Systems
                 snapshot[pair.Key] = pair.Value;
 
             return snapshot;
+        }
+
+        /// <summary>
+        /// Симулирует интервал (watermark → now), clamp по FixedMaxOfflineSeconds.
+        /// При now ≤ watermark — без симуляции; дельта кошелька (миграция карты) всё равно считается.
+        /// После догона watermark = now (учтённый wall-time; сверх cap не копится).
+        /// При now &lt; watermark watermark не двигаем.
+        /// GameEvents подавляются на время симуляции.
+        /// <paramref name="walletBaseline"/> — снимок до миграции карты (GrantRewards входят в дельту модалки).
+        /// </summary>
+        public OfflineCatchUpResult ApplyCatchUp(
+            ref long maxObservedUnixTimeUtc,
+            Dictionary<ResourceDefinition, int> walletBaseline = null)
+        {
+            if (maxObservedUnixTimeUtc < 0)
+                maxObservedUnixTimeUtc = 0;
+
+            var nowUnix = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+            var before = walletBaseline ?? SnapshotWallet(_services.Wallet);
+            var clockBehind = nowUnix < maxObservedUnixTimeUtc;
+
+            long realElapsed = 0;
+            var simulated = 0f;
+            var wasCapped = false;
+
+            if (nowUnix > maxObservedUnixTimeUtc)
+            {
+                realElapsed = nowUnix - maxObservedUnixTimeUtc;
+                simulated = Mathf.Min((float)realElapsed, FixedMaxOfflineSeconds);
+                wasCapped = realElapsed > FixedMaxOfflineSeconds;
+
+                GameEvents.Suppress = true;
+                try
+                {
+                    _services.TickSystem.SimulateForSeconds(simulated);
+                }
+                finally
+                {
+                    GameEvents.Suppress = false;
+                }
+
+                maxObservedUnixTimeUtc = nowUnix;
+            }
+            else if (clockBehind)
+            {
+                Debug.Log(
+                    $"[OfflineSimulation] clock behind watermark " +
+                    $"(now={nowUnix}, max={maxObservedUnixTimeUtc}) — skip tick catch-up");
+            }
+
+            var deltas = BuildDeltas(before, _services.Wallet);
+            var applied = deltas.Count > 0 || simulated > 0f;
+
+            if (!applied && !clockBehind)
+            {
+                LastResult = OfflineCatchUpResult.None;
+                return LastResult;
+            }
+
+            LastResult = new OfflineCatchUpResult(
+                applied: applied,
+                clockBehindWatermark: clockBehind,
+                realElapsedSeconds: realElapsed,
+                simulatedSeconds: simulated,
+                wasCapped: wasCapped,
+                resourceDeltas: deltas);
+
+            if (applied)
+            {
+                Debug.Log(
+                    $"[OfflineSimulation] real={realElapsed}s, simulated={simulated:F1}s " +
+                    $"(cap={FixedMaxOfflineSeconds:F0}s), clockBehind={clockBehind}, " +
+                    $"deltas={deltas.Count}");
+            }
+
+            return LastResult;
         }
 
         private static List<OfflineResourceDelta> BuildDeltas(

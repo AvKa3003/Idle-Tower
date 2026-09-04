@@ -254,10 +254,11 @@
   автостарт сохранённого состава (sort y,x); смена состава → Pause
   RaidMapCellBehavior = тип; RaidSiteConfig на Entry
 
-ЭТАП D — Сейв карты
-  Сохраняем behaviorState клеток (pause, рейды, lootClaimed…).
+ЭТАП D — Сейв карты [в коде; ручные тесты → авто позже]
+  Сохраняем behaviorState клеток (pause, рейды…).
   Reveal/Presence НЕ сохраняем → после Load: RecomputeMapPresence()
-  (Fog / VisibleOnly / Interactive) по текущим Neighbors + радиусам.
+  Миграции MapConfig: map-save-migration.txt
+  Чеклист тестов: map-save-migration-tests.txt
   Смена 4→9 или visionRadius: при следующем запуске пересчитается.
 
 ЭТАП E — PostCapture RaidFarm

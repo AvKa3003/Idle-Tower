@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using IdleTower.Core;
 using IdleTower.Core.Events;
 using IdleTower.Data.Definitions;
@@ -16,6 +17,26 @@ namespace IdleTower.Systems
         }
 
         public ResourceWallet Wallet => _services.Wallet;
+
+        /// <summary>Словарь всех ресурсов из GameBalanceConfig (для сейва / миграции).</summary>
+        public Dictionary<ResourceId, ResourceDefinition> BuildCatalog()
+        {
+            var catalog = new Dictionary<ResourceId, ResourceDefinition>();
+            var all = _services.Balance?.AllResources;
+            if (all == null)
+                return catalog;
+
+            for (var i = 0; i < all.Length; i++)
+            {
+                var resource = all[i];
+                if (resource == null || resource.Id.IsEmpty)
+                    continue;
+
+                catalog[resource.Id] = resource;
+            }
+
+            return catalog;
+        }
 
         public void ApplyStartingResources()
         {

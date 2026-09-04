@@ -4,6 +4,7 @@ using IdleTower.Core;
 using IdleTower.Core.Events;
 using IdleTower.Data.Definitions;
 using IdleTower.Data.Runtime;
+using IdleTower.Data.Save;
 using IdleTower.Map;
 using IdleTower.Map.Behaviors;
 using IdleTower.Map.Raid;
@@ -44,6 +45,43 @@ namespace IdleTower.Systems
         public void ReloadFromConfig()
         {
             State.LoadFromConfig(Config);
+            RecomputeMapPresence();
+        }
+
+        /// <summary>Накладывает mapCells из сейва после LoadFromConfig.</summary>
+        public void ApplySaveFromDisk(
+            MapCellSave[] saves,
+            IReadOnlyDictionary<ResourceId, ResourceDefinition> catalog)
+        {
+            if (saves == null || saves.Length == 0 || catalog == null)
+                return;
+
+            var saveByCoord = new Dictionary<Vector2Int, MapCellSave>();
+            for (var i = 0; i < saves.Length; i++)
+            {
+                var save = saves[i];
+                saveByCoord[new Vector2Int(save.x, save.y)] = save;
+            }
+
+            foreach (var pair in State.Cells)
+            {
+                if (!saveByCoord.TryGetValue(pair.Key, out var save))
+                    continue;
+
+                MapSaveMigration.ApplyCell(_services, pair.Value, save, catalog);
+                saveByCoord.Remove(pair.Key);
+            }
+
+            // Coord убран из MapConfig — emergency-награда за активный рейд, state не восстанавливаем.
+            foreach (var orphan in saveByCoord)
+            {
+                MapCellBehaviorEmergency.FinishFromSave(
+                    orphan.Value.behaviorType,
+                    orphan.Value,
+                    _services,
+                    catalog);
+            }
+
             RecomputeMapPresence();
         }
 
@@ -142,12 +180,13 @@ namespace IdleTower.Systems
             if (!TryGetRaid(coord, out _, out var state, out var site))
                 return false;
 
-            if (!CanStartRaid(coord, state, site, out _, out var army))
+            if (!CanStartRaid(coord, state, site, out var config, out var army))
                 return false;
 
             if (!RaidArmyHelper.TrySpendArmy(_services.Resources, army))
                 return false;
 
+            state.ActiveRaidRewards = RaidArmyHelper.CloneNonEmpty(config?.Rewards ?? Array.Empty<ResourceCost>());
             state.HasActiveRaid = true;
             state.ActiveElapsedSeconds = 0f;
             return true;
@@ -258,6 +297,7 @@ namespace IdleTower.Systems
                 {
                     state.HasActiveRaid = false;
                     state.ActiveElapsedSeconds = 0f;
+                    state.ActiveRaidRewards = Array.Empty<ResourceCost>();
                     continue;
                 }
 
@@ -282,6 +322,7 @@ namespace IdleTower.Systems
         {
             state.HasActiveRaid = false;
             state.ActiveElapsedSeconds = 0f;
+            state.ActiveRaidRewards = Array.Empty<ResourceCost>();
 
             if (config.Rewards != null && config.Rewards.Length > 0)
                 _services.Resources.Add(config.Rewards);

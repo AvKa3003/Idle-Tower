@@ -1,0 +1,179 @@
+================================================================================
+МИГРАЦИИ КАРТЫ ПРИ LOAD (этап D)
+================================================================================
+Документ: описание кейсов, которые код уже обрабатывает.
+Код: MapSystem.ApplySaveFromDisk, MapSaveMigration, MapCellBehaviorEmergency,
+     OfflineSimulationSystem (дельта кошелька с baseline до миграции).
+
+Presence / Fog НЕ в сейве → после миграции всегда RecomputeMapPresence().
+Ключ записи сейва: Coord (x, y), не CellId.
+
+Чеклист тестов (ручные → позже авто): Assets/map-save-migration-tests.txt
+
+
+================================================================================
+0. ПОРЯДОК LOAD
+================================================================================
+
+  1. Wallet из сейва
+  2. Снимок кошелька (walletBaseline) — до GrantRewards миграции
+  3. Tower rooms
+  4. MapState.LoadFromConfig (текущий MapConfig)
+  5. Наложение mapCells + миграции (ниже)
+  6. Restore tick
+  7. Offline catch-up: дельта = кошелёк сейчас − walletBaseline
+     (награды миграции видны в модалке офлайна)
+
+GameSaveData.version: пишем CurrentVersion при Save.
+При Load версию НЕ отвергаем — игрок всегда продолжает; миграции схемы — наша
+ответственность. MapSaveMigration про контент карты, не про version файла.
+
+
+================================================================================
+1. СОСТАВ MapCellSave
+================================================================================
+
+  x, y                     — coord
+  behaviorType             — Home / Decorative / Raid (… позже OneShot)
+  behaviorStateJson        — SerializeState behavior
+  activeRaidRewards[]      — награда на МОМЕНТ СТАРТА активного рейда
+                             (только mode-change / emergency; не для обычного Complete)
+  savedConfigFingerprint   — отпечаток релевантного Site.Raid на момент сейва
+  savedPostCaptureMode     — int PostCaptureMode на момент сейва
+
+
+================================================================================
+2. ГЕОМЕТРИЯ КАРТЫ (coord ↔ MapConfig)
+================================================================================
+
+2.1 Coord есть в MapConfig и в сейве
+    → MapSaveMigration.ApplyCell (см. §3–§5).
+
+2.2 Coord только в MapConfig (новый)
+    → дефолтный state CreateDefaultState(), сейва нет.
+
+2.3 Coord только в сейве (клетку удалили из MapConfig)
+    → EmergencyFinishFromSave по saved behaviorType:
+      Raid + HasActiveRaid → выдать activeRaidRewards.
+      State не восстанавливаем (клетки нет).
+      Captured idle без активного рейда → награды нет.
+
+
+================================================================================
+3. СМЕНА ТИПА BEHAVIOR (behaviorType ≠ текущий)
+================================================================================
+
+Пример: Raid → Decorative / River / Home.
+
+  1. EmergencyFinishFromSave(старый тип):
+     - Raid + активный рейд → выдать activeRaidRewards из сейва
+     - иначе ничего
+  2. runtime.BehaviorState = CreateDefaultState() нового behavior
+  3. Старый Captured idle без активного рейда → сброс без компенсации
+
+Будущие типы (OneShot и др.) — свои ветки в MapCellBehaviorEmergency.
+
+
+================================================================================
+4. ТОТ ЖЕ ТИП, НЕ RAID (Home / Decorative)
+================================================================================
+
+  DeserializeState; при ошибке → default state.
+  Raid-миграции не применяются.
+
+
+================================================================================
+5. RAID → RAID
+================================================================================
+
+Общее перед ветками:
+  - PlannedArmy: вычистить неизвестные / !IsUnit / amount≤0 (sanitize)
+  - если CompletedRaids ≥ MaxCompletedRaids и ещё PreCapture
+      → Captured; Pause только если текущий PostCaptureMode = RaidFarm
+  - в конце (и после unknown-mode): SanitizePause —
+      Captured + Dead/Passive → IsPaused = false всегда
+
+--- 5.0 Неизвестный savedPostCaptureMode (значение удалили из enum)
+
+  - Активный рейд → выдать activeRaidRewards
+  - Сбросить активный рейд
+  - Phase = Captured, CompletedRaids ≥ Max
+  - Pause если текущий mode = RaidFarm
+  - PlannedArmy оставляем
+  - = «только что захватили, ещё ничего не делали» под новый mode
+
+--- 5.A Конфиг/Site изменился, PostCaptureMode ТОТ ЖЕ
+     (fingerprint ≠; rewards / duration / MaxCompletedRaids / …)
+
+  - Полный restore state
+  - Pause:
+      PreCapture → всегда
+      Captured + RaidFarm → да
+      Captured + Dead/Passive → нет (и sanitize снимет флаг)
+  - Если HasActiveRaid: продолжить elapsed; Complete даёт награду из
+    ТЕКУЩЕГО конфига; армию не пересписывать
+  - activeRaidRewards из сейва НЕ тратим
+
+--- 5.B PostCaptureMode изменился + есть активный рейд (Captured)
+
+  - Мгновенно выдать activeRaidRewards (полная награда старта)
+  - Сбросить активный рейд
+  - Pause если ТЕКУЩИЙ mode = RaidFarm (чтобы farm не автостартовал)
+
+--- 5.C PostCaptureMode изменился, активного рейда нет
+
+  - State (Captured, PlannedArmy, …) сохраняем
+  - Pause если ТЕКУЩИЙ mode = RaidFarm
+
+--- 5.D Конфиг и mode не изменились
+
+  - Обычный restore, принудительный Pause не ставим
+  - SanitizePause всё равно: Dead/Passive не оставляем с IsPaused
+
+
+================================================================================
+6. НАГРАДЫ: ЧТО КОГДА
+================================================================================
+
+  Обычный Complete рейда (тик / офлайн)
+    → Rewards из ТЕКУЩЕГО GetActiveRaidConfig
+
+  Смена PostCaptureMode при активном рейде (5.B)
+  Неизвестный PostCaptureMode + активный рейд (5.0)
+  Смена типа / удаление coord + активный рейд (§2.3, §3)
+    → activeRaidRewards из СЕЙВА (снимок на старте рейда)
+
+  Юниты за уже начатый рейд не возвращаются.
+
+
+================================================================================
+7. PAUSE / DEAD / PASSIVE
+================================================================================
+
+  Play/Pause в UI и AllowsPlayPause — только PreCapture или Captured+RaidFarm.
+  После Load Captured+Dead/Passive: IsPaused принудительно false.
+  Ветка A не ставит Pause на Dead/Passive.
+
+
+================================================================================
+8. ОФЛАЙН И МОДАЛКА
+================================================================================
+
+  walletBaseline снимается ДО миграции карты.
+  ApplyCatchUp считает дельту от baseline → GrantRewards миграции
+  попадают в OfflineResult модалку (даже при now ≤ watermark;
+  при отставании часов тики не симулируем, watermark не двигаем вперёд).
+
+
+================================================================================
+9. КОД (ориентир)
+================================================================================
+
+  Scripts/Systems/MapSaveMigration.cs
+  Scripts/Systems/MapSystem.cs          — ApplySaveFromDisk
+  Scripts/Map/MapCellBehaviorEmergency.cs
+  Scripts/Map/Behaviors/RaidMapCellBehavior.cs
+  Scripts/Data/Save/RaidSiteConfigFingerprint.cs
+  Scripts/Data/Save/ResourceSaveHelper.cs
+  Scripts/Systems/SaveSystem.cs
+  Scripts/Systems/OfflineSimulationSystem.cs

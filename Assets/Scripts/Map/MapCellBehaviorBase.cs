@@ -31,6 +31,8 @@ namespace IdleTower.Map
 
         public virtual MapCellRuntimeState CreateDefaultState() => MapCellRuntimeState.Empty;
 
+        public virtual string GetBehaviorTypeId() => GetType().Name;
+
         public virtual string SerializeState(MapCellRuntimeState state) => string.Empty;
 
         public virtual MapCellRuntimeState DeserializeState(string json) => MapCellRuntimeState.Empty;

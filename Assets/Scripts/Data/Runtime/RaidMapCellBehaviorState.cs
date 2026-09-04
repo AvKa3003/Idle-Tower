@@ -15,6 +15,9 @@ namespace IdleTower.Data.Runtime
         /// <summary>Состав, который игрок выбрал для повторных набегов.</summary>
         public ResourceCost[] PlannedArmy = Array.Empty<ResourceCost>();
 
+        /// <summary>Награда активного рейда на момент старта (mode-change / emergency).</summary>
+        public ResourceCost[] ActiveRaidRewards = Array.Empty<ResourceCost>();
+
         public bool IsCaptured => Phase == RaidCellPhase.Captured;
     }
 }

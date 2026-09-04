@@ -7,6 +7,8 @@ namespace IdleTower.Map.Behaviors
     {
         public override bool RevealsNeighborsWhenInteractive => true;
 
+        public override string GetBehaviorTypeId() => MapCellBehaviorIds.Home;
+
         public override MapCellClickResult OnClicked(MapCellBehaviorContext context)
             => new(MapCellClickAction.GoToMainTower);
     }

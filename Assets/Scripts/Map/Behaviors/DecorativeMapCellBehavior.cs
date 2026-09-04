@@ -9,6 +9,8 @@ namespace IdleTower.Map.Behaviors
 
         public override bool RevealsNeighborsWhenInteractive => revealsNeighbors;
 
+        public override string GetBehaviorTypeId() => MapCellBehaviorIds.Decorative;
+
         public override bool HasFunctionalClick => false;
 
         public override MapCellClickResult OnClicked(MapCellBehaviorContext context)

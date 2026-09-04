@@ -11,12 +11,11 @@ namespace IdleTower.Systems
 {
     /// <summary>
     /// Сохранение / загрузка JSON в persistentDataPath.
-    /// Пишет: инвентарь, построенные комнаты (RoomId + behavior JSON), тик.
-    /// Behavior JSON уже содержит ActiveModeId, UnlockedModeIds, ElapsedByMode (все режимы).
+    /// Пишет: инвентарь, построенные комнаты, behaviorState клеток карты, тик.
     /// </summary>
     public class SaveSystem
     {
-        public const int CurrentVersion = 1;
+        public const int CurrentVersion = 2;
         public const string FileName = "idle_tower_save.json";
 
         private readonly GameServices _services;
@@ -82,15 +81,9 @@ namespace IdleTower.Systems
                 if (data == null)
                     throw new InvalidOperationException("пустой JSON.");
 
-                if (data.version != CurrentVersion)
-                {
-                    throw new InvalidOperationException(
-                        $"неподдерживаемая version={data.version}, ожидается {CurrentVersion}.");
-                }
-
-                Apply(data);
+                var walletBaseline = Apply(data);
                 _maxObservedUnixTimeUtc = Math.Max(0L, data.savedUnixTimeUtc);
-                _services.Offline.ApplyCatchUp(ref _maxObservedUnixTimeUtc);
+                _services.Offline.ApplyCatchUp(ref _maxObservedUnixTimeUtc, walletBaseline);
                 Debug.Log($"[SaveSystem] Загружено: {_filePath}");
                 return true;
             }
@@ -137,18 +130,69 @@ namespace IdleTower.Systems
                 tickAccumulator = _services.TickSystem.Accumulator,
                 savedUnixTimeUtc = _maxObservedUnixTimeUtc,
                 resources = resources.ToArray(),
-                rooms = built.ToArray()
+                rooms = built.ToArray(),
+                mapCells = CaptureMapCells()
             };
         }
 
-        private void Apply(GameSaveData data)
+        private MapCellSave[] CaptureMapCells()
         {
-            var resourceCatalog = BuildResourceCatalog();
+            var list = new List<MapCellSave>();
+
+            foreach (var pair in _services.Map.State.Cells)
+            {
+                var runtime = pair.Value;
+                var behavior = runtime.Definition?.Behavior;
+                if (behavior == null)
+                    continue;
+
+                var state = runtime.BehaviorState;
+                var save = new MapCellSave
+                {
+                    x = pair.Key.x,
+                    y = pair.Key.y,
+                    behaviorType = behavior.GetBehaviorTypeId(),
+                    behaviorStateJson = behavior.SerializeState(state) ?? string.Empty,
+                    savedConfigFingerprint = ComputeMapCellFingerprint(runtime, state),
+                    savedPostCaptureMode = ComputeSavedPostCaptureMode(runtime)
+                };
+
+                if (state is RaidMapCellBehaviorState raid && raid.HasActiveRaid)
+                    save.activeRaidRewards = ResourceSaveHelper.ToSave(raid.ActiveRaidRewards);
+
+                list.Add(save);
+            }
+
+            return list.ToArray();
+        }
+
+        private static string ComputeMapCellFingerprint(MapCellRuntime runtime, MapCellRuntimeState state)
+        {
+            if (runtime?.RaidSite == null || state is not RaidMapCellBehaviorState raid)
+                return string.Empty;
+
+            return RaidSiteConfigFingerprint.Compute(runtime.RaidSite, raid);
+        }
+
+        private static int ComputeSavedPostCaptureMode(MapCellRuntime runtime)
+        {
+            return runtime?.RaidSite != null
+                ? (int)runtime.RaidSite.PostCaptureMode
+                : 0;
+        }
+
+        /// <returns>Снимок кошелька после ApplyFromSave и до миграции карты (для офлайн-дельты).</returns>
+        private Dictionary<ResourceDefinition, int> Apply(GameSaveData data)
+        {
+            var resourceCatalog = _services.Resources.BuildCatalog();
             var roomCatalog = BuildRoomCatalog();
 
             _services.Wallet.ApplyFromSave(
                 data.resources ?? Array.Empty<ResourceAmountSave>(),
                 resourceCatalog);
+
+            // До GrantRewards / emergency finish при смене конфига клеток.
+            var walletBaseline = OfflineSimulationSystem.SnapshotWallet(_services.Wallet);
 
             var builtRooms = new List<(RoomDefinition room, RoomBehaviorState state)>();
             var roomSaves = data.rooms ?? Array.Empty<TowerRoomSave>();
@@ -181,27 +225,14 @@ namespace IdleTower.Systems
 
             _services.Tower.ReplaceWithBuiltRooms(builtRooms);
 
+            _services.Map.ApplySaveFromDisk(
+                data.mapCells ?? Array.Empty<MapCellSave>(),
+                resourceCatalog);
+
             var tick = data.currentTick < 0 ? 0UL : (ulong)data.currentTick;
             _services.TickSystem.RestoreFromSave(tick, data.tickAccumulator);
-        }
 
-        private Dictionary<ResourceId, ResourceDefinition> BuildResourceCatalog()
-        {
-            var catalog = new Dictionary<ResourceId, ResourceDefinition>();
-            var all = _services.Balance?.AllResources;
-            if (all == null)
-                return catalog;
-
-            for (var i = 0; i < all.Length; i++)
-            {
-                var resource = all[i];
-                if (resource == null || resource.Id.IsEmpty)
-                    continue;
-
-                catalog[resource.Id] = resource;
-            }
-
-            return catalog;
+            return walletBaseline;
         }
 
         private Dictionary<RoomId, RoomDefinition> BuildRoomCatalog()
