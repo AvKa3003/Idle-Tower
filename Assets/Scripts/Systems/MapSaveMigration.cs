@@ -94,6 +94,7 @@ namespace IdleTower.Systems
                 state.Phase = RaidCellPhase.Captured;
                 state.CompletedRaids = Math.Max(state.CompletedRaids, site.MaxCompletedRaids);
                 state.IsPaused = site.PostCaptureMode == PostCaptureMode.RaidFarm;
+                state.ElapsedSeconds = 0f;
                 Debug.LogWarning(
                     $"[MapSaveMigration] ({save.x},{save.y}): неизвестный savedPostCaptureMode=" +
                     $"{save.savedPostCaptureMode} → Captured + default post-state.");
@@ -113,12 +114,16 @@ namespace IdleTower.Systems
                 RaidMapCellBehavior.ClearActiveRaid(state);
                 if (currentMode == PostCaptureMode.RaidFarm)
                     state.IsPaused = true;
+                if (currentMode == PostCaptureMode.Passive)
+                    state.ElapsedSeconds = 0f;
             }
             // C: PostCaptureMode изменился, активного рейда нет
             else if (!state.HasActiveRaid && savedMode != currentMode)
             {
                 if (currentMode == PostCaptureMode.RaidFarm)
                     state.IsPaused = true;
+                if (currentMode == PostCaptureMode.Passive)
+                    state.ElapsedSeconds = 0f;
             }
             // A: конфиг изменился, mode тот же
             else if (!string.Equals(savedFingerprint, currentFingerprint, StringComparison.Ordinal))
@@ -126,6 +131,7 @@ namespace IdleTower.Systems
                 // PreCapture — всегда Pause; Captured — только Farm (Dead/Passive без паузы).
                 if (!state.IsCaptured || currentMode == PostCaptureMode.RaidFarm)
                     state.IsPaused = true;
+                // Passive: ElapsedSeconds не сбрасываем — цикл догонит/продолжит с новым interval.
             }
 
             SanitizePauseForPostCaptureMode(state, site);

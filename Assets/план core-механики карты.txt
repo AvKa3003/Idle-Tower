@@ -193,7 +193,7 @@
     - preCapture: RaidConfig
     - maxCompletedRaids
     - postCaptureMode + farmConfig / passiveInterval+rewards / capturedSprite
-    - GetActiveRaidConfig(state) — Farm/Passive геймплей позже
+    - GetActiveRaidConfig(state) — PreCapture / FarmConfig; Passive/Dead → null
 
   MapCellDefinition
     - CellId, DisplayName, Sprite
@@ -220,7 +220,7 @@
     - mapPresence: Fog | VisibleOnly | Interactive
       // runtime-кэш; НЕ в сейве; RecomputeMapPresence()
     - behaviorState (JSON или поля): pause, completedRaids, activeRaid?,
-      plannedArmy[], lootClaimed, passiveElapsed, phase…
+      plannedArmy[], lootClaimed, elapsedSeconds, phase…
       // в сейве — только behaviorState (+ то, что нельзя вывести)
 
 5.3 Systems
@@ -261,11 +261,12 @@
   Чеклист тестов: map-save-migration-tests.txt
   Смена 4→9 или visionRadius: при следующем запуске пересчитается.
 
-ЭТАП E — PostCapture RaidFarm
-  mode=RaidFarm, бесконечные рейды, UI тот же
+ЭТАП E — PostCapture RaidFarm [готово]
+  mode=RaidFarm, бесконечные рейды, UI тот же (статус «Захвачено» + FarmConfig)
 
-ЭТАП F — PostCapture Passive
-  mode=Passive; тик; MapPassivePanel; interval/rewards из behavior
+ЭТАП F — PostCapture Passive [готово]
+  mode=Passive; тик ElapsedSeconds; тот же MapRaidPanel
+  (скрыть армию/требования/паузу; прогресс + награда)
 
 ЭТАП G — OneShot loot + текстура claimed + распах при Interactive
 

@@ -241,21 +241,38 @@ namespace IdleTower.UI.Presenters
                 return;
             }
 
-            raidPanel.SetDisplay(BuildRaidDisplay(info));
-            raidPanel.SetArmyRows(BuildArmyRows(info));
+            var display = BuildRaidDisplay(info);
+            raidPanel.SetDisplay(display);
+            raidPanel.SetArmyRows(display.ShowArmy ? BuildArmyRows(info) : null);
         }
 
         private MapRaidPanelDisplay BuildRaidDisplay(RaidCellInfo info)
         {
+            var isPassive = info.Phase == RaidCellPhase.Captured
+                && info.PostCaptureMode == PostCaptureMode.Passive;
+            var isFarm = info.Phase == RaidCellPhase.Captured
+                && info.PostCaptureMode == PostCaptureMode.RaidFarm;
+            var isDead = info.Phase == RaidCellPhase.Captured
+                && info.PostCaptureMode == PostCaptureMode.Dead;
+
             var status = BuildStatus(info);
-            var requirements = BuildRequirements(info);
+            var requirements = isPassive || isDead ? string.Empty : BuildRequirements(info);
             var rewards = "Награда за рейд:\n" + ResourceTextFormat.FormatCosts(info.Rewards);
             if (string.IsNullOrWhiteSpace(ResourceTextFormat.FormatCosts(info.Rewards)))
                 rewards = "Награда за рейд: —";
 
-            var progressLabel = info.HasActiveRaid
-                ? $"{ResourceTextFormat.FormatElapsedSeconds(info.ElapsedSeconds)} / {ResourceTextFormat.FormatDuration(GameDuration.FromSeconds(info.DurationSeconds))}"
-                : ResourceTextFormat.FormatDuration(GameDuration.FromSeconds(info.DurationSeconds));
+            string progressLabel;
+            if (isPassive || info.HasActiveRaid)
+            {
+                progressLabel =
+                    $"{ResourceTextFormat.FormatElapsedSeconds(info.ElapsedSeconds)} / " +
+                    $"{ResourceTextFormat.FormatDuration(GameDuration.FromSeconds(info.DurationSeconds))}";
+            }
+            else
+            {
+                progressLabel = ResourceTextFormat.FormatDuration(
+                    GameDuration.FromSeconds(info.DurationSeconds));
+            }
 
             return new MapRaidPanelDisplay
             {
@@ -266,9 +283,12 @@ namespace IdleTower.UI.Presenters
                 ProgressLabel = progressLabel,
                 Progress01 = info.Progress01,
                 IsPaused = info.IsPaused,
-                PauseInteractable = info.Phase == RaidCellPhase.PreCapture
-                    || (info.Phase == RaidCellPhase.Captured
-                        && info.PostCaptureMode == PostCaptureMode.RaidFarm)
+                PauseInteractable = info.Phase == RaidCellPhase.PreCapture || isFarm,
+                ShowArmy = !isPassive && !isDead,
+                ShowRequirements = !isPassive && !isDead,
+                ShowPause = !isPassive && !isDead,
+                ShowProgress = !isDead,
+                ShowRewards = !isDead
             };
         }
 
@@ -303,25 +323,27 @@ namespace IdleTower.UI.Presenters
 
         private static string BuildStatus(RaidCellInfo info)
         {
-            if (info.Phase == RaidCellPhase.Captured
-                && info.PostCaptureMode != PostCaptureMode.RaidFarm)
+            // Captured: всегда «Захвачено» (Farm показывает FarmConfig ниже; Passive — прогресс/награда).
+            if (info.Phase == RaidCellPhase.Captured)
                 return "Захвачено";
 
+            string line;
             if (info.HasActiveRaid)
-                return info.IsPaused
-                    ? $"Набег… (пауза новых) {info.CompletedRaids}/{info.MaxCompletedRaids}"
-                    : $"Набег… {info.CompletedRaids}/{info.MaxCompletedRaids}";
+            {
+                line = info.IsPaused
+                    ? "Набег… (пауза новых)"
+                    : "Набег…";
+            }
+            else if (info.IsPaused)
+                line = "Пауза";
+            else if (info.CanStartNow)
+                line = "Готов к набегу";
+            else if (!info.MeetsRequirements)
+                line = "Состав не подходит";
+            else
+                line = "Ждём юнитов";
 
-            if (info.IsPaused)
-                return $"Пауза {info.CompletedRaids}/{info.MaxCompletedRaids}";
-
-            if (info.CanStartNow)
-                return $"Готов к набегу {info.CompletedRaids}/{info.MaxCompletedRaids}";
-
-            if (!info.MeetsRequirements)
-                return $"Состав не подходит {info.CompletedRaids}/{info.MaxCompletedRaids}";
-
-            return $"Ждём юнитов {info.CompletedRaids}/{info.MaxCompletedRaids}";
+            return $"{line}\nОсталось до захвата {info.MaxCompletedRaids - info.CompletedRaids}/{info.MaxCompletedRaids}";
         }
 
         private string BuildRequirements(RaidCellInfo info)

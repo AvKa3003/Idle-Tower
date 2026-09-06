@@ -2,7 +2,7 @@
 АРХИТЕКТУРА ПРОЕКТА — IDLE TOWER (по мотивам Idle Apocalypse)
 ================================================================================
 Версия: 1.17
-Статус: фазы 1–5 + сейв/офлайн + карта A/B + Raid MVP (C) + сейв карты D; Farm/Passive — backlog
+Статус: фазы 1–5 + сейв/офлайн + карта A/B + Raid MVP (C) + сейв карты D + Farm E + Passive F; OneShot G — backlog
 
 Согласовано / реализовано:
   [x] Строгое разделение Systems / Presenters / Views (вариант 2)
@@ -404,8 +404,8 @@ Scripts/
     MapPresence (runtime, не в сейве): Fog | VisibleOnly | Interactive
     Behaviors: Home, Decorative, Raid (тип; баланс в MapConfig.Entry.Site.Raid)
     Raid: PlannedArmy; списание при старте; Play ждёт накопления;
-          MapSystem ITickable; Captured → reveal; RaidFarm пауза при захвате
-          (Farm/Passive геймплей — E/F)
+          MapSystem ITickable; Captured → reveal; RaidFarm пауза при захвате;
+          Passive доход по тику; UI — один MapRaidPanel (скрытие блоков)
 
 3.2 IRoomBehavior / RoomBehaviorBase (ScriptableObject)
     Контракт — ядро вызывает только эти методы; внутри — любая логика:
@@ -924,7 +924,7 @@ GameEvents / Presenters вывода (звук постройки — реали
 ——— РЕЙД (этап C) ———
 19. Create → IdleTower → Map Cell Behavior → Raid
     PreCapture: RequiredUnits (IsUnit), RequiredStrength, Duration, Rewards
-    MaxCompletedRaids ≥ 1; PostCaptureMode = Dead (Farm/Passive later)
+    MaxCompletedRaids ≥ 1; PostCaptureMode + FarmConfig / PassiveInterval+Rewards
 20. На MapCellDefinition лагеря: Behavior → Raid
 21. Canvas MapScreen: MapRaidPanel (title/status/requirements/rewards/progress/pause/close + army rows)
 22. MapPresenter: поле Raid Panel → MapRaidPanel
@@ -933,7 +933,7 @@ GameEvents / Presenters вывода (звук постройки — реали
 
 [x] Имена папок и классов — как в разделе 2 (актуальное дерево Scripts/)
 
-Статус: фазы 1–5 + офлайн/сейв + карта A/B/C + сейв карты D; Farm E / Passive F — дальше
+Статус: фазы 1–5 + офлайн/сейв + карта A/B/C/D + Farm E + Passive F; OneShot G — дальше
 Доки миграций: Assets/map-save-migration.txt , Assets/map-save-migration-tests.txt
 
 ================================================================================

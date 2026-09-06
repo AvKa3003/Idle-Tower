@@ -36,14 +36,16 @@ namespace IdleTower.Data.Definitions
 
         public Sprite CapturedSprite;
 
-        /// <summary>Активный RaidConfig для текущей фазы. Farm/Passive — позже.</summary>
+        /// <summary>Активный RaidConfig для текущей фазы (PreCapture / RaidFarm).</summary>
         public RaidConfig GetActiveRaidConfig(RaidMapCellBehaviorState state)
         {
             if (state == null || !state.IsCaptured)
                 return PreCapture;
 
-            // Этап E: PostCaptureMode.RaidFarm → FarmConfig
-            // Этап F: Passive — не RaidConfig
+            if (PostCaptureMode == PostCaptureMode.RaidFarm)
+                return FarmConfig;
+
+            // Dead / Passive — не рейд-конфиг
             return null;
         }
     }

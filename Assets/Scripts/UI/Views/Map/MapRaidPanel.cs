@@ -86,30 +86,52 @@ namespace IdleTower.UI.Views
                 statusText.text = display.Status ?? string.Empty;
 
             if (requirementsText != null)
-                requirementsText.text = display.Requirements ?? string.Empty;
-
-            if (rewardsText != null)
-                rewardsText.text = display.Rewards ?? string.Empty;
+            {
+                requirementsText.gameObject.SetActive(display.ShowRequirements);
+                if (display.ShowRequirements)
+                    requirementsText.text = display.Requirements ?? string.Empty;
+            }
 
             if (progressText != null)
-                progressText.text = display.ProgressLabel ?? string.Empty;
+            {
+                progressText.gameObject.SetActive(display.ShowProgress);
+                if (display.ShowProgress)
+                    progressText.text = display.ProgressLabel ?? string.Empty;
+            }
 
             if (progressSlider != null)
             {
-                progressSlider.minValue = 0f;
-                progressSlider.maxValue = 1f;
-                progressSlider.value = Mathf.Clamp01(display.Progress01);
+                progressSlider.gameObject.SetActive(display.ShowProgress);
+                if (display.ShowProgress)
+                {
+                    progressSlider.minValue = 0f;
+                    progressSlider.maxValue = 1f;
+                    progressSlider.value = Mathf.Clamp01(display.Progress01);
+                }
+            }
+
+            if (rewardsText != null)
+            {
+                rewardsText.gameObject.SetActive(display.ShowRewards);
+                if (display.ShowRewards)
+                    rewardsText.text = display.Rewards ?? string.Empty;
             }
 
             SetPausedVisual(display.IsPaused);
 
             if (pauseButton != null)
+            {
+                pauseButton.gameObject.SetActive(display.ShowPause);
                 pauseButton.interactable = display.PauseInteractable;
+            }
+
+            if (armyRowsRoot != null)
+                armyRowsRoot.gameObject.SetActive(display.ShowArmy);
         }
 
         public void SetArmyRows(IReadOnlyList<MapRaidArmyRowDisplay> displays)
         {
-            if (displays == null || armyRowPrefab == null)
+            if (displays == null || displays.Count == 0 || armyRowPrefab == null)
             {
                 ClearArmyRows();
                 return;
@@ -215,5 +237,10 @@ namespace IdleTower.UI.Views
         public float Progress01;
         public bool IsPaused;
         public bool PauseInteractable;
+        public bool ShowArmy;
+        public bool ShowRequirements;
+        public bool ShowPause;
+        public bool ShowProgress;
+        public bool ShowRewards;
     }
 }

@@ -19,6 +19,12 @@ namespace IdleTower.Data.Save
 
             if (state != null && state.IsCaptured && site.PostCaptureMode == PostCaptureMode.RaidFarm)
                 AppendRaidConfig(sb, site.FarmConfig);
+            else if (state != null && state.IsCaptured && site.PostCaptureMode == PostCaptureMode.Passive)
+            {
+                sb.Append(site.PassiveInterval.Minutes).Append(':')
+                    .Append(site.PassiveInterval.Seconds).Append('|');
+                AppendCosts(sb, site.PassiveRewards);
+            }
             else
                 AppendRaidConfig(sb, site.PreCapture);
 

@@ -99,17 +99,20 @@ GameSaveData.version: пишем CurrentVersion при Save.
   - Сбросить активный рейд
   - Phase = Captured, CompletedRaids ≥ Max
   - Pause если текущий mode = RaidFarm
+  - ElapsedSeconds = 0
   - PlannedArmy оставляем
   - = «только что захватили, ещё ничего не делали» под новый mode
 
 --- 5.A Конфиг/Site изменился, PostCaptureMode ТОТ ЖЕ
-     (fingerprint ≠; rewards / duration / MaxCompletedRaids / …)
+     (fingerprint ≠; rewards / duration / MaxCompletedRaids / PassiveInterval… )
 
   - Полный restore state
   - Pause:
       PreCapture → всегда
       Captured + RaidFarm → да
       Captured + Dead/Passive → нет (и sanitize снимет флаг)
+  - Captured + Passive + fingerprint≠ → ElapsedSeconds оставляем
+    (если новый interval меньше — догон выплат на тике; если больше — прогресс продолжается)
   - Если HasActiveRaid: продолжить elapsed; Complete даёт награду из
     ТЕКУЩЕГО конфига; армию не пересписывать
   - activeRaidRewards из сейва НЕ тратим
@@ -119,11 +122,13 @@ GameSaveData.version: пишем CurrentVersion при Save.
   - Мгновенно выдать activeRaidRewards (полная награда старта)
   - Сбросить активный рейд
   - Pause если ТЕКУЩИЙ mode = RaidFarm (чтобы farm не автостартовал)
+  - ElapsedSeconds = 0 если ТЕКУЩИЙ mode = Passive
 
 --- 5.C PostCaptureMode изменился, активного рейда нет
 
   - State (Captured, PlannedArmy, …) сохраняем
   - Pause если ТЕКУЩИЙ mode = RaidFarm
+  - ElapsedSeconds = 0 если ТЕКУЩИЙ mode = Passive
 
 --- 5.D Конфиг и mode не изменились
 

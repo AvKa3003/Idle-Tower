@@ -236,7 +236,20 @@ namespace IdleTower.Core
 
             ValidateRaidConfig(raid.PreCapture, $"{raidPath}.PreCapture", knownResourceIds, errors);
 
-            // Farm/Passive — поля заложены; полная валидация на этапах E/F.
+            if (raid.PostCaptureMode == PostCaptureMode.RaidFarm)
+                ValidateRaidConfig(raid.FarmConfig, $"{raidPath}.FarmConfig", knownResourceIds, errors);
+            else if (raid.PostCaptureMode == PostCaptureMode.Passive)
+            {
+                if (raid.PassiveInterval.TotalSeconds <= 0f)
+                    errors.Add($"{raidPath}: PassiveInterval должен быть > 0.");
+
+                ValidateRaidCosts(
+                    raid.PassiveRewards,
+                    $"{raidPath}.PassiveRewards",
+                    knownResourceIds,
+                    errors,
+                    requireUnit: false);
+            }
         }
 
         private static void ValidateRaidConfig(

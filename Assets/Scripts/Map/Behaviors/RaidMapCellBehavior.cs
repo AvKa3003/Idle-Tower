@@ -121,7 +121,7 @@ namespace IdleTower.Map.Behaviors
                 return;
 
             state.HasActiveRaid = false;
-            state.ActiveElapsedSeconds = 0f;
+            state.ElapsedSeconds = 0f;
             state.ActiveRaidRewards = Array.Empty<ResourceCost>();
         }
 
@@ -132,7 +132,7 @@ namespace IdleTower.Map.Behaviors
             public bool isPaused;
             public int completedRaids;
             public bool hasActiveRaid;
-            public float activeElapsedSeconds;
+            public float elapsedSeconds;
             public ResourceAmountSave[] plannedArmy = Array.Empty<ResourceAmountSave>();
 
             public static RaidMapCellStateDto FromState(RaidMapCellBehaviorState state)
@@ -143,7 +143,7 @@ namespace IdleTower.Map.Behaviors
                     isPaused = state.IsPaused,
                     completedRaids = state.CompletedRaids,
                     hasActiveRaid = state.HasActiveRaid,
-                    activeElapsedSeconds = state.ActiveElapsedSeconds,
+                    elapsedSeconds = state.ElapsedSeconds,
                     plannedArmy = ResourceSaveHelper.ToSave(state.PlannedArmy)
                 };
             }
@@ -158,7 +158,7 @@ namespace IdleTower.Map.Behaviors
                     IsPaused = isPaused,
                     CompletedRaids = Math.Max(0, completedRaids),
                     HasActiveRaid = hasActiveRaid,
-                    ActiveElapsedSeconds = Math.Max(0f, activeElapsedSeconds),
+                    ElapsedSeconds = Math.Max(0f, elapsedSeconds),
                     PlannedArmy = Array.Empty<ResourceCost>()
                 };
             }

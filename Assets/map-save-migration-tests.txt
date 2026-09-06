@@ -109,14 +109,26 @@ B. ТОТ ЖЕ RAID, ТОТ ЖЕ PostCaptureMode, НО ПОМЕНЯЛИ БАЛА
   - Пауза включена.
   - Состав армии сохранился (если юниты ещё существуют в балансе).
 
------ B3. Farm + активный рейд + смена FarmConfig (этап E, пока отложить) -----
+----- B3. Farm + активный рейд + смена FarmConfig -----
 
-Когда появится геймплей RaidFarm:
+Что сделать:
   1. Captured + Farm, идёт farm-рейд.
   2. Save → поменять FarmConfig.Rewards → Load.
 
 Что проверить:
   - Pause, рейд доигрывается с новой наградой, без автостарта.
+
+----- B3b. Passive + смена PassiveInterval/Rewards -----
+
+Что сделать:
+  1. Captured + Passive, прогресс пассива > 0.
+  2. Save → поменять PassiveInterval или PassiveRewards → Load.
+
+Что проверить:
+  - ElapsedSeconds сохранён (не сброшен).
+  - IsPaused = false.
+  - Если новый interval ≤ elapsed — выплаты догоняются на тике; иначе прогресс идёт дальше к новому interval.
+  - Награда уже по новым PassiveRewards.
 
 ----- B4. Captured Dead, меняем что-то в Site (спрайт / PreCapture) -----
 
@@ -162,9 +174,9 @@ C. СМЕНИЛИ PostCaptureMode В КОНФИГЕ
 
 Что проверить:
   - Клетка на паузе (Farm сам не ест армию).
-  - После ручного Play — уже правила Farm (когда E будет готов).
+  - После ручного Play — уже правила Farm.
 
------ C4. Passive → Farm (когда будет Passive) -----
+----- C4. Passive → Farm -----
 
 Что сделать:
   1. Captured + Passive.
@@ -172,6 +184,17 @@ C. СМЕНИЛИ PostCaptureMode В КОНФИГЕ
 
 Что проверить:
   - Pause на Farm.
+
+----- C4b. Farm → Passive -----
+
+Что сделать:
+  1. Captured + Farm (с/без активного рейда).
+  2. Save → mode Passive → Load.
+
+Что проверить:
+  - Если был активный рейд — награда из сейва, рейд сброшен.
+  - ElapsedSeconds = 0, без паузы.
+  - UI: «Захвачено», прогресс + награда, без армии.
 
 ----- C5. PreCapture + активный рейд, в Site крутанули только PostCaptureMode -----
 
