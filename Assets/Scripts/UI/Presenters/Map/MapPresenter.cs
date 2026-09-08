@@ -257,9 +257,12 @@ namespace IdleTower.UI.Presenters
 
             var status = BuildStatus(info);
             var requirements = isPassive || isDead ? string.Empty : BuildRequirements(info);
-            var rewards = "Награда за рейд:\n" + ResourceTextFormat.FormatCosts(info.Rewards);
-            if (string.IsNullOrWhiteSpace(ResourceTextFormat.FormatCosts(info.Rewards)))
-                rewards = "Награда за рейд: —";
+            var rewards = FormatRewardBlock("Награда за рейд", info.Rewards);
+            var hasCaptureRewards = info.Phase == RaidCellPhase.PreCapture
+                && HasRewardCosts(info.CaptureRewards);
+            var captureRewards = hasCaptureRewards
+                ? FormatRewardBlock("Награда за захват", info.CaptureRewards)
+                : string.Empty;
 
             string progressLabel;
             if (isPassive || info.HasActiveRaid)
@@ -280,6 +283,7 @@ namespace IdleTower.UI.Presenters
                 Status = status,
                 Requirements = requirements,
                 Rewards = rewards,
+                CaptureRewards = captureRewards,
                 ProgressLabel = progressLabel,
                 Progress01 = info.Progress01,
                 IsPaused = info.IsPaused,
@@ -288,8 +292,32 @@ namespace IdleTower.UI.Presenters
                 ShowRequirements = !isPassive && !isDead,
                 ShowPause = !isPassive && !isDead,
                 ShowProgress = !isDead,
-                ShowRewards = !isDead
+                ShowRewards = !isDead,
+                ShowCaptureRewards = hasCaptureRewards
             };
+        }
+
+        private static bool HasRewardCosts(ResourceCost[] costs)
+        {
+            if (costs == null || costs.Length == 0)
+                return false;
+
+            for (var i = 0; i < costs.Length; i++)
+            {
+                var cost = costs[i];
+                if (cost.Resource != null && cost.Amount > 0)
+                    return true;
+            }
+
+            return false;
+        }
+
+        private static string FormatRewardBlock(string title, ResourceCost[] costs)
+        {
+            var body = ResourceTextFormat.FormatCosts(costs);
+            if (string.IsNullOrWhiteSpace(body))
+                return title + ": —";
+            return title + ":\n" + body;
         }
 
         private List<MapRaidArmyRowDisplay> BuildArmyRows(RaidCellInfo info)

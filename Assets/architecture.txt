@@ -924,9 +924,10 @@ GameEvents / Presenters вывода (звук постройки — реали
 ——— РЕЙД (этап C) ———
 19. Create → IdleTower → Map Cell Behavior → Raid
     PreCapture: RequiredUnits (IsUnit), RequiredStrength, Duration, Rewards
-    MaxCompletedRaids ≥ 1; PostCaptureMode + FarmConfig / PassiveInterval+Rewards
+    CaptureRewards (полный захват); MaxCompletedRaids ≥ 1
+    PostCaptureMode + FarmConfig / PassiveInterval+Rewards
 20. На MapCellDefinition лагеря: Behavior → Raid
-21. Canvas MapScreen: MapRaidPanel (title/status/requirements/rewards/progress/pause/close + army rows)
+21. Canvas MapScreen: MapRaidPanel (title/status/requirements/rewards[/captureRewards]/progress/pause/close + army rows)
 22. MapPresenter: поле Raid Panel → MapRaidPanel
 23. Play: сохранённый состав + Play ждёт накопления; смена состава → Pause;
     capture → соседи; RaidFarm при захвате на Pause

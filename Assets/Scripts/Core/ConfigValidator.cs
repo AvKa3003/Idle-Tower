@@ -235,6 +235,12 @@ namespace IdleTower.Core
                 errors.Add($"{raidPath}: MaxCompletedRaids < 1.");
 
             ValidateRaidConfig(raid.PreCapture, $"{raidPath}.PreCapture", knownResourceIds, errors);
+            ValidateRaidCosts(
+                raid.CaptureRewards,
+                $"{raidPath}.CaptureRewards",
+                knownResourceIds,
+                errors,
+                requireUnit: false);
 
             if (raid.PostCaptureMode == PostCaptureMode.RaidFarm)
                 ValidateRaidConfig(raid.FarmConfig, $"{raidPath}.FarmConfig", knownResourceIds, errors);

@@ -192,6 +192,7 @@
   RaidSiteConfig
     - preCapture: RaidConfig
     - maxCompletedRaids
+    - captureRewards[]          // полный захват; всегда из текущего конфига
     - postCaptureMode + farmConfig / passiveInterval+rewards / capturedSprite
     - GetActiveRaidConfig(state) — PreCapture / FarmConfig; Passive/Dead → null
 

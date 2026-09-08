@@ -26,7 +26,11 @@ namespace IdleTower.Data.Save
                 AppendCosts(sb, site.PassiveRewards);
             }
             else
+            {
                 AppendRaidConfig(sb, site.PreCapture);
+                sb.Append('|');
+                AppendCosts(sb, site.CaptureRewards);
+            }
 
             return sb.ToString();
         }

@@ -226,6 +226,7 @@ namespace IdleTower.Systems
                     plannedArmyStrength: 0,
                     meetsRequirements: true,
                     site.PassiveRewards ?? Array.Empty<ResourceCost>(),
+                    Array.Empty<ResourceCost>(),
                     canStartNow: false,
                     PostCaptureMode.Passive);
                 return true;
@@ -243,6 +244,9 @@ namespace IdleTower.Systems
             var plannedStrength = RaidArmyHelper.CalcStrength(planned);
             var meets = config != null && RaidArmyHelper.MeetsConfigRequirements(config, planned);
             var canStart = CanStartRaid(coord, state, site, out _, out _);
+            var captureRewards = !state.IsCaptured && site != null
+                ? site.CaptureRewards ?? Array.Empty<ResourceCost>()
+                : Array.Empty<ResourceCost>();
 
             info = new RaidCellInfo(
                 coord,
@@ -261,6 +265,7 @@ namespace IdleTower.Systems
                 plannedStrength,
                 meets,
                 config?.Rewards ?? Array.Empty<ResourceCost>(),
+                captureRewards,
                 canStart,
                 site != null ? site.PostCaptureMode : PostCaptureMode.Dead);
             return true;
@@ -372,6 +377,7 @@ namespace IdleTower.Systems
             state.Phase = RaidCellPhase.Captured;
             // Farm иначе сразу автостартует и может съесть армию/ресурсы без согласия игрока.
             state.IsPaused = site != null && site.PostCaptureMode == PostCaptureMode.RaidFarm;
+            RaidRewardsHelper.GrantCaptureRewards(_services.Resources, site);
             presenceDirty = true;
         }
 

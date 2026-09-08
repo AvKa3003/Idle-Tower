@@ -21,6 +21,7 @@ namespace IdleTower.Editor
             var h = EditorGUIUtility.singleLineHeight + Pad; // foldout
             h += Line(property, "PreCapture");
             h += Line(property, "MaxCompletedRaids");
+            h += Line(property, "CaptureRewards");
             h += Line(property, "PostCaptureMode");
 
             var mode = (PostCaptureMode)property.FindPropertyRelative("PostCaptureMode").enumValueIndex;
@@ -58,6 +59,7 @@ namespace IdleTower.Editor
 
             y = Draw(position, y, property, "PreCapture");
             y = Draw(position, y, property, "MaxCompletedRaids");
+            y = Draw(position, y, property, "CaptureRewards");
             y = Draw(position, y, property, "PostCaptureMode");
 
             var mode = (PostCaptureMode)property.FindPropertyRelative("PostCaptureMode").enumValueIndex;

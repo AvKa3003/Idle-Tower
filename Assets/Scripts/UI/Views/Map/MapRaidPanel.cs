@@ -15,6 +15,7 @@ namespace IdleTower.UI.Views
         [SerializeField] private TMP_Text statusText;
         [SerializeField] private TMP_Text requirementsText;
         [SerializeField] private TMP_Text rewardsText;
+        [SerializeField] private TMP_Text captureRewardsText;
         [SerializeField] private TMP_Text progressText;
         [SerializeField] private Slider progressSlider;
         [SerializeField] private Transform armyRowsRoot;
@@ -115,6 +116,13 @@ namespace IdleTower.UI.Views
                 rewardsText.gameObject.SetActive(display.ShowRewards);
                 if (display.ShowRewards)
                     rewardsText.text = display.Rewards ?? string.Empty;
+            }
+
+            if (captureRewardsText != null)
+            {
+                captureRewardsText.gameObject.SetActive(display.ShowCaptureRewards);
+                if (display.ShowCaptureRewards)
+                    captureRewardsText.text = display.CaptureRewards ?? string.Empty;
             }
 
             SetPausedVisual(display.IsPaused);
@@ -233,6 +241,7 @@ namespace IdleTower.UI.Views
         public string Status;
         public string Requirements;
         public string Rewards;
+        public string CaptureRewards;
         public string ProgressLabel;
         public float Progress01;
         public bool IsPaused;
@@ -242,5 +251,6 @@ namespace IdleTower.UI.Views
         public bool ShowPause;
         public bool ShowProgress;
         public bool ShowRewards;
+        public bool ShowCaptureRewards;
     }
 }

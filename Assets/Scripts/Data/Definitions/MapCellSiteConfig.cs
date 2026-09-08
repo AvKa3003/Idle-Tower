@@ -27,6 +27,8 @@ namespace IdleTower.Data.Definitions
         [Min(1)]
         public int MaxCompletedRaids = 1;
 
+        public ResourceCost[] CaptureRewards = Array.Empty<ResourceCost>();
+
         public PostCaptureMode PostCaptureMode = PostCaptureMode.Dead;
 
         // Видны в Inspector только при соответствующем PostCaptureMode (RaidSiteConfigDrawer).

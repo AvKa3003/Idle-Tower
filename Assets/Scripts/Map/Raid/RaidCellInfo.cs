@@ -22,6 +22,7 @@ namespace IdleTower.Systems
         public int PlannedArmyStrength { get; }
         public bool MeetsRequirements { get; }
         public ResourceCost[] Rewards { get; }
+        public ResourceCost[] CaptureRewards { get; }
         public bool CanStartNow { get; }
         public PostCaptureMode PostCaptureMode { get; }
 
@@ -42,6 +43,7 @@ namespace IdleTower.Systems
             int plannedArmyStrength,
             bool meetsRequirements,
             ResourceCost[] rewards,
+            ResourceCost[] captureRewards,
             bool canStartNow,
             PostCaptureMode postCaptureMode)
         {
@@ -61,6 +63,7 @@ namespace IdleTower.Systems
             PlannedArmyStrength = plannedArmyStrength;
             MeetsRequirements = meetsRequirements;
             Rewards = rewards;
+            CaptureRewards = captureRewards;
             CanStartNow = canStartNow;
             PostCaptureMode = postCaptureMode;
         }

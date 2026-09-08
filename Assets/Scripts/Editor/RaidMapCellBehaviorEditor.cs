@@ -12,7 +12,7 @@ namespace IdleTower.Editor
             EditorGUILayout.HelpBox(
                 "RaidMapCellBehavior — только тип клетки (клик, захват, reveal).\n" +
                 "Баланс рейда задаётся в MapConfig → Entry → Site → Raid\n" +
-                "(PreCapture, MaxCompletedRaids, PostCaptureMode, Farm/Passive поля).",
+                "(PreCapture, CaptureRewards, MaxCompletedRaids, PostCaptureMode, Farm/Passive поля).",
                 MessageType.Info);
 
             DrawDefaultInspector();

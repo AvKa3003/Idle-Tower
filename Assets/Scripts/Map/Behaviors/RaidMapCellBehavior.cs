@@ -73,11 +73,8 @@ namespace IdleTower.Map.Behaviors
             if (save == null || services == null || catalog == null)
                 return;
 
-            if (string.IsNullOrEmpty(save.behaviorStateJson))
-                return;
-
-            var dto = JsonUtility.FromJson<RaidMapCellStateDto>(save.behaviorStateJson);
-            if (dto == null || !dto.hasActiveRaid)
+            // При Save activeRaidRewards пишутся только при HasActiveRaid — этого достаточно.
+            if (save.activeRaidRewards == null || save.activeRaidRewards.Length == 0)
                 return;
 
             ResourceSaveHelper.GrantRewards(save.activeRaidRewards, services.Resources, catalog);

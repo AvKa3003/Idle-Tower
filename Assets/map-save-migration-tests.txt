@@ -99,6 +99,37 @@ B. ТОТ ЖЕ RAID, ТОТ ЖЕ PostCaptureMode, НО ПОМЕНЯЛИ БАЛА
   - В конце приходит НОВАЯ награда из конфига, не старая из момента старта.
   - Пока не нажмёшь Play — следующий рейд не уходит.
 
+----- B1b. Меняем CaptureRewards, идёт последний PreCapture-рейд -----
+
+Что сделать:
+  1. PreCapture, CompletedRaids = Max−1, запустить рейд (запоминаем старую CaptureRewards).
+  2. Save → поменять CaptureRewards → Load.
+
+Что проверить:
+  - Пауза; рейд доигрывается.
+  - В конце: награда рейда (текущий PreCapture.Rewards) + НОВАЯ CaptureRewards (не снимок).
+
+----- B1c. MaxCompletedRaids снизили → Captured на Load -----
+
+Что сделать:
+  1. PreCapture, CompletedRaids = 2, Max было 3, без активного рейда.
+  2. Save → MaxCompletedRaids = 2 → Load.
+
+Что проверить:
+  - Phase = Captured.
+  - Выданы текущие CaptureRewards (видны в офлайн-дельте, если был offline path).
+
+----- B1d. Max снизили + активный PreCapture-рейд -----
+
+Что сделать:
+  1. PreCapture, CompletedRaids уже ≥ нового Max, идёт рейд.
+  2. Save → уменьшить MaxCompletedRaids → Load.
+
+Что проверить:
+  - Выданы activeRaidRewards (снимок старта), рейд сброшен.
+  - Phase = Captured + текущие CaptureRewards.
+  - Farm → на паузе.
+
 ----- B2. Меняем требования, рейда нет -----
 
 Что сделать:
@@ -222,19 +253,32 @@ D. В СЕЙВЕ PostCaptureMode, КОТОРОГО БОЛЬШЕ НЕТ В ENUM
   3. Load.
 
 Что проверить:
-  - Клетка Captured «как только что захватили».
+  - Клетка остаётся Captured (не «сброс с нуля»).
   - Активного рейда нет.
-  - Pause только если в конфиге сейчас Farm.
+  - Дальше как 5.C: Pause только если в конфиге сейчас Farm; Passive → Elapsed=0.
+  - CaptureRewards не выдаются.
   - В Console есть warning про неизвестный mode.
 
------ D2. То же, но в сейве был активный рейд -----
+----- D2. Captured + активный рейд -----
 
 Что сделать:
   Как D1, но hasActiveRaid / activeRaidRewards заполнены.
 
 Что проверить:
-  - Награда из activeRaidRewards выдана.
-  - Рейд сброшен, состояние «свежий Captured» под текущий mode.
+  - Как 5.B: награда из activeRaidRewards, рейд сброшен.
+  - Pause/Passive defaults под текущий mode.
+  - CaptureRewards не выдаются.
+
+----- D3. PreCapture + битый savedPostCaptureMode -----
+
+Что сделать:
+  1. PreCapture (с/без активного рейда).
+  2. Подменить savedPostCaptureMode на 99 → Load.
+
+Что проверить:
+  - Фаза остаётся PreCapture (нет мгновенного захвата).
+  - CaptureRewards нет (если не сработал CompletedRaids ≥ Max).
+  - Активный PreCapture-рейд не сбрасывается из‑за битого mode.
 
 
 ================================================================================

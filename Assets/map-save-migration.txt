@@ -36,8 +36,9 @@ GameSaveData.version: пишем CurrentVersion при Save.
   x, y                     — coord
   behaviorType             — Home / Decorative / Raid (… позже OneShot)
   behaviorStateJson        — SerializeState behavior
-  activeRaidRewards[]      — награда на МОМЕНТ СТАРТА активного рейда
-                             (только mode-change / emergency; не для обычного Complete)
+  activeRaidRewards[]      — награда РЕЙДА на МОМЕНТ СТАРТА активного рейда
+                             (только mode-change / emergency; не для обычного Complete;
+                              CaptureRewards сюда НЕ входят)
   savedConfigFingerprint   — отпечаток релевантного Site.Raid на момент сейва
   savedPostCaptureMode     — int PostCaptureMode на момент сейва
 
@@ -95,16 +96,14 @@ GameSaveData.version: пишем CurrentVersion при Save.
 
 --- 5.0 Неизвестный savedPostCaptureMode (значение удалили из enum)
 
-  - Активный рейд → выдать activeRaidRewards
-  - Сбросить активный рейд
-  - Phase = Captured, CompletedRaids ≥ Max
-  - Pause если текущий mode = RaidFarm
-  - ElapsedSeconds = 0
-  - PlannedArmy оставляем
-  - = «только что захватили, ещё ничего не делали» под новый mode
+  - Не форсируем Captured и не выдаём CaptureRewards из‑за битого mode.
+  - Считаем modeChanged = true → дальше как 5.B / 5.C с ТЕКУЩИМ Site.PostCaptureMode.
+  - PreCapture: спец-логики нет (рейд/фаза как в сейве; mode просто из конфига).
+  - Captured + активный рейд → 5.B; Captured без рейда → 5.C.
+  - CaptureRewards только если сработал блок CompletedRaids ≥ Max (ниже / выше).
 
 --- 5.A Конфиг/Site изменился, PostCaptureMode ТОТ ЖЕ
-     (fingerprint ≠; rewards / duration / MaxCompletedRaids / PassiveInterval… )
+     (fingerprint ≠; rewards / duration / MaxCompletedRaids / CaptureRewards / PassiveInterval… )
 
   - Полный restore state
   - Pause:
@@ -113,18 +112,29 @@ GameSaveData.version: пишем CurrentVersion при Save.
       Captured + Dead/Passive → нет (и sanitize снимет флаг)
   - Captured + Passive + fingerprint≠ → ElapsedSeconds оставляем
     (если новый interval меньше — догон выплат на тике; если больше — прогресс продолжается)
-  - Если HasActiveRaid: продолжить elapsed; Complete даёт награду из
-    ТЕКУЩЕГО конфига; армию не пересписывать
+  - Если HasActiveRaid: продолжить elapsed; Complete даёт:
+      Rewards рейда из ТЕКУЩЕГО GetActiveRaidConfig
+      CaptureRewards из ТЕКУЩЕГО Site (если этот Complete захватывает)
   - activeRaidRewards из сейва НЕ тратим
+  - CaptureRewards никогда не снапшотится в сейв
+
+--- PreCapture → Captured из‑за CompletedRaids ≥ MaxCompletedRaids (на Load)
+
+  - если HasActiveRaid → выдать activeRaidRewards, ClearActiveRaid
+  - Phase = Captured, Pause если Farm
+  - Выдать CaptureRewards из ТЕКУЩЕГО конфига
+  - Единственный путь миграции, где CaptureRewards выдаются «сразу на Load»
 
 --- 5.B PostCaptureMode изменился + есть активный рейд (Captured)
+     (то же при битом savedPostCaptureMode)
 
   - Мгновенно выдать activeRaidRewards (полная награда старта)
   - Сбросить активный рейд
   - Pause если ТЕКУЩИЙ mode = RaidFarm (чтобы farm не автостартовал)
   - ElapsedSeconds = 0 если ТЕКУЩИЙ mode = Passive
 
---- 5.C PostCaptureMode изменился, активного рейда нет
+--- 5.C PostCaptureMode изменился, активного рейда нет (только Captured)
+     (то же при битом savedPostCaptureMode; PreCapture — без спец-веток)
 
   - State (Captured, PlannedArmy, …) сохраняем
   - Pause если ТЕКУЩИЙ mode = RaidFarm
@@ -142,11 +152,14 @@ GameSaveData.version: пишем CurrentVersion при Save.
 
   Обычный Complete рейда (тик / офлайн)
     → Rewards из ТЕКУЩЕГО GetActiveRaidConfig
+    → если этот Complete переводит в Captured → + CaptureRewards из ТЕКУЩЕГО Site
 
-  Смена PostCaptureMode при активном рейде (5.B)
-  Неизвестный PostCaptureMode + активный рейд (5.0)
+  Смена PostCaptureMode при активном рейде Captured (5.B)
+  Битый savedPostCaptureMode + Captured + активный рейд (5.0 → 5.B)
   Смена типа / удаление coord + активный рейд (§2.3, §3)
-    → activeRaidRewards из СЕЙВА (снимок на старте рейда)
+    → activeRaidRewards из СЕЙВА (снимок награды РЕЙДА на старте)
+    → CaptureRewards из сейва НЕ выдаём
+    → CaptureRewards на Load только при CompletedRaids ≥ Max
 
   Юниты за уже начатый рейд не возвращаются.
 

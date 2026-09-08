@@ -6,6 +6,7 @@ using IdleTower.Data.Runtime;
 using IdleTower.Data.Save;
 using IdleTower.Map;
 using IdleTower.Map.Behaviors;
+using IdleTower.Map.Raid;
 using UnityEngine;
 
 namespace IdleTower.Systems
@@ -78,63 +79,72 @@ namespace IdleTower.Systems
 
             state.PlannedArmy = ResourceSaveHelper.SanitizePlannedArmy(state.PlannedArmy, catalog);
 
+            // MaxCompletedRaids снизили / сейв «догоняет» Captured — награда за захват из ТЕКУЩЕГО конфига.
             if (!state.IsCaptured && state.CompletedRaids >= site.MaxCompletedRaids)
             {
+                if (state.HasActiveRaid)
+                {
+                    ResourceSaveHelper.GrantRewards(save.activeRaidRewards, services.Resources, catalog);
+                    RaidMapCellBehavior.ClearActiveRaid(state);
+                }
+
                 state.Phase = RaidCellPhase.Captured;
                 state.IsPaused = site.PostCaptureMode == PostCaptureMode.RaidFarm;
+                RaidRewardsHelper.GrantCaptureRewards(services, site);
             }
 
-            // Удалённый/неизвестный PostCaptureMode из сейва → Captured «с нуля» (как сразу после захвата).
-            if (!Enum.IsDefined(typeof(PostCaptureMode), save.savedPostCaptureMode))
+            var currentMode = site.PostCaptureMode;
+            var unknownSavedMode = !Enum.IsDefined(typeof(PostCaptureMode), save.savedPostCaptureMode);
+            if (unknownSavedMode)
             {
-                if (state.HasActiveRaid)
-                    ResourceSaveHelper.GrantRewards(save.activeRaidRewards, services.Resources, catalog);
-
-                RaidMapCellBehavior.ClearActiveRaid(state);
-                state.Phase = RaidCellPhase.Captured;
-                state.CompletedRaids = Math.Max(state.CompletedRaids, site.MaxCompletedRaids);
-                state.IsPaused = site.PostCaptureMode == PostCaptureMode.RaidFarm;
-                state.ElapsedSeconds = 0f;
                 Debug.LogWarning(
                     $"[MapSaveMigration] ({save.x},{save.y}): неизвестный savedPostCaptureMode=" +
-                    $"{save.savedPostCaptureMode} → Captured + default post-state.");
-                SanitizePauseForPostCaptureMode(state, site);
-                return;
+                    $"{save.savedPostCaptureMode} → используем текущий PostCaptureMode из конфига ({currentMode}).");
             }
 
-            var savedMode = (PostCaptureMode)save.savedPostCaptureMode;
-            var currentMode = site.PostCaptureMode;
+            // Битый/удалённый mode в сейве ≡ «mode сменился» на актуальный из Site (без принудительного Captured).
+            var modeChanged = unknownSavedMode
+                || (PostCaptureMode)save.savedPostCaptureMode != currentMode;
+
             var currentFingerprint = RaidSiteConfigFingerprint.Compute(site, state);
             var savedFingerprint = save.savedConfigFingerprint ?? string.Empty;
 
-            // B: PostCaptureMode изменился + активный рейд (Captured Farm/Passive)
-            if (state.HasActiveRaid && state.IsCaptured && savedMode != currentMode)
+            // B: Captured + активный рейд + PostCaptureMode сменился (в т.ч. битый saved)
+            if (state.HasActiveRaid && state.IsCaptured && modeChanged)
             {
                 ResourceSaveHelper.GrantRewards(save.activeRaidRewards, services.Resources, catalog);
                 RaidMapCellBehavior.ClearActiveRaid(state);
-                if (currentMode == PostCaptureMode.RaidFarm)
-                    state.IsPaused = true;
-                if (currentMode == PostCaptureMode.Passive)
-                    state.ElapsedSeconds = 0f;
+                ApplyCapturedPostModeDefaults(state, currentMode);
             }
-            // C: PostCaptureMode изменился, активного рейда нет
-            else if (!state.HasActiveRaid && savedMode != currentMode)
+            // C: mode сменился, активного рейда нет — спец-логика только для уже Captured
+            else if (!state.HasActiveRaid && modeChanged && state.IsCaptured)
             {
-                if (currentMode == PostCaptureMode.RaidFarm)
-                    state.IsPaused = true;
-                if (currentMode == PostCaptureMode.Passive)
-                    state.ElapsedSeconds = 0f;
+                ApplyCapturedPostModeDefaults(state, currentMode);
             }
-            // A: конфиг изменился, mode тот же
-            else if (!string.Equals(savedFingerprint, currentFingerprint, StringComparison.Ordinal))
+            // A: конфиг изменился, mode тот же (или PreCapture — mode из конфига без спец-веток)
+            else if (!modeChanged
+                     && !string.Equals(savedFingerprint, currentFingerprint, StringComparison.Ordinal))
             {
                 // PreCapture — всегда Pause; Captured — только Farm (Dead/Passive без паузы).
                 if (!state.IsCaptured || currentMode == PostCaptureMode.RaidFarm)
                     state.IsPaused = true;
                 // Passive: ElapsedSeconds не сбрасываем — цикл догонит/продолжит с новым interval.
+                // CaptureRewards / PreCapture Rewards: при активном рейде Complete берёт ТЕКУЩИЙ конфиг
+                // (награда за захват никогда не снапшотится в activeRaidRewards).
             }
 
             SanitizePauseForPostCaptureMode(state, site);
+        }
+
+        /// <summary>После смены PostCaptureMode у уже Captured клетки.</summary>
+        private static void ApplyCapturedPostModeDefaults(
+            RaidMapCellBehaviorState state,
+            PostCaptureMode currentMode)
+        {
+            if (currentMode == PostCaptureMode.RaidFarm)
+                state.IsPaused = true;
+            if (currentMode == PostCaptureMode.Passive)
+                state.ElapsedSeconds = 0f;
         }
 
         /// <summary>Dead/Passive не используют Pause — сбрасываем флаг после Captured.</summary>
