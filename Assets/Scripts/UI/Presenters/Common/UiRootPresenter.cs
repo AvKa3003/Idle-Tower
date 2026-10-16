@@ -5,17 +5,15 @@ using UnityEngine;
 namespace IdleTower.UI.Presenters
 {
     /// <summary>
-    /// UiRootPresenter — общий bootstrap UI (GO UI_Root).
-    /// Регистрирует экраны, инициализирует presenters, стартовый Show.
-    ///
-    /// Не логика башни: за башню отвечают MainTowerScreen + TowerPresenter (GO Tower).
+    /// UiRootPresenter — bootstrap общего UI (GO UI_Root).
+    /// UI_Root всегда активен и рисуется поверх игровых экранов (MapScreen и т.п.):
+    /// Header, модалки, MapRaidPanel. Сами экраны — не дети UI_Root.
     ///
     /// Получает: GameServices от GameBootstrap
     /// Отправляет: Initialize(services) дочерним presenters; Show MainTowerScreen
     ///
     /// Screens:      MainTowerScreen, MapScreen (через MapPresenter)
     /// Presenters:   Header, RoomSelection, ProductionMode, Tower, OfflineResult, Map
-    /// GameEvents:   —
     /// </summary>
     public class UiRootPresenter : MonoBehaviour
     {
@@ -34,6 +32,10 @@ namespace IdleTower.UI.Presenters
         {
             if (services == null || _initialized)
                 return;
+
+            // Общий UI не должен выключаться при смене экранов.
+            if (!gameObject.activeSelf)
+                gameObject.SetActive(true);
 
             if (screenManager != null && mainTowerScreen != null)
                 screenManager.Register(mainTowerScreen);

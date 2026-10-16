@@ -5,6 +5,10 @@ using UnityEngine;
 
 namespace IdleTower.UI
 {
+    /// <summary>
+    /// Переключает только зарегистрированные IScreen (их root).
+    /// Не трогает UI_Root / общий хром — экраны не должны Hide-ить весь UI_Root.
+    /// </summary>
     public class ScreenManager : MonoBehaviour
     {
         private readonly Dictionary<ScreenId, IScreen> _screens = new();

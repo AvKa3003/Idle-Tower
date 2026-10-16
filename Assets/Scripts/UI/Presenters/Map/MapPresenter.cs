@@ -14,6 +14,9 @@ namespace IdleTower.UI.Presenters
     /// <summary>
     /// MapPresenter — экран карты + панель Raid.
     ///
+    /// MapScreen — игровой экран (вне UI_Root). MapRaidPanel — в UI_Root;
+    /// UI_Root в Hierarchy должен быть выше MapScreen, иначе панель окажется «под» картой.
+    ///
     /// Получает: клики MapView / MapScreen / Raid (pause, close, ± армии);
     ///           OpenMap от Header; GameEvents (GameTick, ResourceChanged, MapPresenceChanged);
     ///           чтение Map (displays, RaidCellInfo)

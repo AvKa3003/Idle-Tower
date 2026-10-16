@@ -4,9 +4,15 @@ using UnityEngine.UI;
 
 namespace IdleTower.UI.Screens
 {
+    /// <summary>
+    /// Игровой экран карты (не общий UI). Sibling под Canvas рядом с UI_Root;
+    /// Show/Hide переключает только этот root. Общий UI поверх — отдельно в UI_Root.
+    /// </summary>
     public class MapScreen : MonoBehaviour, IScreen
     {
+        [Tooltip("Корень экрана карты (обычно этот же GameObject).")]
         [SerializeField] private GameObject root;
+
         [SerializeField] private Button backToTowerButton;
 
         public ScreenId Id => ScreenId.Map;
@@ -30,12 +36,14 @@ namespace IdleTower.UI.Screens
 
         public void Show()
         {
-            root.SetActive(true);
+            if (root != null)
+                root.SetActive(true);
         }
 
         public void Hide()
         {
-            root.SetActive(false);
+            if (root != null)
+                root.SetActive(false);
         }
 
         private void HandleBackClick()
