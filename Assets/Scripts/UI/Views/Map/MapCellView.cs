@@ -109,8 +109,6 @@ namespace IdleTower.UI.Views
             iconRt.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, spriteH);
 
             // Не вписываем в хитбокс — 1:1 px спрайта в UI-единицах (как baseWidth/Height).
-            icon.preserveAspect = false;
-
             var footprintHeight = root.rect.height;
             iconRt.anchoredPosition = new Vector2(0f, -footprintHeight * 0.5f);
         }
