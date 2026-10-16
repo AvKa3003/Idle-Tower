@@ -14,5 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::IdleTower.Data.Definitions.MapCellDefinition
   id: river
   displayName: "\u0420\u0435\u043A\u0430"
-  sprite: {fileID: 6778488303953824384, guid: 5328f726ad4c70d438ddd5adf36abb1e, type: 3}
+  sprite: {fileID: -3663761578151886962, guid: e8a81783c47734e47aa9002474f3a62c, type: 3}
   behavior: {fileID: 11400000, guid: 5ef9f6de7dcfd2442b0463f65535fd5b, type: 2}

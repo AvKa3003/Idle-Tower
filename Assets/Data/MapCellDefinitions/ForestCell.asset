@@ -14,5 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::IdleTower.Data.Definitions.MapCellDefinition
   id: forest
   displayName: "\u041B\u0435\u0441"
-  sprite: {fileID: -30984205135474821, guid: 769d7c3f711f92048b08441dd403e227, type: 3}
+  sprite: {fileID: 9085546173938197295, guid: aadbaca318bd0f44abf479a80843812f, type: 3}
   behavior: {fileID: 11400000, guid: 4946e0f7c11ea4543bfa45896bf533e7, type: 2}

@@ -912,7 +912,7 @@ GameEvents / Presenters вывода (звук постройки — реали
          если дальше interaction)
 14. Canvas:
     - GO MapScreen + MapScreen (root, кнопка «В башню»)
-    - дочерний MapView (cellsRoot, cellPrefab, fogSprite, cellSize/spacing)
+    - дочерний MapView (cellsRoot, cellPrefab, fogSprite, baseWidth/baseHeight/spacingPixels — iso)
       Fog клетки видны со спрайтом fogSprite (назначить в Inspector)
     - префаб MapCellView: Image + Button (+ CanvasGroup опционально)
     - MapRaidPanel + MapPresenter: MapScreen, MapView, MapRaidPanel

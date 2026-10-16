@@ -52,6 +52,8 @@ namespace IdleTower.UI.Views
             if (icon != null)
                 icon.sprite = sprite;
 
+            ApplyIconToFootprint();
+
             var showDim = presence == MapPresence.VisibleOnly && hasFunctionalClick;
             if (canvasGroup != null)
             {
@@ -61,15 +63,56 @@ namespace IdleTower.UI.Views
             }
 
             if (button != null)
-            {
                 button.interactable = canClick;
-            }
         }
 
         public void SetAnchoredPosition(Vector2 position)
         {
             if (root != null)
                 root.anchoredPosition = position;
+        }
+
+        /// <summary>Размер hit-box / основания ромба; высокий спрайт может выходить за пределы.</summary>
+        public void SetFootprintSize(Vector2 size)
+        {
+            if (root == null)
+                return;
+
+            root.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, size.x);
+            root.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, size.y);
+            ApplyIconToFootprint();
+        }
+
+        /// <summary>
+        /// Оригинальный размер спрайта; pivot из Texture совпадает с центром нижней грани footprint.
+        /// </summary>
+        private void ApplyIconToFootprint()
+        {
+            if (icon == null || root == null)
+                return;
+
+            var sprite = icon.sprite;
+            if (sprite == null)
+                return;
+
+            var iconRt = icon.rectTransform;
+            var spriteW = sprite.rect.width;
+            var spriteH = sprite.rect.height;
+            if (spriteW <= 0f || spriteH <= 0f)
+                return;
+
+            iconRt.anchorMin = new Vector2(0.5f, 0.5f);
+            iconRt.anchorMax = new Vector2(0.5f, 0.5f);
+            iconRt.localScale = Vector3.one;
+            iconRt.pivot = new Vector2(sprite.pivot.x / spriteW, sprite.pivot.y / spriteH);
+            iconRt.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, spriteW);
+            iconRt.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, spriteH);
+
+            // Не вписываем в хитбокс — 1:1 px спрайта в UI-единицах (как baseWidth/Height).
+            icon.preserveAspect = false;
+
+            var footprintHeight = root.rect.height;
+            iconRt.anchoredPosition = new Vector2(0f, -footprintHeight * 0.5f);
         }
 
         private void HandleClick()

@@ -596,7 +596,6 @@ RectTransform:
   - {fileID: 934070066}
   - {fileID: 1072906536}
   - {fileID: 1078079450}
-  - {fileID: 2128162265}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -3521,7 +3520,7 @@ RectTransform:
   m_GameObject: {fileID: 934050102}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 4, y: 4, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1078079450}
@@ -3545,9 +3544,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::IdleTower.UI.Views.MapView
   cellsRoot: {fileID: 934050103}
   cellPrefab: {fileID: 3360157428176800733, guid: 180ace91e124ce7478a1cd4fcc0752ac, type: 3}
-  fogSprite: {fileID: -5431969821822574963, guid: 027640fba705a9b4d90d9ae6452bc73b, type: 3}
-  cellSize: 150
-  spacing: 0
+  fogSprite: {fileID: -1766006069671443837, guid: ec2e97f776ee2af4c87bef8c0e48229c, type: 3}
+  baseWidth: 64
+  baseHeight: 32
+  spacingPixels: 0
+  stepAdjustX: 0
+  stepAdjustY: 1
+  mapScale: 4
+  mapScaleMin: 0.5
+  mapScaleMax: 4
 --- !u!1 &934070064
 GameObject:
   m_ObjectHideFlags: 0
@@ -4196,6 +4201,7 @@ RectTransform:
   - {fileID: 1262541603}
   - {fileID: 2041944217}
   - {fileID: 1532832465}
+  - {fileID: 2128162265}
   m_Father: {fileID: 41214774}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -8607,7 +8613,7 @@ RectTransform:
   - {fileID: 1775977521}
   - {fileID: 597787676}
   - {fileID: 69793414}
-  m_Father: {fileID: 41214774}
+  m_Father: {fileID: 1072906536}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}

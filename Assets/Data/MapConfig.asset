@@ -44,7 +44,7 @@ MonoBehaviour:
         PassiveRewards: []
         CapturedSprite: {fileID: 0}
   - Coord: {x: 1, y: 0}
-    Cell: {fileID: 11400000, guid: e7e4f9c271529b4479864d417c2384cb, type: 2}
+    Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
     Site:
       Raid:
         PreCapture:
@@ -70,7 +70,7 @@ MonoBehaviour:
         PassiveRewards: []
         CapturedSprite: {fileID: 0}
   - Coord: {x: 2, y: 0}
-    Cell: {fileID: 11400000, guid: e7e4f9c271529b4479864d417c2384cb, type: 2}
+    Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
     Site:
       Raid:
         PreCapture:
@@ -372,14 +372,16 @@ MonoBehaviour:
         CaptureRewards:
         - Resource: {fileID: 11400000, guid: 70d18213541e7b7468d21553e1074335, type: 2}
           Amount: 150
-        PostCaptureMode: 2
+        PostCaptureMode: 0
         FarmConfig:
           RequiredUnits: []
-          RequiredStrength: 0
+          RequiredStrength: 200
           Duration:
-            Minutes: 0
+            Minutes: 1
             Seconds: 0
-          Rewards: []
+          Rewards:
+          - Resource: {fileID: 11400000, guid: 6f9a325df12a750439fe2fd353ca0c4f, type: 2}
+            Amount: 100
         PassiveInterval:
           Minutes: 1
           Seconds: 0
@@ -396,7 +398,7 @@ MonoBehaviour:
           RequiredStrength: 100
           Duration:
             Minutes: 0
-            Seconds: 1
+            Seconds: 30
           Rewards: []
         MaxCompletedRaids: 1
         CaptureRewards: []
@@ -426,18 +428,20 @@ MonoBehaviour:
           RequiredStrength: 100
           Duration:
             Minutes: 0
-            Seconds: 1
+            Seconds: 30
           Rewards: []
         MaxCompletedRaids: 1
         CaptureRewards: []
-        PostCaptureMode: 2
+        PostCaptureMode: 1
         FarmConfig:
           RequiredUnits: []
-          RequiredStrength: 0
+          RequiredStrength: 100
           Duration:
             Minutes: 0
-            Seconds: 0
-          Rewards: []
+            Seconds: 35
+          Rewards:
+          - Resource: {fileID: 11400000, guid: 13cb60f13b5682f46ba2d36e781cef6f, type: 2}
+            Amount: 1000
         PassiveInterval:
           Minutes: 0
           Seconds: 20
@@ -454,18 +458,24 @@ MonoBehaviour:
           RequiredStrength: 100
           Duration:
             Minutes: 0
-            Seconds: 1
-          Rewards: []
+            Seconds: 30
+          Rewards:
+          - Resource: {fileID: 11400000, guid: 70d18213541e7b7468d21553e1074335, type: 2}
+            Amount: 10000
         MaxCompletedRaids: 1
-        CaptureRewards: []
-        PostCaptureMode: 0
+        CaptureRewards:
+        - Resource: {fileID: 11400000, guid: 6057606f450efbc41814c3ad3ddb61b6, type: 2}
+          Amount: 10000
+        PostCaptureMode: 1
         FarmConfig:
           RequiredUnits: []
-          RequiredStrength: 0
+          RequiredStrength: 100
           Duration:
             Minutes: 0
-            Seconds: 0
-          Rewards: []
+            Seconds: 30
+          Rewards:
+          - Resource: {fileID: 11400000, guid: 13cb60f13b5682f46ba2d36e781cef6f, type: 2}
+            Amount: 10000
         PassiveInterval:
           Minutes: 0
           Seconds: 0
@@ -477,21 +487,59 @@ MonoBehaviour:
       Raid:
         PreCapture:
           RequiredUnits: []
-          RequiredStrength: 10
+          RequiredStrength: 100
           Duration:
             Minutes: 0
-            Seconds: 1
-          Rewards: []
+            Seconds: 30
+          Rewards:
+          - Resource: {fileID: 11400000, guid: 70d18213541e7b7468d21553e1074335, type: 2}
+            Amount: 10000
         MaxCompletedRaids: 1
-        CaptureRewards: []
-        PostCaptureMode: 0
+        CaptureRewards:
+        - Resource: {fileID: 11400000, guid: 6057606f450efbc41814c3ad3ddb61b6, type: 2}
+          Amount: 10000
+        PostCaptureMode: 1
         FarmConfig:
           RequiredUnits: []
-          RequiredStrength: 0
+          RequiredStrength: 100
           Duration:
             Minutes: 0
-            Seconds: 0
-          Rewards: []
+            Seconds: 30
+          Rewards:
+          - Resource: {fileID: 11400000, guid: 13cb60f13b5682f46ba2d36e781cef6f, type: 2}
+            Amount: 10000
+        PassiveInterval:
+          Minutes: 0
+          Seconds: 0
+        PassiveRewards: []
+        CapturedSprite: {fileID: 0}
+  - Coord: {x: 3, y: 2}
+    Cell: {fileID: 11400000, guid: 2aa14af92765da748b60133c95bf6468, type: 2}
+    Site:
+      Raid:
+        PreCapture:
+          RequiredUnits: []
+          RequiredStrength: 100
+          Duration:
+            Minutes: 0
+            Seconds: 30
+          Rewards:
+          - Resource: {fileID: 11400000, guid: 70d18213541e7b7468d21553e1074335, type: 2}
+            Amount: 10000
+        MaxCompletedRaids: 1
+        CaptureRewards:
+        - Resource: {fileID: 11400000, guid: 6057606f450efbc41814c3ad3ddb61b6, type: 2}
+          Amount: 10000
+        PostCaptureMode: 1
+        FarmConfig:
+          RequiredUnits: []
+          RequiredStrength: 100
+          Duration:
+            Minutes: 0
+            Seconds: 30
+          Rewards:
+          - Resource: {fileID: 11400000, guid: 13cb60f13b5682f46ba2d36e781cef6f, type: 2}
+            Amount: 10000
         PassiveInterval:
           Minutes: 0
           Seconds: 0
