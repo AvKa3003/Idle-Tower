@@ -78,12 +78,13 @@ MapCellDefinition.id — по-прежнему id ШАБЛОНА (camp/forest), 
   [x] Пустой id в рантайме — LogWarning; меню IdleTower/Fix MapConfig Instance Ids
   [x] MapCellSave: ключ instanceId; x,y оставлены
   [x] SaveSystem.CaptureMapCells / ApplySaveFromDisk: матч по instanceId
-  [x] Пометка в MapSaveMigration / GameSaveData: будущие миграции — InstanceId
+  [x] Пометка в MapSaveMigration / GameSaveData: ключ — InstanceId
+  [x] map-save-migration.txt / tests: матч по instanceId, без фолбэка по coord
   [x] Существующий MapConfig.asset: InstanceId проставлены
 
 Не делать:
   - Editor Window
-  - Миграцию старых player saves с coord-only
+  - Миграцию/конвертацию старых player saves с coord-only (записи без id игнор)
 
 Проверка:
   - Play: сохранить/загрузить прогресс рейда на клетке

@@ -48,7 +48,10 @@ namespace IdleTower.Systems
             RecomputeMapPresence();
         }
 
-        /// <summary>Накладывает mapCells из сейва после LoadFromConfig (ключ — instanceId).</summary>
+        /// <summary>
+        /// Накладывает mapCells из сейва после LoadFromConfig.
+        /// Ключ — instanceId; матч/фолбэк по coord (x,y) не используется.
+        /// </summary>
         public void ApplySaveFromDisk(
             MapCellSave[] saves,
             IReadOnlyDictionary<ResourceId, ResourceDefinition> catalog)
@@ -61,7 +64,12 @@ namespace IdleTower.Systems
             {
                 var save = saves[i];
                 if (string.IsNullOrWhiteSpace(save.instanceId))
+                {
+                    Debug.LogWarning(
+                        $"[MapSystem] mapCells[{i}] @({save.x},{save.y}): пустой instanceId — " +
+                        "запись пропущена (фолбэка по координатам нет).");
                     continue;
+                }
 
                 saveByInstanceId[save.instanceId] = save;
             }

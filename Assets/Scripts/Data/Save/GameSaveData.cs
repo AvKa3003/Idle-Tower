@@ -10,7 +10,7 @@ namespace IdleTower.Data.Save
     [Serializable]
     public class GameSaveData
     {
-        /// <summary>3+: mapCells ключ — instanceId (не только coord). Будущие миграции — учитывать InstanceId.</summary>
+        /// <summary>3+: mapCells ключ — instanceId (не coord). Сейвы без instanceId при Load игнорируются.</summary>
         public int version = 3;
         public long currentTick;
         public float tickAccumulator;
@@ -22,7 +22,7 @@ namespace IdleTower.Data.Save
 
     /// <summary>
     /// BehaviorState одной клетки карты.
-    /// Ключ прогресса — instanceId; x/y — позиция на момент сейва (отладка / будущие миграции).
+    /// Ключ прогресса — instanceId; x/y — позиция на момент сейва (отладка, не ключ матча).
     /// </summary>
     [Serializable]
     public class MapCellSave

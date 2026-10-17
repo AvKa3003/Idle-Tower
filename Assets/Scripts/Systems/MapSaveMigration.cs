@@ -12,9 +12,8 @@ using UnityEngine;
 namespace IdleTower.Systems
 {
     /// <summary>
-    /// Правила миграции mapCells при Load.
-    /// Матч сейва к клетке — по instanceId (см. MapSystem.ApplySaveFromDisk).
-    /// Будущие миграции формата сейва должны сохранять/переносить InstanceId.
+    /// Правила миграции mapCells при Load (контент клетки после матча по instanceId).
+    /// Матч сейва к runtime — только MapSystem.ApplySaveFromDisk (без фолбэка по coord).
     /// </summary>
     public static class MapSaveMigration
     {
@@ -59,7 +58,7 @@ namespace IdleTower.Systems
             catch (Exception ex)
             {
                 Debug.LogWarning(
-                    $"[MapSaveMigration] Deserialize failed at ({save.x},{save.y}): {ex.Message}");
+                    $"[MapSaveMigration] Deserialize failed instanceId={FormatId(save)}: {ex.Message}");
                 runtime.BehaviorState = behavior.CreateDefaultState();
                 return;
             }
@@ -102,7 +101,7 @@ namespace IdleTower.Systems
             if (unknownSavedMode)
             {
                 Debug.LogWarning(
-                    $"[MapSaveMigration] ({save.x},{save.y}): неизвестный savedPostCaptureMode=" +
+                    $"[MapSaveMigration] instanceId={FormatId(save)}: неизвестный savedPostCaptureMode=" +
                     $"{save.savedPostCaptureMode} → используем текущий PostCaptureMode из конфига ({currentMode}).");
             }
 
@@ -161,6 +160,15 @@ namespace IdleTower.Systems
 
             if (site.PostCaptureMode != PostCaptureMode.RaidFarm)
                 state.IsPaused = false;
+        }
+
+        private static string FormatId(MapCellSave save)
+        {
+            if (save == null)
+                return "<null>";
+
+            var id = string.IsNullOrWhiteSpace(save.instanceId) ? "<empty>" : save.instanceId;
+            return $"{id} @({save.x},{save.y})";
         }
     }
 }
