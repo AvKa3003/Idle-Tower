@@ -98,10 +98,10 @@ MapCellDefinition.id — по-прежнему id ШАБЛОНА (camp/forest), 
   «Реализуй этап 2 из Assets/map-editor-implementation-plan.txt»
 
 Сделать:
-  [ ] Вынести чистые функции раскладки из MapView
+  [x] Вынести чистые функции раскладки из MapView
       (halfStep, CoordToAnchored, при необходимости depth-compare)
       в общий static/helper без Editor-зависимостей
-  [ ] MapView перевести на helper (поведение игры не менять)
+  [x] MapView перевести на helper (поведение игры не менять)
 
 Не делать:
   - Editor Window

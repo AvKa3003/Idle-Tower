@@ -162,8 +162,8 @@ namespace IdleTower.UI.Views
 
             var parent = cellsRoot != null ? cellsRoot : transform as RectTransform;
             // spacingPixels целиком в half-step: 1 = 1px щель между основаниями (не /2).
-            var halfStepX = Mathf.Max(0f, baseWidth * 0.5f + spacingPixels + stepAdjustX);
-            var halfStepY = Mathf.Max(0f, baseHeight * 0.5f + spacingPixels + stepAdjustY);
+            var halfStepX = IsoMapLayout.HalfStep(baseWidth, spacingPixels, stepAdjustX);
+            var halfStepY = IsoMapLayout.HalfStep(baseHeight, spacingPixels, stepAdjustY);
             var footprint = new Vector2(baseWidth, baseHeight);
 
             foreach (var info in displays)
@@ -181,7 +181,8 @@ namespace IdleTower.UI.Views
                     info.Presence,
                     info.HasFunctionalClick,
                     !isFog && info.CanClick);
-                cell.SetAnchoredPosition(CoordToAnchored(info.Coord, halfStepX, halfStepY));
+                cell.SetAnchoredPosition(
+                    IsoMapLayout.CoordToAnchored(info.Coord, halfStepX, halfStepY));
                 cell.Clicked += HandleCellClicked;
                 _cells.Add(cell);
             }
@@ -202,17 +203,6 @@ namespace IdleTower.UI.Views
             }
 
             _cells.Clear();
-        }
-
-        /// <summary>
-        /// Изометрия: X вправо-вниз по сетке, Y влево-вниз (UI Y вверх).
-        /// spacingPixels добавляется целиком к half-step (1 = 1px щель); stepAdjust* — ручная подгонка.
-        /// </summary>
-        private static Vector2 CoordToAnchored(Vector2Int coord, float halfStepX, float halfStepY)
-        {
-            return new Vector2(
-                (coord.x - coord.y) * halfStepX,
-                (coord.x + coord.y) * halfStepY);
         }
 
         /// <summary>
@@ -237,16 +227,7 @@ namespace IdleTower.UI.Views
             if (b == null)
                 return -1;
 
-            // Больший x+y = дальше «на север» экрана = позади.
-            var depthA = a.Coord.x + a.Coord.y;
-            var depthB = b.Coord.x + b.Coord.y;
-            var byDepth = depthB.CompareTo(depthA);
-            if (byDepth != 0)
-                return byDepth;
-
-            // Стабильный тай-брейк.
-            byDepth = a.Coord.x.CompareTo(b.Coord.x);
-            return byDepth != 0 ? byDepth : a.Coord.y.CompareTo(b.Coord.y);
+            return IsoMapLayout.CompareDepthBackToFront(a.Coord, b.Coord);
         }
 
         private void ApplyMapScale()
