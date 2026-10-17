@@ -3,13 +3,17 @@ using System.Collections.Generic;
 using IdleTower.Map;
 using IdleTower.Systems;
 using UnityEngine;
+using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.EnhancedTouch;
 using UnityEngine.Serialization;
+using Touch = UnityEngine.InputSystem.EnhancedTouch.Touch;
 
 namespace IdleTower.UI.Views
 {
     /// <summary>
     /// Сетка клеток карты (изометрия). Только отображение — без Systems.
     /// Логические Coord не меняются; меняется только экранная раскладка.
+    /// Пан / зум (колесо, pinch) — как в браузерных картах.
     /// </summary>
     public class MapView : MonoBehaviour
     {
@@ -39,21 +43,66 @@ namespace IdleTower.UI.Views
         [SerializeField] private float stepAdjustY = 1f;
 
         [Header("Масштаб")]
-        [Tooltip("Масштаб всей сетки (CellsRoot). Позже — колесо мыши / pinch. Не меняет baseWidth в px.")]
+        [Tooltip("Масштаб всей сетки (CellsRoot). Не меняет baseWidth в px.")]
         [SerializeField] private float mapScale = 2f;
 
         [SerializeField] private float mapScaleMin = 0.5f;
         [SerializeField] private float mapScaleMax = 4f;
 
+        [Header("Жесты (пан / зум)")]
+        [Tooltip("Область жестов (обычно MapScreen). Пусто — родитель CellsRoot.")]
+        [SerializeField] private RectTransform viewport;
+
+        [Tooltip("Сдвиг в px экрана до пана (чтобы не съедать клик по клетке).")]
+        [SerializeField] private float panDragThresholdPixels = 12f;
+
+        [Tooltip("Чувствительность колеса (экспонента за единицу scroll).")]
+        [SerializeField] private float wheelZoomSensitivity = 0.0015f;
+
+        [Tooltip("Затухание инерции пана (выше — быстрее останавливается).")]
+        [SerializeField] private float panInertiaDamping = 8f;
+
+        [Tooltip("Порог скорости (parent-local units/s), ниже — инерция обнуляется.")]
+        [SerializeField] private float panInertiaStopSpeed = 20f;
+
         private readonly List<MapCellView> _cells = new();
+        private readonly List<Vector2> _pointerScreenBuffer = new(4);
+
+        private Camera _uiCamera;
+        private bool _suppressCellClicks;
+        private bool _singlePanArmed;
+        private Vector2 _singlePanScreenPos;
+        private Vector2 _singlePanAccumScreen;
+        private bool _pinchActive;
+        private Vector2 _pinchMidScreen;
+        private float _pinchDistance;
+        private Vector2 _panVelocity;
+        private bool _pointersWereDown;
 
         public float MapScale => mapScale;
+
+        /// <summary>Пан/пинч превысили порог — клик по клетке в этом жесте игнорировать.</summary>
+        public bool SuppressCellClicks => _suppressCellClicks;
 
         public event Action<Vector2Int> CellClicked;
 
         private void Awake()
         {
+            ResolveRefs();
             ApplyMapScale();
+        }
+
+        private void OnEnable()
+        {
+            EnhancedTouchSupport.Enable();
+            ResolveRefs();
+            CacheUiCamera();
+        }
+
+        private void OnDisable()
+        {
+            EnhancedTouchSupport.Disable();
+            ResetGestureState(clearVelocity: true);
         }
 
 #if UNITY_EDITOR
@@ -65,7 +114,37 @@ namespace IdleTower.UI.Views
         }
 #endif
 
-        /// <summary>Зум карты (для колеса / свайпа). Клетки в пространстве не пересчитываются — только scale корня.</summary>
+        private void Update()
+        {
+            if (cellsRoot == null)
+                return;
+
+            CacheUiCamera();
+            GatherPointersOverViewport(_pointerScreenBuffer);
+
+            var pointerCount = _pointerScreenBuffer.Count;
+            if (pointerCount == 0)
+            {
+                if (_pointersWereDown)
+                    ResetGestureState(clearVelocity: false);
+                _pointersWereDown = false;
+                ApplyPanInertia(Time.unscaledDeltaTime);
+                HandleMouseWheelZoom();
+                return;
+            }
+
+            _pointersWereDown = true;
+            _panVelocity = Vector2.zero;
+
+            if (pointerCount >= 2)
+                UpdatePinchAndPan(_pointerScreenBuffer[0], _pointerScreenBuffer[1]);
+            else
+                UpdateSinglePointerPan(_pointerScreenBuffer[0]);
+
+            HandleMouseWheelZoom();
+        }
+
+        /// <summary>Зум карты. Клетки в пространстве не пересчитываются — только scale корня.</summary>
         public void SetMapScale(float scale)
         {
             mapScale = Mathf.Clamp(scale, mapScaleMin, mapScaleMax);
@@ -183,6 +262,245 @@ namespace IdleTower.UI.Views
         private void HandleCellClicked(Vector2Int coord)
         {
             CellClicked?.Invoke(coord);
+        }
+
+        private void ResolveRefs()
+        {
+            if (cellsRoot == null)
+                cellsRoot = transform as RectTransform;
+
+            if (viewport == null && cellsRoot != null && cellsRoot.parent is RectTransform parentRt)
+                viewport = parentRt;
+        }
+
+        private void CacheUiCamera()
+        {
+            var canvas = cellsRoot != null
+                ? cellsRoot.GetComponentInParent<Canvas>()
+                : GetComponentInParent<Canvas>();
+            if (canvas == null || canvas.renderMode == RenderMode.ScreenSpaceOverlay)
+                _uiCamera = null;
+            else
+                _uiCamera = canvas.worldCamera;
+        }
+
+        private RectTransform GestureParent
+            => cellsRoot != null && cellsRoot.parent is RectTransform p ? p : viewport;
+
+        private void GatherPointersOverViewport(List<Vector2> into)
+        {
+            into.Clear();
+
+            if (Touch.activeTouches.Count > 0)
+            {
+                for (var i = 0; i < Touch.activeTouches.Count; i++)
+                {
+                    var touch = Touch.activeTouches[i];
+                    if (!touch.isInProgress)
+                        continue;
+
+                    var screen = touch.screenPosition;
+                    if (IsScreenPointInViewport(screen))
+                        into.Add(screen);
+                }
+
+                return;
+            }
+
+            var mouse = Mouse.current;
+            if (mouse != null && mouse.leftButton.isPressed)
+            {
+                var screen = mouse.position.ReadValue();
+                if (IsScreenPointInViewport(screen))
+                    into.Add(screen);
+            }
+        }
+
+        private bool IsScreenPointInViewport(Vector2 screenPoint)
+        {
+            var area = viewport != null ? viewport : GestureParent;
+            if (area == null)
+                return true;
+
+            return RectTransformUtility.RectangleContainsScreenPoint(area, screenPoint, _uiCamera);
+        }
+
+        private void UpdateSinglePointerPan(Vector2 screenPos)
+        {
+            // Переход с pinch: не прыгаем — берём текущую точку как новую базу.
+            if (_pinchActive)
+            {
+                _pinchActive = false;
+                _singlePanArmed = true;
+                _singlePanScreenPos = screenPos;
+                _singlePanAccumScreen = Vector2.zero;
+                return;
+            }
+
+            if (!_singlePanArmed)
+            {
+                _singlePanArmed = true;
+                _singlePanScreenPos = screenPos;
+                _singlePanAccumScreen = Vector2.zero;
+                return;
+            }
+
+            var screenFrom = _singlePanScreenPos;
+            var screenDelta = screenPos - screenFrom;
+            _singlePanScreenPos = screenPos;
+
+            if (!_suppressCellClicks)
+            {
+                _singlePanAccumScreen += screenDelta;
+                if (_singlePanAccumScreen.sqrMagnitude
+                    < panDragThresholdPixels * panDragThresholdPixels)
+                    return;
+
+                _suppressCellClicks = true;
+                screenFrom = screenPos - _singlePanAccumScreen;
+                _singlePanAccumScreen = Vector2.zero;
+            }
+
+            if (TryScreenPointsToParentLocalDelta(screenFrom, screenPos, out var localDelta))
+            {
+                PanByParentLocal(localDelta);
+                var dt = Mathf.Max(Time.unscaledDeltaTime, 0.0001f);
+                _panVelocity = localDelta / dt;
+            }
+        }
+
+        private void UpdatePinchAndPan(Vector2 screenA, Vector2 screenB)
+        {
+            // Переход с одного пальца на два.
+            _singlePanArmed = false;
+            _suppressCellClicks = true;
+
+            var mid = (screenA + screenB) * 0.5f;
+            var dist = Vector2.Distance(screenA, screenB);
+            if (dist < 1f)
+                dist = 1f;
+
+            if (!_pinchActive)
+            {
+                _pinchActive = true;
+                _pinchMidScreen = mid;
+                _pinchDistance = dist;
+                return;
+            }
+
+            var scaleFactor = dist / _pinchDistance;
+            if (!Mathf.Approximately(scaleFactor, 1f))
+                ZoomByFactorAroundScreenPoint(scaleFactor, mid);
+
+            if (TryScreenPointsToParentLocalDelta(_pinchMidScreen, mid, out var localDelta))
+            {
+                PanByParentLocal(localDelta);
+                var dt = Mathf.Max(Time.unscaledDeltaTime, 0.0001f);
+                _panVelocity = localDelta / dt;
+            }
+
+            _pinchMidScreen = mid;
+            _pinchDistance = dist;
+        }
+
+        private void HandleMouseWheelZoom()
+        {
+            var mouse = Mouse.current;
+            if (mouse == null)
+                return;
+
+            var scroll = mouse.scroll.ReadValue().y;
+            if (Mathf.Abs(scroll) < 0.01f)
+                return;
+
+            var screen = mouse.position.ReadValue();
+            if (!IsScreenPointInViewport(screen))
+                return;
+
+            // Пока pinch — только пальцы.
+            if (_pinchActive)
+                return;
+
+            var factor = Mathf.Exp(scroll * wheelZoomSensitivity);
+            ZoomByFactorAroundScreenPoint(factor, screen);
+        }
+
+        private void ZoomByFactorAroundScreenPoint(float factor, Vector2 screenPoint)
+        {
+            if (cellsRoot == null || GestureParent == null)
+                return;
+
+            var newScale = Mathf.Clamp(mapScale * factor, mapScaleMin, mapScaleMax);
+            if (Mathf.Approximately(newScale, mapScale))
+                return;
+
+            if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(
+                    GestureParent, screenPoint, _uiCamera, out var focusParent))
+                return;
+
+            var oldScale = Mathf.Max(mapScale, 0.0001f);
+            // Вектор от текущего смещения карты к центру жеста в координатах viewport, без учёта scale.
+            var contentOffset = (focusParent - cellsRoot.anchoredPosition) / oldScale;
+
+            mapScale = newScale;
+            ApplyMapScale();
+            // Та же точка контента под центром жеста, но уже в пропорциях нового scale.
+            cellsRoot.anchoredPosition = focusParent - contentOffset * mapScale;
+        }
+
+        private void PanByParentLocal(Vector2 localDelta)
+        {
+            if (cellsRoot == null)
+                return;
+
+            cellsRoot.anchoredPosition += localDelta;
+        }
+
+        /// <summary>
+        /// Для жестов: переводит две экранные точки в локаль viewport и возвращает вектор сдвига,
+        /// если точка на viewport изменилась.
+        /// </summary>
+        private bool TryScreenPointsToParentLocalDelta(
+            Vector2 screenFrom,
+            Vector2 screenTo,
+            out Vector2 localDelta)
+        {
+            localDelta = Vector2.zero;
+            var parent = GestureParent;
+            if (parent == null)
+                return false;
+
+            if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(
+                    parent, screenFrom, _uiCamera, out var localFrom))
+                return false;
+            if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(
+                    parent, screenTo, _uiCamera, out var localTo))
+                return false;
+
+            localDelta = localTo - localFrom;
+            return localDelta.sqrMagnitude > 0.0000001f;
+        }
+
+        private void ApplyPanInertia(float dt)
+        {
+            if (cellsRoot == null || _panVelocity.sqrMagnitude < panInertiaStopSpeed * panInertiaStopSpeed)
+            {
+                _panVelocity = Vector2.zero;
+                return;
+            }
+
+            cellsRoot.anchoredPosition += _panVelocity * dt;
+            _panVelocity *= Mathf.Exp(-panInertiaDamping * dt);
+        }
+
+        private void ResetGestureState(bool clearVelocity)
+        {
+            _singlePanArmed = false;
+            _singlePanAccumScreen = Vector2.zero;
+            _pinchActive = false;
+            _suppressCellClicks = false;
+            if (clearVelocity)
+                _panVelocity = Vector2.zero;
         }
     }
 }

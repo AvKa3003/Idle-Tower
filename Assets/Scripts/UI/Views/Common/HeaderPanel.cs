@@ -44,6 +44,11 @@ namespace IdleTower.UI.Views
                 unitsButton.gameObject.SetActive(visible);
         }
 
+        public void SetVisible(bool visible)
+        {
+            gameObject.SetActive(visible);
+        }
+
         private void HandleResourcesClick()
         {
             ResourcesClicked?.Invoke();

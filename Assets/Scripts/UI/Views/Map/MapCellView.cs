@@ -21,6 +21,8 @@ namespace IdleTower.UI.Views
 
         public event System.Action<Vector2Int> Clicked;
 
+        private MapView _mapView;
+
         private void Awake()
         {
             if (root == null)
@@ -28,6 +30,8 @@ namespace IdleTower.UI.Views
 
             if (button == null)
                 button = GetComponentInChildren<Button>();
+
+            _mapView = GetComponentInParent<MapView>();
 
             if (button != null)
                 button.onClick.AddListener(HandleClick);
@@ -115,6 +119,10 @@ namespace IdleTower.UI.Views
 
         private void HandleClick()
         {
+            // Пан / pinch: не открывать клетку после сдвига.
+            if (_mapView != null && _mapView.SuppressCellClicks)
+                return;
+
             Clicked?.Invoke(Coord);
         }
     }

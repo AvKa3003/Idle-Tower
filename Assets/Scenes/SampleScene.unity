@@ -3551,8 +3551,13 @@ MonoBehaviour:
   stepAdjustX: 0
   stepAdjustY: 1
   mapScale: 4
-  mapScaleMin: 0.5
-  mapScaleMax: 4
+  mapScaleMin: 4
+  mapScaleMax: 8
+  viewport: {fileID: 1078079450}
+  panDragThresholdPixels: 12
+  wheelZoomSensitivity: 0.25
+  panInertiaDamping: 8
+  panInertiaStopSpeed: 20
 --- !u!1 &934070064
 GameObject:
   m_ObjectHideFlags: 0
@@ -4265,8 +4270,8 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 975123822}
-  - {fileID: 29586505}
   - {fileID: 934050103}
+  - {fileID: 29586505}
   m_Father: {fileID: 41214774}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}

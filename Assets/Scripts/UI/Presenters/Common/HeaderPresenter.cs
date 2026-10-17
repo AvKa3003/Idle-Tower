@@ -15,7 +15,7 @@ namespace IdleTower.UI.Presenters
     /// View:        HeaderPanel
     /// Systems:      Wallet (видимость кнопки юнитов)
     /// Presenters:   ResourceList, UnitList, Map; RoomSelection, ProductionMode, OfflineResult (закрывает)
-    /// GameEvents:   ResourceChanged (кнопка юнитов)
+    /// GameEvents:   ResourceChanged (кнопка юнитов); ScreenChanged (скрыть на карте)
     /// </summary>
     public class HeaderPresenter : MonoBehaviour
     {
@@ -84,6 +84,7 @@ namespace IdleTower.UI.Presenters
                 return;
 
             GameEvents.ResourceChanged += OnResourceChanged;
+            GameEvents.ScreenChanged += OnScreenChanged;
             _gameEventsSubscribed = true;
         }
 
@@ -93,6 +94,7 @@ namespace IdleTower.UI.Presenters
                 return;
 
             GameEvents.ResourceChanged -= OnResourceChanged;
+            GameEvents.ScreenChanged -= OnScreenChanged;
             _gameEventsSubscribed = false;
         }
 
@@ -102,6 +104,12 @@ namespace IdleTower.UI.Presenters
                 return;
 
             RefreshUnitsButtonVisibility();
+        }
+
+        private void OnScreenChanged(ScreenId screenId)
+        {
+            // На карте сверху кнопка закрытия — Header не перекрывает её.
+            panel?.SetVisible(screenId != ScreenId.Map);
         }
 
         private void RefreshUnitsButtonVisibility()
