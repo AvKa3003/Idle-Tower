@@ -34,7 +34,18 @@ namespace IdleTower.Data.Runtime
                     ? behavior.CreateDefaultState()
                     : MapCellRuntimeState.Empty;
 
-                _cells[entry.Coord] = new MapCellRuntime(entry.Cell, state, entry.Site);
+                if (string.IsNullOrWhiteSpace(entry.InstanceId))
+                {
+                    Debug.LogWarning(
+                        $"[MapState] Entries[{i}] Coord={entry.Coord}: пустой InstanceId — " +
+                        "прогресс сейва к клетке не привяжется. Проставь id (IdleTower/Fix MapConfig Instance Ids).");
+                }
+
+                _cells[entry.Coord] = new MapCellRuntime(
+                    entry.InstanceId,
+                    entry.Cell,
+                    state,
+                    entry.Site);
             }
         }
 

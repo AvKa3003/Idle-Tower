@@ -23,6 +23,9 @@ namespace IdleTower.Data.Definitions
     [Serializable]
     public class MapConfigEntry
     {
+        [Tooltip("Стабильный id экземпляра на карте (прогресс сейва). Не менять при Move.")]
+        public string InstanceId;
+
         public Vector2Int Coord;
         public MapCellDefinition Cell;
 

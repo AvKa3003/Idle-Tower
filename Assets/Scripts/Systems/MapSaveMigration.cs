@@ -11,7 +11,11 @@ using UnityEngine;
 
 namespace IdleTower.Systems
 {
-    /// <summary>Правила миграции mapCells при Load (этап D).</summary>
+    /// <summary>
+    /// Правила миграции mapCells при Load.
+    /// Матч сейва к клетке — по instanceId (см. MapSystem.ApplySaveFromDisk).
+    /// Будущие миграции формата сейва должны сохранять/переносить InstanceId.
+    /// </summary>
     public static class MapSaveMigration
     {
         public static void ApplyCell(

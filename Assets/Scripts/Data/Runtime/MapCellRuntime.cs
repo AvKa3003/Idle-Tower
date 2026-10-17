@@ -5,6 +5,9 @@ namespace IdleTower.Data.Runtime
 {
     public sealed class MapCellRuntime
     {
+        /// <summary>Стабильный id экземпляра с MapConfigEntry (сейв / move).</summary>
+        public string InstanceId { get; }
+
         public MapCellDefinition Definition { get; }
         public MapPresence Presence { get; set; }
         public MapCellRuntimeState BehaviorState { get; set; }
@@ -15,10 +18,12 @@ namespace IdleTower.Data.Runtime
         public RaidSiteConfig RaidSite => Site?.Raid;
 
         public MapCellRuntime(
+            string instanceId,
             MapCellDefinition definition,
             MapCellRuntimeState behaviorState,
             MapCellSiteConfig site = null)
         {
+            InstanceId = instanceId ?? string.Empty;
             Definition = definition;
             BehaviorState = behaviorState ?? MapCellRuntimeState.Empty;
             Site = site;

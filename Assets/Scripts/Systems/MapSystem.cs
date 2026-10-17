@@ -48,7 +48,7 @@ namespace IdleTower.Systems
             RecomputeMapPresence();
         }
 
-        /// <summary>Накладывает mapCells из сейва после LoadFromConfig.</summary>
+        /// <summary>Накладывает mapCells из сейва после LoadFromConfig (ключ — instanceId).</summary>
         public void ApplySaveFromDisk(
             MapCellSave[] saves,
             IReadOnlyDictionary<ResourceId, ResourceDefinition> catalog)
@@ -56,24 +56,31 @@ namespace IdleTower.Systems
             if (saves == null || saves.Length == 0 || catalog == null)
                 return;
 
-            var saveByCoord = new Dictionary<Vector2Int, MapCellSave>();
+            var saveByInstanceId = new Dictionary<string, MapCellSave>();
             for (var i = 0; i < saves.Length; i++)
             {
                 var save = saves[i];
-                saveByCoord[new Vector2Int(save.x, save.y)] = save;
+                if (string.IsNullOrWhiteSpace(save.instanceId))
+                    continue;
+
+                saveByInstanceId[save.instanceId] = save;
             }
 
             foreach (var pair in State.Cells)
             {
-                if (!saveByCoord.TryGetValue(pair.Key, out var save))
+                var runtime = pair.Value;
+                if (string.IsNullOrWhiteSpace(runtime.InstanceId))
                     continue;
 
-                MapSaveMigration.ApplyCell(_services, pair.Value, save, catalog);
-                saveByCoord.Remove(pair.Key);
+                if (!saveByInstanceId.TryGetValue(runtime.InstanceId, out var save))
+                    continue;
+
+                MapSaveMigration.ApplyCell(_services, runtime, save, catalog);
+                saveByInstanceId.Remove(runtime.InstanceId);
             }
 
-            // Coord убран из MapConfig — emergency-награда за активный рейд, state не восстанавливаем.
-            foreach (var orphan in saveByCoord)
+            // instanceId нет в текущем MapConfig — emergency-награда за активный рейд, state не восстанавливаем.
+            foreach (var orphan in saveByInstanceId)
             {
                 MapCellBehaviorEmergency.FinishFromSave(
                     orphan.Value.behaviorType,

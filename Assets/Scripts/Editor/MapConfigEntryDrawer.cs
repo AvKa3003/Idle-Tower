@@ -19,6 +19,7 @@ namespace IdleTower.Editor
                 return EditorGUIUtility.singleLineHeight;
 
             var h = EditorGUIUtility.singleLineHeight + Pad; // foldout
+            h += Line(property.FindPropertyRelative("InstanceId"));
             h += Line(property.FindPropertyRelative("Coord"));
             h += Line(property.FindPropertyRelative("Cell"));
 
@@ -53,6 +54,7 @@ namespace IdleTower.Editor
             EditorGUI.indentLevel++;
             var y = foldRect.yMax + Pad;
 
+            y = DrawProp(position, y, property.FindPropertyRelative("InstanceId"));
             y = DrawProp(position, y, property.FindPropertyRelative("Coord"));
             y = DrawProp(position, y, property.FindPropertyRelative("Cell"));
 

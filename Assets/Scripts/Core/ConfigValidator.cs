@@ -168,6 +168,7 @@ namespace IdleTower.Core
 
             var knownResourceIds = CollectResourceIds(balance);
             var coords = new HashSet<Vector2Int>();
+            var instanceIds = new HashSet<string>();
             var homeFound = false;
 
             for (var i = 0; i < entries.Length; i++)
@@ -177,6 +178,11 @@ namespace IdleTower.Core
 
                 if (!coords.Add(entry.Coord))
                     errors.Add($"{path}: дубликат Coord {entry.Coord}.");
+
+                if (string.IsNullOrWhiteSpace(entry.InstanceId))
+                    errors.Add($"{path}: пустой InstanceId.");
+                else if (!instanceIds.Add(entry.InstanceId))
+                    errors.Add($"{path}: дубликат InstanceId '{entry.InstanceId}'.");
 
                 if (entry.Coord == mapConfig.HomeCoord)
                     homeFound = true;

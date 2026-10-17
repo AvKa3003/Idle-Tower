@@ -74,20 +74,12 @@ MapCellDefinition.id — по-прежнему id ШАБЛОНА (camp/forest), 
   «Реализуй этап 1 из Assets/map-editor-implementation-plan.txt»
 
 Сделать:
-  [ ] MapConfigEntry.instanceId (string)
-  [ ] При загрузке конфига в рантайме: если instanceId пустой (старые ассеты
-      в проекте) — сгенерировать GUID один раз? 
-      Решение для НЕ-продакшена: Editor-утилита «Fix missing ids» ИЛИ
-      генерация при первом открытии в Map Editor (этап 3).
-      В этапе 1: поле + запись в сейв/чтение из сейва; пустой id в рантайме
-      — LogWarning, клетка без прогресса или сгенерировать runtime-only
-      (лучше: обязать заполнить через меню Assets до Play).
-  [ ] MapCellSave: ключ instanceId; убрать зависимость прогресса от x,y
-      как единственного ключа (x,y оставить полями)
-  [ ] SaveSystem.CaptureMapCells / Load map: матч по instanceId
-  [ ] MapSystem / миграции загрузки карты: применить сейв по id
-  [ ] Краткая пометка в комментарии/architecture при наличии:
-      «будущие миграции сейва — учитывать instanceId»
+  [x] MapConfigEntry.InstanceId (string)
+  [x] Пустой id в рантайме — LogWarning; меню IdleTower/Fix MapConfig Instance Ids
+  [x] MapCellSave: ключ instanceId; x,y оставлены
+  [x] SaveSystem.CaptureMapCells / ApplySaveFromDisk: матч по instanceId
+  [x] Пометка в MapSaveMigration / GameSaveData: будущие миграции — InstanceId
+  [x] Существующий MapConfig.asset: InstanceId проставлены
 
 Не делать:
   - Editor Window

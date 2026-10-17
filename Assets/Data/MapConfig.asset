@@ -17,7 +17,8 @@ MonoBehaviour:
   visionRadius: 2
   neighborMode: 0
   entries:
-  - Coord: {x: 0, y: 0}
+  - InstanceId: 8792a1c478c64c34a363db2418a2b0f9
+    Coord: {x: 0, y: 0}
     Cell: {fileID: 11400000, guid: 9d077f4604fda5945b2d5e0f64fa56a2, type: 2}
     Site:
       Raid:
@@ -43,7 +44,8 @@ MonoBehaviour:
           Seconds: 0
         PassiveRewards: []
         CapturedSprite: {fileID: 0}
-  - Coord: {x: 1, y: 0}
+  - InstanceId: 65c0e01a43194fb0820dc84fcfb91584
+    Coord: {x: 1, y: 0}
     Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
     Site:
       Raid:
@@ -69,7 +71,8 @@ MonoBehaviour:
           Seconds: 0
         PassiveRewards: []
         CapturedSprite: {fileID: 0}
-  - Coord: {x: 2, y: 0}
+  - InstanceId: ff6a4c96f2e14a16ae371e2b646368a0
+    Coord: {x: 2, y: 0}
     Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
     Site:
       Raid:
@@ -95,7 +98,8 @@ MonoBehaviour:
           Seconds: 0
         PassiveRewards: []
         CapturedSprite: {fileID: 0}
-  - Coord: {x: 2, y: 1}
+  - InstanceId: d842bef7a8c44619903ee6863d29a5c7
+    Coord: {x: 2, y: 1}
     Cell: {fileID: 11400000, guid: e7e4f9c271529b4479864d417c2384cb, type: 2}
     Site:
       Raid:
@@ -121,7 +125,8 @@ MonoBehaviour:
           Seconds: 0
         PassiveRewards: []
         CapturedSprite: {fileID: 0}
-  - Coord: {x: 1, y: 1}
+  - InstanceId: 0f651e364ca147b8add9cb1ca50385fa
+    Coord: {x: 1, y: 1}
     Cell: {fileID: 11400000, guid: abe681d6596fe54489c5850d5fcac9b1, type: 2}
     Site:
       Raid:
@@ -147,7 +152,8 @@ MonoBehaviour:
           Seconds: 0
         PassiveRewards: []
         CapturedSprite: {fileID: 0}
-  - Coord: {x: 1, y: 2}
+  - InstanceId: fd3bf74c20d34f5b948ae7400d8bde71
+    Coord: {x: 1, y: 2}
     Cell: {fileID: 11400000, guid: abe681d6596fe54489c5850d5fcac9b1, type: 2}
     Site:
       Raid:
@@ -173,7 +179,8 @@ MonoBehaviour:
           Seconds: 0
         PassiveRewards: []
         CapturedSprite: {fileID: 0}
-  - Coord: {x: 1, y: 3}
+  - InstanceId: b5e500e2b496439c87ecb0798794efae
+    Coord: {x: 1, y: 3}
     Cell: {fileID: 11400000, guid: abe681d6596fe54489c5850d5fcac9b1, type: 2}
     Site:
       Raid:
@@ -199,7 +206,8 @@ MonoBehaviour:
           Seconds: 0
         PassiveRewards: []
         CapturedSprite: {fileID: 0}
-  - Coord: {x: 0, y: 1}
+  - InstanceId: 40589ae629df403987b23ab2e1ba58c4
+    Coord: {x: 0, y: 1}
     Cell: {fileID: 11400000, guid: abe681d6596fe54489c5850d5fcac9b1, type: 2}
     Site:
       Raid:
@@ -225,7 +233,8 @@ MonoBehaviour:
           Seconds: 0
         PassiveRewards: []
         CapturedSprite: {fileID: 0}
-  - Coord: {x: 0, y: 2}
+  - InstanceId: 4cc83de7cf82424b95aec57427a93934
+    Coord: {x: 0, y: 2}
     Cell: {fileID: 11400000, guid: abe681d6596fe54489c5850d5fcac9b1, type: 2}
     Site:
       Raid:
@@ -251,7 +260,8 @@ MonoBehaviour:
           Seconds: 0
         PassiveRewards: []
         CapturedSprite: {fileID: 0}
-  - Coord: {x: 0, y: 3}
+  - InstanceId: 05e95c64594143a98d9fa7d8273dd4bc
+    Coord: {x: 0, y: 3}
     Cell: {fileID: 11400000, guid: abe681d6596fe54489c5850d5fcac9b1, type: 2}
     Site:
       Raid:
@@ -277,7 +287,8 @@ MonoBehaviour:
           Seconds: 0
         PassiveRewards: []
         CapturedSprite: {fileID: 0}
-  - Coord: {x: -1, y: 1}
+  - InstanceId: f3dfe41fc4e34f4cac5864534317ad9d
+    Coord: {x: -1, y: 1}
     Cell: {fileID: 11400000, guid: abe681d6596fe54489c5850d5fcac9b1, type: 2}
     Site:
       Raid:
@@ -303,7 +314,8 @@ MonoBehaviour:
           Seconds: 0
         PassiveRewards: []
         CapturedSprite: {fileID: 0}
-  - Coord: {x: -1, y: 2}
+  - InstanceId: 3b92946e5445402fafcbbeba013cddca
+    Coord: {x: -1, y: 2}
     Cell: {fileID: 11400000, guid: abe681d6596fe54489c5850d5fcac9b1, type: 2}
     Site:
       Raid:
@@ -329,7 +341,8 @@ MonoBehaviour:
           Seconds: 0
         PassiveRewards: []
         CapturedSprite: {fileID: 0}
-  - Coord: {x: -1, y: 3}
+  - InstanceId: c567e8f1aa304b92b670d42e2fcabd96
+    Coord: {x: -1, y: 3}
     Cell: {fileID: 11400000, guid: abe681d6596fe54489c5850d5fcac9b1, type: 2}
     Site:
       Raid:
@@ -355,7 +368,8 @@ MonoBehaviour:
           Seconds: 0
         PassiveRewards: []
         CapturedSprite: {fileID: 0}
-  - Coord: {x: 0, y: -1}
+  - InstanceId: ab2d179ea8c34cf98581a23ed4aa560c
+    Coord: {x: 0, y: -1}
     Cell: {fileID: 11400000, guid: 2aa14af92765da748b60133c95bf6468, type: 2}
     Site:
       Raid:
@@ -389,7 +403,8 @@ MonoBehaviour:
         - Resource: {fileID: 11400000, guid: 6f9a325df12a750439fe2fd353ca0c4f, type: 2}
           Amount: 100
         CapturedSprite: {fileID: 0}
-  - Coord: {x: 1, y: -1}
+  - InstanceId: a3df998660d64b7aa43702ba6171ef84
+    Coord: {x: 1, y: -1}
     Cell: {fileID: 11400000, guid: 2aa14af92765da748b60133c95bf6468, type: 2}
     Site:
       Raid:
@@ -419,7 +434,8 @@ MonoBehaviour:
           Seconds: 0
         PassiveRewards: []
         CapturedSprite: {fileID: 0}
-  - Coord: {x: 2, y: -1}
+  - InstanceId: b6453b33e59248628d2b650a28c9ae81
+    Coord: {x: 2, y: -1}
     Cell: {fileID: 11400000, guid: 2aa14af92765da748b60133c95bf6468, type: 2}
     Site:
       Raid:
@@ -449,7 +465,8 @@ MonoBehaviour:
         - Resource: {fileID: 11400000, guid: 6057606f450efbc41814c3ad3ddb61b6, type: 2}
           Amount: 1000
         CapturedSprite: {fileID: 0}
-  - Coord: {x: 3, y: 0}
+  - InstanceId: ec73af3a463649a0a749cdaee4ad61a1
+    Coord: {x: 3, y: 0}
     Cell: {fileID: 11400000, guid: 2aa14af92765da748b60133c95bf6468, type: 2}
     Site:
       Raid:
@@ -481,7 +498,8 @@ MonoBehaviour:
           Seconds: 0
         PassiveRewards: []
         CapturedSprite: {fileID: 0}
-  - Coord: {x: 3, y: 1}
+  - InstanceId: ddca1129588a49f49e007329f22f3a2e
+    Coord: {x: 3, y: 1}
     Cell: {fileID: 11400000, guid: 2aa14af92765da748b60133c95bf6468, type: 2}
     Site:
       Raid:
@@ -513,7 +531,8 @@ MonoBehaviour:
           Seconds: 0
         PassiveRewards: []
         CapturedSprite: {fileID: 0}
-  - Coord: {x: 3, y: 2}
+  - InstanceId: 404cd76107dd4adbbb8a733c16a332da
+    Coord: {x: 3, y: 2}
     Cell: {fileID: 11400000, guid: 2aa14af92765da748b60133c95bf6468, type: 2}
     Site:
       Raid:
@@ -545,7 +564,8 @@ MonoBehaviour:
           Seconds: 0
         PassiveRewards: []
         CapturedSprite: {fileID: 0}
-  - Coord: {x: 4, y: 0}
+  - InstanceId: ec9a5e9af6a6424eb3af03831b6d6d13
+    Coord: {x: 4, y: 0}
     Cell: {fileID: 11400000, guid: 2aa14af92765da748b60133c95bf6468, type: 2}
     Site:
       Raid:
@@ -571,7 +591,8 @@ MonoBehaviour:
           Seconds: 0
         PassiveRewards: []
         CapturedSprite: {fileID: 0}
-  - Coord: {x: 5, y: 0}
+  - InstanceId: d55060272b9047939c9ef706f82c11b6
+    Coord: {x: 5, y: 0}
     Cell: {fileID: 11400000, guid: e7e4f9c271529b4479864d417c2384cb, type: 2}
     Site:
       Raid:
@@ -597,7 +618,8 @@ MonoBehaviour:
           Seconds: 0
         PassiveRewards: []
         CapturedSprite: {fileID: 0}
-  - Coord: {x: 6, y: 0}
+  - InstanceId: 5e521344aa8a4ccc97d75fdb09ff939a
+    Coord: {x: 6, y: 0}
     Cell: {fileID: 11400000, guid: e7e4f9c271529b4479864d417c2384cb, type: 2}
     Site:
       Raid:

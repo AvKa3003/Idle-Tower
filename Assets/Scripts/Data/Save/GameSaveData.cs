@@ -10,7 +10,8 @@ namespace IdleTower.Data.Save
     [Serializable]
     public class GameSaveData
     {
-        public int version = 2;
+        /// <summary>3+: mapCells ключ — instanceId (не только coord). Будущие миграции — учитывать InstanceId.</summary>
+        public int version = 3;
         public long currentTick;
         public float tickAccumulator;
         public long savedUnixTimeUtc;
@@ -19,10 +20,14 @@ namespace IdleTower.Data.Save
         public MapCellSave[] mapCells = Array.Empty<MapCellSave>();
     }
 
-    /// <summary>BehaviorState одной клетки карты (ключ — Coord).</summary>
+    /// <summary>
+    /// BehaviorState одной клетки карты.
+    /// Ключ прогресса — instanceId; x/y — позиция на момент сейва (отладка / будущие миграции).
+    /// </summary>
     [Serializable]
     public class MapCellSave
     {
+        public string instanceId;
         public int x;
         public int y;
         public string behaviorType;

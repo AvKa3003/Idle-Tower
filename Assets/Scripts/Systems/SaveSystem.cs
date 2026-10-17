@@ -15,7 +15,7 @@ namespace IdleTower.Systems
     /// </summary>
     public class SaveSystem
     {
-        public const int CurrentVersion = 2;
+        public const int CurrentVersion = 3;
         public const string FileName = "idle_tower_save.json";
 
         private readonly GameServices _services;
@@ -147,8 +147,16 @@ namespace IdleTower.Systems
                     continue;
 
                 var state = runtime.BehaviorState;
+                if (string.IsNullOrWhiteSpace(runtime.InstanceId))
+                {
+                    Debug.LogWarning(
+                        $"[SaveSystem] Клетка {pair.Key}: пустой InstanceId — пропуск записи в сейв.");
+                    continue;
+                }
+
                 var save = new MapCellSave
                 {
+                    instanceId = runtime.InstanceId,
                     x = pair.Key.x,
                     y = pair.Key.y,
                     behaviorType = behavior.GetBehaviorTypeId(),
