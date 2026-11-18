@@ -39,6 +39,8 @@ namespace IdleTower.Editor
                 $"пустых InstanceId заполнено: {filled}.");
         }
 
+        public static string CreateInstanceId() => System.Guid.NewGuid().ToString("N");
+
         /// <summary>
         /// Проставляет GUID пустым InstanceId. ApplyModifiedPropertiesWithoutUndo.
         /// Возвращает число заполненных id.

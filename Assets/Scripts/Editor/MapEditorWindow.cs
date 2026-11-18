@@ -1,17 +1,26 @@
 using System.Collections.Generic;
 using IdleTower.Data.Definitions;
 using IdleTower.Map;
+using IdleTower.Map.Behaviors;
 using UnityEditor;
 using UnityEngine;
 
 namespace IdleTower.Editor
 {
     /// <summary>
-    /// Редактор MapConfig: iso-превью, dirty/Save, смена карты.
-    /// Paint / Move / Erase — этап 4; Inspector selection — этап 5.
+    /// Редактор MapConfig: iso-превью, dirty/Save, смена карты,
+    /// Paint / Erase / Move. Inspector selection — этап 5.
     /// </summary>
     public sealed class MapEditorWindow : EditorWindow
     {
+        private enum MapEditTool
+        {
+            Select,
+            Paint,
+            Erase,
+            Move
+        }
+
         private const string MenuPath = "IdleTower/Map Editor";
 
         // Как на MapView в сцене (SampleScene): 64×32, spacing 0, adjustY 1, scale 4.
@@ -33,6 +42,11 @@ namespace IdleTower.Editor
         private Vector2Int? _hoverCoord;
         private bool _hoverOccupied;
         private bool _layoutFoldout;
+        private MapEditTool _tool = MapEditTool.Select;
+        private MapCellDefinition _paintDefinition;
+        private bool _strokeActive;
+        private Vector2Int? _lastStrokeCoord;
+        private string _statusHint = string.Empty;
 
         private readonly List<PreviewCell> _drawBuffer = new(128);
         private readonly Dictionary<Vector2Int, int> _coordToEntry = new();
@@ -80,6 +94,7 @@ namespace IdleTower.Editor
 
         private void OnGUI()
         {
+            HandleToolHotkeys();
             DrawToolbar();
             EditorGUILayout.Space(4f);
 
@@ -109,6 +124,11 @@ namespace IdleTower.Editor
                 if (EditorGUI.EndChangeCheck())
                     TryBindConfig(next);
 
+                DrawToolToggle(MapEditTool.Select, "Select", "ЛКМ: выбрать клетку. Горячая клавиша 1.");
+                DrawToolToggle(MapEditTool.Paint, "Paint", "ЛКМ / drag: поставить или заменить Cell. Горячая клавиша 2.");
+                DrawToolToggle(MapEditTool.Erase, "Erase", "ЛКМ / drag: удалить клетку. Горячая клавиша 3.");
+                DrawToolToggle(MapEditTool.Move, "Move", "ЛКМ по клетке → ЛКМ по пустому coord. InstanceId не меняется. Горячая клавиша 4.");
+
                 GUILayout.FlexibleSpace();
 
                 var shortcutsContent = new GUIContent(
@@ -116,9 +136,15 @@ namespace IdleTower.Editor
                     "Превью карты:\n" +
                     "• Пан (камера): СКМ (средняя кнопка) или Alt + ЛКМ\n" +
                     "• Зум: колёсико мыши (к курсору)\n" +
-                    "• Select клетки: ЛКМ\n" +
-                    "• Сброс пана: кнопка в «Превью: шаг / зум»\n" +
-                    "• Назначить карту: ObjectField или drag MapConfig в окно");
+                    "• Select / Paint / Erase / Move: 1–4\n" +
+                    "• Select: ЛКМ по клетке\n" +
+                    "• Paint: ЛКМ / drag (нужен Brush)\n" +
+                    "• Erase: ЛКМ / drag\n" +
+                    "• Move: ЛКМ pick → ЛКМ пустой coord (занято — запрет)\n" +
+                    "• Esc: снять select\n" +
+                    "• Drag MapCellDefinition на coord: add / replace Cell\n" +
+                    "• Назначить карту: ObjectField или drag MapConfig в окно\n" +
+                    "• Сброс пана: кнопка в «Превью: шаг / зум»");
                 GUILayout.Label(shortcutsContent, EditorStyles.toolbarButton);
 
                 using (new EditorGUI.DisabledScope(_config == null || !_sessionDirty))
@@ -135,11 +161,48 @@ namespace IdleTower.Editor
                 }
             }
 
+            using (new EditorGUILayout.HorizontalScope(EditorStyles.toolbar))
+            {
+                GUILayout.Label("Brush", EditorStyles.miniLabel, GUILayout.Width(40f));
+                EditorGUI.BeginChangeCheck();
+                _paintDefinition = (MapCellDefinition)EditorGUILayout.ObjectField(
+                    _paintDefinition,
+                    typeof(MapCellDefinition),
+                    false,
+                    GUILayout.MinWidth(160f));
+                if (EditorGUI.EndChangeCheck())
+                    Repaint();
+
+                GUILayout.FlexibleSpace();
+                var brushLabel = _paintDefinition == null
+                    ? "для Paint и drop"
+                    : string.IsNullOrEmpty(_paintDefinition.DisplayName)
+                        ? _paintDefinition.name
+                        : _paintDefinition.DisplayName;
+                GUILayout.Label(brushLabel, EditorStyles.miniLabel);
+            }
+
             if (_serializedConfig != null && _config != null)
             {
                 _serializedConfig.Update();
+                using (new EditorGUILayout.HorizontalScope())
+                {
+                    EditorGUI.BeginChangeCheck();
+                    EditorGUILayout.PropertyField(_serializedConfig.FindProperty("homeCoord"));
+                    if (EditorGUI.EndChangeCheck())
+                    {
+                        _serializedConfig.ApplyModifiedProperties();
+                        MarkSessionDirty();
+                    }
+
+                    using (new EditorGUI.DisabledScope(string.IsNullOrEmpty(_selectedInstanceId)))
+                    {
+                        if (GUILayout.Button("Home ← select", GUILayout.Width(118f)))
+                            SetHomeToSelection();
+                    }
+                }
+
                 EditorGUI.BeginChangeCheck();
-                EditorGUILayout.PropertyField(_serializedConfig.FindProperty("homeCoord"));
                 using (new EditorGUILayout.HorizontalScope())
                 {
                     EditorGUILayout.PropertyField(
@@ -184,7 +247,7 @@ namespace IdleTower.Editor
             {
                 // Всегда видно: как двигать камеру.
                 GUILayout.Label(
-                    "Пан: СКМ / Alt+ЛКМ   ·   Зум: колесо   ·   Select: ЛКМ",
+                    ToolStatusHint(),
                     EditorStyles.miniLabel,
                     GUILayout.ExpandWidth(false));
 
@@ -202,8 +265,9 @@ namespace IdleTower.Editor
                 var sel = string.IsNullOrEmpty(_selectedInstanceId)
                     ? "select —"
                     : $"select {_selectedInstanceId}";
+                var hint = string.IsNullOrEmpty(_statusHint) ? string.Empty : $"   |   {_statusHint}";
                 GUILayout.Label(
-                    $"{hover}   |   {sel}   |   entries={_coordToEntry.Count}",
+                    $"{hover}   |   {sel}   |   entries={_coordToEntry.Count}{hint}",
                     EditorStyles.miniLabel);
             }
         }
@@ -219,18 +283,26 @@ namespace IdleTower.Editor
                     new Color(0.05f, 0.05f, 0.05f, 1f));
             }
 
-            if (_config == null || _serializedConfig == null)
-            {
-                GUI.Label(rect, "Нет карты", EditorStyles.centeredGreyMiniLabel);
-                return;
-            }
-
             var halfX = IsoMapLayout.HalfStep(_baseWidth, _spacingPixels, _stepAdjustX);
             var halfY = IsoMapLayout.HalfStep(_baseHeight, _spacingPixels, _stepAdjustY);
             var viewCenter = rect.center;
 
+            if (_config == null || _serializedConfig == null)
+            {
+                GUI.Label(rect, "Нет карты", EditorStyles.centeredGreyMiniLabel);
+                HandlePreviewDragDrop(rect, halfX, halfY, viewCenter);
+                return;
+            }
+
             RebuildCoordIndex();
-            HandlePreviewInput(rect, halfX, halfY, viewCenter);
+            var mutated = HandlePreviewInput(rect, halfX, halfY, viewCenter);
+            mutated |= HandlePreviewDragDrop(rect, halfX, halfY, viewCenter);
+            if (mutated)
+            {
+                RebuildCoordIndex();
+                if (_hoverCoord.HasValue)
+                    _hoverOccupied = _coordToEntry.ContainsKey(_hoverCoord.Value);
+            }
             CollectVisibleCells(rect, viewCenter, halfX, halfY);
 
             if (Event.current.type == EventType.Repaint)
@@ -240,6 +312,26 @@ namespace IdleTower.Editor
                 var clip = new Rect(0f, 0f, rect.width, rect.height);
                 for (var i = 0; i < _drawBuffer.Count; i++)
                     DrawCellSprite(_drawBuffer[i], rect, viewCenter);
+
+                if (_tool == MapEditTool.Paint
+                    && _paintDefinition != null
+                    && _hoverCoord.HasValue
+                    && !_hoverOccupied)
+                {
+                    var ghostContent = IsoMapLayout.CoordToAnchored(_hoverCoord.Value, halfX, halfY);
+                    var prevColor = GUI.color;
+                    GUI.color = new Color(1f, 1f, 1f, 0.4f);
+                    DrawCellSprite(
+                        new PreviewCell
+                        {
+                            Coord = _hoverCoord.Value,
+                            Sprite = _paintDefinition.Sprite,
+                            ContentPos = ghostContent
+                        },
+                        rect,
+                        viewCenter);
+                    GUI.color = prevColor;
+                }
 
                 if (!string.IsNullOrEmpty(_selectedInstanceId))
                 {
@@ -256,33 +348,32 @@ namespace IdleTower.Editor
                     }
                 }
 
-                // Hover: занятая — подсветка; пустая — призрак под paint.
+                // Hover: цвет зависит от инструмента (add / replace / erase / move dest).
                 if (_hoverCoord.HasValue)
                 {
                     var hoverContent = IsoMapLayout.CoordToAnchored(_hoverCoord.Value, halfX, halfY);
-                    var hoverColor = _hoverOccupied
-                        ? new Color(0.55f, 0.9f, 1f, 0.95f)
-                        : new Color(0.4f, 0.75f, 1f, 0.85f);
+                    HoverStyle(out var hoverColor, out var hoverThickness);
                     DrawDiamondOutlineLocal(
                         ContentToView(hoverContent, viewCenter) - rect.min,
                         hoverColor,
-                        _hoverOccupied ? 2f : 1.5f,
+                        hoverThickness,
                         clip);
                 }
 
                 GUI.EndGroup();
             }
-
-            HandlePreviewDragDrop(rect);
         }
 
-        private void HandlePreviewInput(Rect rect, float halfX, float halfY, Vector2 viewCenter)
+        private bool HandlePreviewInput(Rect rect, float halfX, float halfY, Vector2 viewCenter)
         {
             var e = Event.current;
             if (!rect.Contains(e.mousePosition) && e.type != EventType.MouseUp && e.type != EventType.MouseDrag)
-                return;
+                return false;
 
-            if (e.type == EventType.MouseMove || e.type == EventType.MouseDrag || e.type == EventType.Repaint)
+            if (e.type == EventType.MouseMove
+                || e.type == EventType.MouseDrag
+                || e.type == EventType.Repaint
+                || e.type == EventType.DragUpdated)
             {
                 if (rect.Contains(e.mousePosition))
                 {
@@ -290,7 +381,7 @@ namespace IdleTower.Editor
                     _hoverCoord = IsoMapLayout.AnchoredToCoord(content, halfX, halfY);
                     _hoverOccupied = _coordToEntry.ContainsKey(_hoverCoord.Value);
                 }
-                else if (!_isPanning)
+                else if (!_isPanning && !_strokeActive)
                 {
                     _hoverCoord = null;
                     _hoverOccupied = false;
@@ -307,7 +398,7 @@ namespace IdleTower.Editor
                 _pan += (Vector2)e.mousePosition - newView;
                 e.Use();
                 Repaint();
-                return;
+                return false;
             }
 
             // Средняя кнопка / Alt+ЛКМ — пан.
@@ -315,10 +406,11 @@ namespace IdleTower.Editor
             if (e.type == EventType.MouseDown && panButton && rect.Contains(e.mousePosition))
             {
                 _isPanning = true;
+                _strokeActive = false;
                 _panStartMouse = e.mousePosition;
                 _panStartOffset = _pan;
                 e.Use();
-                return;
+                return false;
             }
 
             if (e.type == EventType.MouseDrag && _isPanning)
@@ -326,38 +418,50 @@ namespace IdleTower.Editor
                 _pan = _panStartOffset + ((Vector2)e.mousePosition - _panStartMouse);
                 e.Use();
                 Repaint();
-                return;
+                return false;
             }
 
             if (e.type == EventType.MouseUp && _isPanning)
             {
                 _isPanning = false;
                 e.Use();
-                return;
+                return false;
             }
 
-            if (e.type == EventType.MouseDown
-                && e.button == 0
-                && !e.alt
-                && rect.Contains(e.mousePosition))
+            if (e.type == EventType.MouseUp && e.button == 0)
             {
-                var content = ViewToContent(e.mousePosition, viewCenter);
-                var coord = IsoMapLayout.AnchoredToCoord(content, halfX, halfY);
-                if (_coordToEntry.TryGetValue(coord, out var entryIndex))
-                {
-                    var entries = _serializedConfig.FindProperty("entries");
-                    var id = entries.GetArrayElementAtIndex(entryIndex)
-                        .FindPropertyRelative("InstanceId").stringValue;
-                    _selectedInstanceId = id ?? string.Empty;
-                }
-                else
-                {
-                    _selectedInstanceId = string.Empty;
-                }
-
-                e.Use();
-                Repaint();
+                _strokeActive = false;
+                _lastStrokeCoord = null;
             }
+
+            var toolClick = e.button == 0 && !e.alt && !_isPanning;
+            var isDown = e.type == EventType.MouseDown && toolClick && rect.Contains(e.mousePosition);
+            var isDrag = e.type == EventType.MouseDrag && toolClick && _strokeActive;
+            if (!isDown && !isDrag)
+                return false;
+
+            var clickContent = ViewToContent(e.mousePosition, viewCenter);
+            var coord = IsoMapLayout.AnchoredToCoord(clickContent, halfX, halfY);
+            if (isDown)
+            {
+                _strokeActive = AllowsStroke(_tool);
+                _lastStrokeCoord = null;
+                GUIUtility.keyboardControl = 0;
+            }
+
+            if (_lastStrokeCoord.HasValue && _lastStrokeCoord.Value == coord)
+            {
+                e.Use();
+                return false;
+            }
+
+            if (AllowsStroke(_tool))
+                _lastStrokeCoord = coord;
+
+            var mutated = ApplyToolAt(coord, isDrag);
+            e.Use();
+            Repaint();
+            return mutated;
         }
 
         private void CollectVisibleCells(
@@ -543,20 +647,41 @@ namespace IdleTower.Editor
             return true;
         }
 
-        private void HandlePreviewDragDrop(Rect rect)
+        private bool HandlePreviewDragDrop(Rect rect, float halfX, float halfY, Vector2 viewCenter)
         {
             var e = Event.current;
             if (!rect.Contains(e.mousePosition))
-                return;
+                return false;
 
             if (e.type != EventType.DragUpdated && e.type != EventType.DragPerform)
-                return;
+                return false;
 
-            var config = DragAndDrop.objectReferences != null && DragAndDrop.objectReferences.Length > 0
-                ? DragAndDrop.objectReferences[0] as MapConfig
-                : null;
+            var definition = FindDragged<MapCellDefinition>();
+            var config = FindDragged<MapConfig>();
+
+            if (definition != null && _config != null && _serializedConfig != null)
+            {
+                DragAndDrop.visualMode = DragAndDropVisualMode.Copy;
+                var content = ViewToContent(e.mousePosition, viewCenter);
+                _hoverCoord = IsoMapLayout.AnchoredToCoord(content, halfX, halfY);
+                _hoverOccupied = _coordToEntry.ContainsKey(_hoverCoord.Value);
+                if (e.type == EventType.DragPerform)
+                {
+                    DragAndDrop.AcceptDrag();
+                    _paintDefinition = definition;
+                    var mutated = PaintAt(_hoverCoord.Value);
+                    e.Use();
+                    Repaint();
+                    return mutated;
+                }
+
+                e.Use();
+                Repaint();
+                return false;
+            }
+
             if (config == null)
-                return;
+                return false;
 
             DragAndDrop.visualMode = DragAndDropVisualMode.Copy;
             if (e.type == EventType.DragPerform)
@@ -566,6 +691,264 @@ namespace IdleTower.Editor
             }
 
             e.Use();
+            return false;
+        }
+
+        private void HandleToolHotkeys()
+        {
+            var e = Event.current;
+            if (e.type != EventType.KeyDown)
+                return;
+            if (e.alt || e.control || e.command || EditorGUIUtility.editingTextField)
+                return;
+
+            switch (e.keyCode)
+            {
+                case KeyCode.Alpha1:
+                case KeyCode.Keypad1:
+                    _tool = MapEditTool.Select;
+                    break;
+                case KeyCode.Alpha2:
+                case KeyCode.Keypad2:
+                    _tool = MapEditTool.Paint;
+                    break;
+                case KeyCode.Alpha3:
+                case KeyCode.Keypad3:
+                    _tool = MapEditTool.Erase;
+                    break;
+                case KeyCode.Alpha4:
+                case KeyCode.Keypad4:
+                    _tool = MapEditTool.Move;
+                    break;
+                case KeyCode.Escape:
+                    _selectedInstanceId = string.Empty;
+                    _statusHint = string.Empty;
+                    break;
+                default:
+                    return;
+            }
+
+            e.Use();
+            Repaint();
+        }
+
+        private void DrawToolToggle(MapEditTool tool, string label, string tooltip)
+        {
+            var on = _tool == tool;
+            var prev = GUI.backgroundColor;
+            if (on)
+                GUI.backgroundColor = new Color(0.55f, 0.8f, 1f);
+            if (GUILayout.Toggle(on, new GUIContent(label, tooltip), EditorStyles.toolbarButton, GUILayout.Width(52f)))
+                _tool = tool;
+            GUI.backgroundColor = prev;
+        }
+
+        private string ToolStatusHint()
+        {
+            return _tool switch
+            {
+                MapEditTool.Paint => "Пан: СКМ / Alt+ЛКМ   ·   Зум: колесо   ·   Paint: ЛКМ / drag",
+                MapEditTool.Erase => "Пан: СКМ / Alt+ЛКМ   ·   Зум: колесо   ·   Erase: ЛКМ / drag",
+                MapEditTool.Move => "Пан: СКМ / Alt+ЛКМ   ·   Зум: колесо   ·   Move: pick → пустой coord",
+                _ => "Пан: СКМ / Alt+ЛКМ   ·   Зум: колесо   ·   Select: ЛКМ"
+            };
+        }
+
+        private static bool AllowsStroke(MapEditTool tool)
+            => tool == MapEditTool.Paint || tool == MapEditTool.Erase;
+
+        private bool ApplyToolAt(Vector2Int coord, bool isDrag)
+        {
+            switch (_tool)
+            {
+                case MapEditTool.Select:
+                    if (isDrag)
+                        return false;
+                    SelectAt(coord);
+                    return false;
+                case MapEditTool.Paint:
+                    return PaintAt(coord);
+                case MapEditTool.Erase:
+                    return EraseAt(coord);
+                case MapEditTool.Move:
+                    if (isDrag)
+                        return false;
+                    return MoveClick(coord);
+                default:
+                    return false;
+            }
+        }
+
+        private void SelectAt(Vector2Int coord)
+        {
+            _selectedInstanceId = _coordToEntry.TryGetValue(coord, out var entryIndex)
+                ? InstanceIdAt(entryIndex)
+                : string.Empty;
+            _statusHint = string.Empty;
+        }
+
+        private bool PaintAt(Vector2Int coord)
+        {
+            if (_paintDefinition == null)
+            {
+                _statusHint = "Paint: назначь Brush (MapCellDefinition).";
+                return false;
+            }
+
+            if (!MapConfigEntriesEditor.TryPaintCell(
+                    _serializedConfig, coord, _paintDefinition, out var instanceId))
+            {
+                if (!string.IsNullOrEmpty(instanceId))
+                    _selectedInstanceId = instanceId;
+                return false;
+            }
+
+            _selectedInstanceId = instanceId;
+            _statusHint = _coordToEntry.ContainsKey(coord) ? $"replace {coord}" : $"add {coord}";
+            MarkSessionDirty();
+            return true;
+        }
+
+        private bool EraseAt(Vector2Int coord)
+        {
+            var home = _serializedConfig.FindProperty("homeCoord")?.vector2IntValue;
+            if (!MapConfigEntriesEditor.TryEraseCell(_serializedConfig, coord, out var removedId))
+                return false;
+
+            if (_selectedInstanceId == removedId)
+                _selectedInstanceId = string.Empty;
+
+            _statusHint = home.HasValue && home.Value == coord
+                ? $"erase {coord} (это был HomeCoord — назначь Home ← select)"
+                : $"erase {coord}";
+            MarkSessionDirty();
+            return true;
+        }
+
+        private bool MoveClick(Vector2Int coord)
+        {
+            if (_coordToEntry.TryGetValue(coord, out var occupiedIndex))
+            {
+                _selectedInstanceId = InstanceIdAt(occupiedIndex);
+                _statusHint = string.IsNullOrEmpty(_selectedInstanceId)
+                    ? "Move: выбери клетку"
+                    : "Move: клик по пустому coord";
+                return false;
+            }
+
+            if (string.IsNullOrEmpty(_selectedInstanceId))
+            {
+                _statusHint = "Move: сначала выбери клетку.";
+                return false;
+            }
+
+            if (!MapConfigEntriesEditor.TryMoveCell(
+                    _serializedConfig, _selectedInstanceId, coord, out var error))
+            {
+                if (!string.IsNullOrEmpty(error))
+                    _statusHint = error;
+                return false;
+            }
+
+            _statusHint = $"move → {coord}";
+            MarkSessionDirty();
+            return true;
+        }
+
+        private void SetHomeToSelection()
+        {
+            if (!MapConfigEntriesEditor.TryGetCoordByInstanceId(
+                    _serializedConfig, _selectedInstanceId, out var coord))
+            {
+                _statusHint = "Home: нет выбранной клетки.";
+                return;
+            }
+
+            if (!MapConfigEntriesEditor.TrySetHomeCoord(_serializedConfig, coord))
+                return;
+
+            _statusHint = $"homeCoord = {coord}";
+            if (_coordToEntry.TryGetValue(coord, out var homeIndex))
+            {
+                var cell = _serializedConfig.FindProperty("entries")
+                    ?.GetArrayElementAtIndex(homeIndex)
+                    .FindPropertyRelative("Cell").objectReferenceValue as MapCellDefinition;
+                if (cell?.Behavior is not HomeMapCellBehavior)
+                    _statusHint += " (нужен HomeMapCellBehavior)";
+            }
+
+            MarkSessionDirty();
+            Repaint();
+        }
+
+        private void HoverStyle(out Color color, out float thickness)
+        {
+            thickness = _hoverOccupied ? 2f : 1.5f;
+            var hoverIsSelected = false;
+            if (_hoverOccupied
+                && _hoverCoord.HasValue
+                && !string.IsNullOrEmpty(_selectedInstanceId)
+                && _coordToEntry.TryGetValue(_hoverCoord.Value, out var hoverIndex))
+            {
+                hoverIsSelected = InstanceIdAt(hoverIndex) == _selectedInstanceId;
+            }
+
+            switch (_tool)
+            {
+                case MapEditTool.Paint:
+                    color = _hoverOccupied
+                        ? new Color(1f, 0.7f, 0.25f, 0.95f)
+                        : new Color(0.4f, 1f, 0.55f, 0.9f);
+                    return;
+                case MapEditTool.Erase:
+                    color = _hoverOccupied
+                        ? new Color(1f, 0.35f, 0.3f, 0.95f)
+                        : new Color(0.4f, 0.75f, 1f, 0.7f);
+                    return;
+                case MapEditTool.Move:
+                    if (!_hoverOccupied)
+                    {
+                        color = string.IsNullOrEmpty(_selectedInstanceId)
+                            ? new Color(0.4f, 0.75f, 1f, 0.85f)
+                            : new Color(0.4f, 1f, 0.55f, 0.9f);
+                        return;
+                    }
+
+                    color = hoverIsSelected
+                        ? new Color(1f, 0.85f, 0.2f, 1f)
+                        : string.IsNullOrEmpty(_selectedInstanceId)
+                            ? new Color(0.55f, 0.9f, 1f, 0.95f)
+                            : new Color(1f, 0.35f, 0.3f, 0.95f);
+                    return;
+                default:
+                    color = _hoverOccupied
+                        ? new Color(0.55f, 0.9f, 1f, 0.95f)
+                        : new Color(0.4f, 0.75f, 1f, 0.85f);
+                    return;
+            }
+        }
+
+        private string InstanceIdAt(int entryIndex)
+        {
+            var entries = _serializedConfig.FindProperty("entries");
+            if (entries == null || entryIndex < 0 || entryIndex >= entries.arraySize)
+                return string.Empty;
+            return entries.GetArrayElementAtIndex(entryIndex)
+                .FindPropertyRelative("InstanceId").stringValue ?? string.Empty;
+        }
+
+        private static T FindDragged<T>() where T : UnityEngine.Object
+        {
+            var refs = DragAndDrop.objectReferences;
+            if (refs == null)
+                return null;
+            for (var i = 0; i < refs.Length; i++)
+            {
+                if (refs[i] is T typed)
+                    return typed;
+            }
+
+            return null;
         }
 
         private Vector2 ContentToView(Vector2 content, Vector2 viewCenter)
@@ -644,6 +1027,9 @@ namespace IdleTower.Editor
             _selectedInstanceId = string.Empty;
             _hoverCoord = null;
             _pan = Vector2.zero;
+            _strokeActive = false;
+            _lastStrokeCoord = null;
+            _statusHint = string.Empty;
 
             if (_config == null)
             {
@@ -698,6 +1084,9 @@ namespace IdleTower.Editor
             _config = AssetDatabase.LoadAssetAtPath<MapConfig>(path);
             _serializedConfig = _config != null ? new SerializedObject(_config) : null;
             _selectedInstanceId = string.Empty;
+            _strokeActive = false;
+            _lastStrokeCoord = null;
+            _statusHint = string.Empty;
             ClearSessionDirty();
         }
 
