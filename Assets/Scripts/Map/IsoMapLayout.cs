@@ -26,6 +26,18 @@ namespace IdleTower.Map
         }
 
         /// <summary>
+        /// Обратное к CoordToAnchored: content → ближайший logical coord (для hit-test в редакторе).
+        /// </summary>
+        public static Vector2Int AnchoredToCoord(Vector2 anchored, float halfStepX, float halfStepY)
+        {
+            var u = halfStepX > 0.0001f ? anchored.x / halfStepX : 0f;
+            var v = halfStepY > 0.0001f ? anchored.y / halfStepY : 0f;
+            return new Vector2Int(
+                Mathf.RoundToInt((u + v) * 0.5f),
+                Mathf.RoundToInt((-u + v) * 0.5f));
+        }
+
+        /// <summary>
         /// Дальние клетки (больший x+y) раньше в сортировке → ближние сверху (перекрытия).
         /// Тай-брейк: x, затем y.
         /// </summary>
