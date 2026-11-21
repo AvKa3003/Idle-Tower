@@ -170,11 +170,12 @@ namespace IdleTower.Core
             var coords = new HashSet<Vector2Int>();
             var instanceIds = new HashSet<string>();
             var homeFound = false;
+            var homeIndex = -1;
 
             for (var i = 0; i < entries.Length; i++)
             {
                 var entry = entries[i];
-                var path = $"MapConfig.Entries[{i}]";
+                var path = EntryPath(i, entry);
 
                 if (!coords.Add(entry.Coord))
                     errors.Add($"{path}: дубликат Coord {entry.Coord}.");
@@ -185,7 +186,11 @@ namespace IdleTower.Core
                     errors.Add($"{path}: дубликат InstanceId '{entry.InstanceId}'.");
 
                 if (entry.Coord == mapConfig.HomeCoord)
+                {
                     homeFound = true;
+                    if (homeIndex < 0)
+                        homeIndex = i;
+                }
 
                 var cell = entry.Cell;
                 if (cell == null)
@@ -206,21 +211,28 @@ namespace IdleTower.Core
             if (!homeFound)
                 errors.Add($"MapConfig: нет Entries с Coord == HomeCoord {mapConfig.HomeCoord}.");
 
-            MapCellDefinition homeCell = null;
-            for (var i = 0; i < entries.Length; i++)
+            if (homeIndex >= 0)
             {
-                if (entries[i].Coord == mapConfig.HomeCoord)
+                var homeCell = entries[homeIndex].Cell;
+                if (homeCell?.Behavior != null && homeCell.Behavior is not HomeMapCellBehavior)
                 {
-                    homeCell = entries[i].Cell;
-                    break;
+                    errors.Add(
+                        $"{EntryPath(homeIndex, entries[homeIndex])}: " +
+                        "клетка HomeCoord должна иметь HomeMapCellBehavior.");
                 }
             }
+        }
 
-            if (homeCell?.Behavior != null && homeCell.Behavior is not HomeMapCellBehavior)
-            {
-                errors.Add(
-                    "MapConfig: клетка HomeCoord должна иметь HomeMapCellBehavior.");
-            }
+        /// <summary>Путь ошибки по клетке: индекс, координата, id определения и InstanceId.</summary>
+        private static string EntryPath(int index, MapConfigEntry entry)
+        {
+            var cellId = entry.Cell != null && !entry.Cell.Id.IsEmpty
+                ? entry.Cell.Id.Value
+                : "?";
+            var instanceId = string.IsNullOrWhiteSpace(entry.InstanceId)
+                ? "?"
+                : entry.InstanceId;
+            return $"MapConfig.Entries[{index}] (Coord={entry.Coord} Id={cellId} InstanceId={instanceId})";
         }
 
         private static void ValidateRaidMapEntry(
