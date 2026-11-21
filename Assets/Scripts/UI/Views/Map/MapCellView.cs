@@ -53,21 +53,40 @@ namespace IdleTower.UI.Views
             gridCoord = coord;
             gameObject.SetActive(true);
 
+            var showDim = presence == MapPresence.VisibleOnly && hasFunctionalClick;
             if (icon != null)
+            {
+                icon.enabled = sprite != null;
                 icon.sprite = sprite;
+                icon.color = showDim
+                    ? new Color(visibleOnlyDimAlpha, visibleOnlyDimAlpha, visibleOnlyDimAlpha, 1f)
+                    : Color.white;
+            }
 
             ApplyIconToFootprint();
 
-            var showDim = presence == MapPresence.VisibleOnly && hasFunctionalClick;
+            // Затемнение VisibleOnly — цвет спрайта. Прямоугольник CanvasGroup не показывается.
             if (canvasGroup != null)
             {
-                canvasGroup.alpha = showDim ? visibleOnlyDimAlpha : 0f;
+                canvasGroup.alpha = 0f;
                 canvasGroup.blocksRaycasts = false;
                 canvasGroup.interactable = false;
+                canvasGroup.gameObject.SetActive(false);
             }
 
             if (button != null)
+            {
+                // Картинка кнопки прозрачная: клик по ромбу, без заливки клетки.
+                button.transition = Selectable.Transition.None;
+                if (button.targetGraphic != null)
+                {
+                    var graphicColor = button.targetGraphic.color;
+                    graphicColor.a = 0f;
+                    button.targetGraphic.color = graphicColor;
+                }
+
                 button.interactable = canClick;
+            }
         }
 
         public void SetAnchoredPosition(Vector2 position)
