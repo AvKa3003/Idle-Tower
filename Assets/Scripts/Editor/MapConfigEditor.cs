@@ -7,7 +7,7 @@ namespace IdleTower.Editor
 {
     /// <summary>
     /// Inspector MapConfig: выбранная в Map Editor entry, иначе настройки карты.
-    /// Полный список entries — свёрнутый foldout «All».
+    /// Список entries — только без выбранной клетки, свёрнутый foldout «All».
     /// </summary>
     [CustomEditor(typeof(MapConfig))]
     public sealed class MapConfigEditor : UnityEditor.Editor
@@ -35,14 +35,18 @@ namespace IdleTower.Editor
             EditorGUI.BeginChangeCheck();
 
             if (TryGetSelectedEntry(config, so, out var entry))
+            {
                 DrawSelectedEntry(entry);
+            }
             else
+            {
                 DrawMapSettings(so);
 
-            EditorGUILayout.Space(6f);
-            _showAllEntries = EditorGUILayout.Foldout(_showAllEntries, "All", true);
-            if (_showAllEntries)
-                EditorGUILayout.PropertyField(so.FindProperty("entries"), true);
+                EditorGUILayout.Space(6f);
+                _showAllEntries = EditorGUILayout.Foldout(_showAllEntries, "All", true);
+                if (_showAllEntries)
+                    EditorGUILayout.PropertyField(so.FindProperty("entries"), true);
+            }
 
             if (EditorGUI.EndChangeCheck() && so.ApplyModifiedProperties())
                 NotifyWindow(config);

@@ -1,8 +1,10 @@
 using System.Collections.Generic;
+using System.IO;
 using IdleTower.Data.Definitions;
 using IdleTower.Map;
 using IdleTower.Map.Behaviors;
 using UnityEditor;
+using UnityEditorInternal;
 using UnityEngine;
 
 namespace IdleTower.Editor
@@ -1101,9 +1103,33 @@ namespace IdleTower.Editor
             }
 
             var path = AssetDatabase.GetAssetPath(_config);
-            EditorUtility.ClearDirty(_config);
-            AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate);
-            _config = AssetDatabase.LoadAssetAtPath<MapConfig>(path);
+            var config = _config;
+
+            // OnUndoRedo отписан на время отката, чтобы dirty в середине копирования не включил сессию снова.
+            Undo.undoRedoPerformed -= OnUndoRedo;
+            try
+            {
+                // Буфер сессии обнуляется до копирования файла, иначе Apply вернёт в объект несохранённые правки.
+                _serializedConfig = null;
+                if (!TryRevertAssetFromDisk(config, path))
+                {
+                    Debug.LogError(
+                        $"[MapEditor] Не удалось откатить '{path}' к файлу на диске. " +
+                        "Правки остались в загруженном объекте.");
+                }
+                else
+                {
+                    Undo.ClearUndo(config);
+                }
+            }
+            finally
+            {
+                Undo.undoRedoPerformed += OnUndoRedo;
+            }
+
+            _config = string.IsNullOrEmpty(path)
+                ? config
+                : AssetDatabase.LoadAssetAtPath<MapConfig>(path);
             _serializedConfig = _config != null ? new SerializedObject(_config) : null;
             _selectedInstanceId = string.Empty;
             _strokeActive = false;
@@ -1111,6 +1137,55 @@ namespace IdleTower.Editor
             _statusHint = string.Empty;
             ClearSessionDirty();
             PublishSelection(false);
+            ActiveEditorTracker.sharedTracker.ForceRebuild();
+        }
+
+        /// <summary>
+        /// Копирует сериализованные поля из файла ассета в загруженный объект и снимает dirty.
+        /// Файл читается отдельным экземпляром: LoadAssetAtPath возвращает уже загруженный объект.
+        /// </summary>
+        private static bool TryRevertAssetFromDisk(Object asset, string assetPath)
+        {
+            if (asset == null || string.IsNullOrEmpty(assetPath))
+                return false;
+
+            var projectRoot = Path.GetDirectoryName(Application.dataPath);
+            if (string.IsNullOrEmpty(projectRoot))
+                return false;
+
+            var fullPath = Path.GetFullPath(Path.Combine(projectRoot, assetPath));
+            var loaded = InternalEditorUtility.LoadSerializedFileAndForget(fullPath);
+            if (loaded == null || loaded.Length == 0)
+                return false;
+
+            Object source = null;
+            for (var i = 0; i < loaded.Length; i++)
+            {
+                if (loaded[i] != null && loaded[i].GetType() == asset.GetType())
+                {
+                    source = loaded[i];
+                    break;
+                }
+            }
+
+            var copied = false;
+            if (source != null)
+            {
+                EditorUtility.CopySerialized(source, asset);
+                copied = true;
+            }
+
+            for (var i = 0; i < loaded.Length; i++)
+            {
+                if (loaded[i] != null)
+                    Object.DestroyImmediate(loaded[i]);
+            }
+
+            if (!copied)
+                return false;
+
+            EditorUtility.ClearDirty(asset);
+            return true;
         }
 
         private void SetSelectedInstanceId(string instanceId, bool focusInspector)
