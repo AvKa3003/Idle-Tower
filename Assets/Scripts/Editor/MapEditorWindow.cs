@@ -9,7 +9,7 @@ namespace IdleTower.Editor
 {
     /// <summary>
     /// Редактор MapConfig: iso-превью, dirty/Save, смена карты,
-    /// Paint / Erase / Move. Inspector selection — этап 5.
+    /// Paint / Erase / Move, selection → Inspector.
     /// </summary>
     public sealed class MapEditorWindow : EditorWindow
     {
@@ -68,16 +68,34 @@ namespace IdleTower.Editor
             window.Show();
         }
 
+        internal MapConfig SessionConfig => _config;
+
+        internal SerializedObject SessionSerializedObject => _serializedConfig;
+
         private void OnEnable()
         {
             wantsMouseMove = true;
             autoRepaintOnSceneChange = true;
+            if (_config != null && _serializedConfig == null)
+                _serializedConfig = new SerializedObject(_config);
+            Undo.undoRedoPerformed += OnUndoRedo;
             SyncUnsavedFlag();
+            PublishSelection(false);
         }
 
         private void OnDisable()
         {
+            Undo.undoRedoPerformed -= OnUndoRedo;
             // Закрытие окна: Unity спросит через hasUnsavedChanges + SaveChanges/DiscardChanges.
+            if (ReferenceEquals(MapEditorSelection.Window, this))
+                MapEditorSelection.Clear();
+        }
+
+        /// <summary>Правка в Inspector того же MapConfig. На диск пишет только Save.</summary>
+        internal void NotifyInspectorEdited()
+        {
+            MarkSessionDirty();
+            Repaint();
         }
 
         public override void SaveChanges()
@@ -721,7 +739,7 @@ namespace IdleTower.Editor
                     _tool = MapEditTool.Move;
                     break;
                 case KeyCode.Escape:
-                    _selectedInstanceId = string.Empty;
+                    SetSelectedInstanceId(string.Empty, false);
                     _statusHint = string.Empty;
                     break;
                 default:
@@ -781,10 +799,11 @@ namespace IdleTower.Editor
 
         private void SelectAt(Vector2Int coord)
         {
-            _selectedInstanceId = _coordToEntry.TryGetValue(coord, out var entryIndex)
+            var id = _coordToEntry.TryGetValue(coord, out var entryIndex)
                 ? InstanceIdAt(entryIndex)
                 : string.Empty;
             _statusHint = string.Empty;
+            SetSelectedInstanceId(id, !string.IsNullOrEmpty(id));
         }
 
         private bool PaintAt(Vector2Int coord)
@@ -799,11 +818,11 @@ namespace IdleTower.Editor
                     _serializedConfig, coord, _paintDefinition, out var instanceId))
             {
                 if (!string.IsNullOrEmpty(instanceId))
-                    _selectedInstanceId = instanceId;
+                    SetSelectedInstanceId(instanceId, true);
                 return false;
             }
 
-            _selectedInstanceId = instanceId;
+            SetSelectedInstanceId(instanceId, true);
             _statusHint = _coordToEntry.ContainsKey(coord) ? $"replace {coord}" : $"add {coord}";
             MarkSessionDirty();
             return true;
@@ -816,7 +835,7 @@ namespace IdleTower.Editor
                 return false;
 
             if (_selectedInstanceId == removedId)
-                _selectedInstanceId = string.Empty;
+                SetSelectedInstanceId(string.Empty, false);
 
             _statusHint = home.HasValue && home.Value == coord
                 ? $"erase {coord} (это был HomeCoord — назначь Home ← select)"
@@ -829,7 +848,7 @@ namespace IdleTower.Editor
         {
             if (_coordToEntry.TryGetValue(coord, out var occupiedIndex))
             {
-                _selectedInstanceId = InstanceIdAt(occupiedIndex);
+                SetSelectedInstanceId(InstanceIdAt(occupiedIndex), true);
                 _statusHint = string.IsNullOrEmpty(_selectedInstanceId)
                     ? "Move: выбери клетку"
                     : "Move: клик по пустому coord";
@@ -852,6 +871,7 @@ namespace IdleTower.Editor
 
             _statusHint = $"move → {coord}";
             MarkSessionDirty();
+            RepaintInspectors();
             return true;
         }
 
@@ -1035,6 +1055,7 @@ namespace IdleTower.Editor
             {
                 _serializedConfig = null;
                 ClearSessionDirty();
+                PublishSelection(false);
                 return;
             }
 
@@ -1056,6 +1077,7 @@ namespace IdleTower.Editor
 
             saveChangesMessage =
                 $"Сохранить изменения MapConfig «{_config.name}»?";
+            PublishSelection(false);
         }
 
         private void SaveAsset()
@@ -1088,12 +1110,56 @@ namespace IdleTower.Editor
             _lastStrokeCoord = null;
             _statusHint = string.Empty;
             ClearSessionDirty();
+            PublishSelection(false);
+        }
+
+        private void SetSelectedInstanceId(string instanceId, bool focusInspector)
+        {
+            _selectedInstanceId = instanceId ?? string.Empty;
+            PublishSelection(focusInspector);
+        }
+
+        private void PublishSelection(bool focusInspector)
+        {
+            MapEditorSelection.Set(this, _config, _selectedInstanceId);
+            if (focusInspector
+                && _config != null
+                && !string.IsNullOrEmpty(_selectedInstanceId)
+                && Selection.activeObject != _config)
+                Selection.activeObject = _config;
+            RepaintInspectors();
+        }
+
+        private static void RepaintInspectors()
+        {
+            var windows = Resources.FindObjectsOfTypeAll<EditorWindow>();
+            for (var i = 0; i < windows.Length; i++)
+            {
+                if (windows[i].GetType().Name.Contains("Inspector"))
+                    windows[i].Repaint();
+            }
+        }
+
+        private void OnUndoRedo()
+        {
+            if (_config == null)
+                return;
+
+            _serializedConfig?.Update();
+            if (EditorUtility.IsDirty(_config))
+                MarkSessionDirty();
+            else
+                ClearSessionDirty();
+
+            Repaint();
+            RepaintInspectors();
         }
 
         private void MarkSessionDirty()
         {
             _sessionDirty = true;
             SyncUnsavedFlag();
+            RepaintInspectors();
         }
 
         private void ClearSessionDirty()

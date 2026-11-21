@@ -1,7 +1,7 @@
 Map Editor — план реализации
 ============================
 Дата: 2026-10-17
-Статус: этапы 1–3 сделаны; 4–5 в плане
+Статус: этапы 1–5 сделаны
 
 Цель
 ----
@@ -153,16 +153,16 @@ MapCellDefinition.id — по-прежнему id ШАБЛОНА (camp/forest), 
   «Реализуй этап 4 из Assets/map-editor-implementation-plan.txt»
 
 Сделать:
-  [ ] Drag MapCellDefinition из Project на coord (пусто → add, занято →
+  [x] Drag MapCellDefinition из Project на coord (пусто → add, занято →
       заменить Cell, Site сбросить или спросить — по умолчанию: заменить
       только Cell, Site оставить; instanceId при replace на той же coord
       сохранить)
-  [ ] Инструмент Paint (выбранный definition + клик/drag)
-  [ ] Erase
-  [ ] Move: pick cell → клик по целевому пустому coord; instanceId тот же;
+  [x] Инструмент Paint (выбранный definition + клик/drag)
+  [x] Erase
+  [x] Move: pick cell → клик по целевому пустому coord; instanceId тот же;
       конфликт «занято» — запрет или swap (лучше запрет + сообщение)
-  [ ] Все правки → dirty; только Save пишет на диск
-  [ ] homeCoord: инструмент или кнопка «Set home to selection»
+  [x] Все правки → dirty; только Save пишет на диск
+  [x] homeCoord: инструмент или кнопка «Set home to selection»
 
 Проверка:
   - Поставить/удалить/сдвинуть клетку, Save, Play — позиция и прогресс
@@ -176,11 +176,11 @@ MapCellDefinition.id — по-прежнему id ШАБЛОНА (camp/forest), 
   «Реализуй этап 5 из Assets/map-editor-implementation-plan.txt»
 
 Сделать:
-  [ ] При select клетки в окне: Selection + контекст выбранного instanceId
-  [ ] CustomEditor MapConfig: если задан selection из Map Editor —
+  [x] При select клетки в окне: Selection + контекст выбранного instanceId
+  [x] CustomEditor MapConfig: если задан selection из Map Editor —
       показать поля только этой entry (Cell, Site, instanceId read-only,
       Coord read-only или с предупреждением «двигай инструментом Move»)
-  [ ] Если selection снят — настройки карты (home, радиусы, neighbor) без
+  [x] Если selection снят — настройки карты (home, радиусы, neighbor) без
       обязательного огромного списка entries (список можно Foldout «All»)
 
 Проверка:
