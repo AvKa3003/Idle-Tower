@@ -1,11 +1,11 @@
 using System;
 using System.Collections.Generic;
+using IdleTower.Data.Definitions;
 using IdleTower.Map;
 using IdleTower.Systems;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.EnhancedTouch;
-using UnityEngine.Serialization;
 using Touch = UnityEngine.InputSystem.EnhancedTouch.Touch;
 
 namespace IdleTower.UI.Views
@@ -20,34 +20,7 @@ namespace IdleTower.UI.Views
         [SerializeField] private RectTransform cellsRoot;
         [SerializeField] private MapCellView cellPrefab;
         [SerializeField] private Sprite fogSprite;
-
-        [Header("Основание ромба (пиксели текстуры)")]
-        [Tooltip("Ширина ромба основания клетки (= ширина спрайта земли в px).")]
-        [FormerlySerializedAs("cellSize")]
-        [SerializeField] private float baseWidth = 150f;
-
-        [Tooltip("Высота ромба основания (= высота спрайта земли в px). Обычно baseWidth/2 для 2:1.")]
-        [SerializeField] private float baseHeight = 75f;
-
-        [Tooltip(
-            "Зазор между основаниями в пикселях. 1 = 1px щель (целиком в half-step, без /2); 0 = вплотную.")]
-        [SerializeField] private float spacingPixels = 1f;
-
-        [Header("Подгонка шага (pixel-art)")]
-        [Tooltip("Добавка к half-step по X: baseWidth/2 + spacing + adjust. Для 64px обычно 0.")]
-        [SerializeField] private float stepAdjustX = 0f;
-
-        [Tooltip(
-            "Добавка к half-step по Y: baseHeight/2 + spacing + adjust. " +
-            "1 → шаг 17 при baseHeight 32 (стык «ниже-правее»); подстрой глазами.")]
-        [SerializeField] private float stepAdjustY = 1f;
-
-        [Header("Масштаб")]
-        [Tooltip("Масштаб всей сетки (CellsRoot). Не меняет baseWidth в px.")]
-        [SerializeField] private float mapScale = 2f;
-
-        [SerializeField] private float mapScaleMin = 0.5f;
-        [SerializeField] private float mapScaleMax = 4f;
+        [SerializeField] private MapViewConfig viewConfig;
 
         [Header("Жесты (пан / зум)")]
         [Tooltip("Область жестов (обычно MapScreen). Пусто — родитель CellsRoot.")]
@@ -78,8 +51,11 @@ namespace IdleTower.UI.Views
         private float _pinchDistance;
         private Vector2 _panVelocity;
         private bool _pointersWereDown;
+        private float _mapScale = 1f;
+        private bool _runtimeScaleReady;
+        private bool _missingConfigWarned;
 
-        public float MapScale => mapScale;
+        public float MapScale => _mapScale;
 
         /// <summary>Пан/пинч превысили порог — клик по клетке в этом жесте игнорировать.</summary>
         public bool SuppressCellClicks => _suppressCellClicks;
@@ -89,6 +65,7 @@ namespace IdleTower.UI.Views
         private void Awake()
         {
             ResolveRefs();
+            EnsureRuntimeScale();
             ApplyMapScale();
         }
 
@@ -108,9 +85,12 @@ namespace IdleTower.UI.Views
 #if UNITY_EDITOR
         private void OnValidate()
         {
-            mapScale = Mathf.Clamp(mapScale, mapScaleMin, mapScaleMax);
-            if (!Application.isPlaying)
-                ApplyMapScale();
+            if (Application.isPlaying || viewConfig == null)
+                return;
+
+            _mapScale = viewConfig.MapScale;
+            _runtimeScaleReady = true;
+            ApplyMapScale();
         }
 #endif
 
@@ -147,7 +127,11 @@ namespace IdleTower.UI.Views
         /// <summary>Зум карты. Клетки в пространстве не пересчитываются — только scale корня.</summary>
         public void SetMapScale(float scale)
         {
-            mapScale = Mathf.Clamp(scale, mapScaleMin, mapScaleMax);
+            if (viewConfig == null)
+                return;
+
+            _mapScale = Mathf.Clamp(scale, viewConfig.MapScaleMin, viewConfig.MapScaleMax);
+            _runtimeScaleReady = true;
             ApplyMapScale();
         }
 
@@ -158,13 +142,17 @@ namespace IdleTower.UI.Views
             if (displays == null || cellPrefab == null)
                 return;
 
+            if (!EnsureViewConfig())
+                return;
+
+            EnsureRuntimeScale();
             ApplyMapScale();
 
             var parent = cellsRoot != null ? cellsRoot : transform as RectTransform;
             // spacingPixels целиком в half-step: 1 = 1px щель между основаниями (не /2).
-            var halfStepX = IsoMapLayout.HalfStep(baseWidth, spacingPixels, stepAdjustX);
-            var halfStepY = IsoMapLayout.HalfStep(baseHeight, spacingPixels, stepAdjustY);
-            var footprint = new Vector2(baseWidth, baseHeight);
+            var halfStepX = viewConfig.HalfStepX;
+            var halfStepY = viewConfig.HalfStepY;
+            var footprint = new Vector2(viewConfig.BaseWidth, viewConfig.BaseHeight);
 
             foreach (var info in displays)
             {
@@ -230,13 +218,38 @@ namespace IdleTower.UI.Views
             return IsoMapLayout.CompareDepthBackToFront(a.Coord, b.Coord);
         }
 
+        private bool EnsureViewConfig()
+        {
+            if (viewConfig != null)
+                return true;
+
+            if (!_missingConfigWarned)
+            {
+                _missingConfigWarned = true;
+                Debug.LogWarning("[MapView] Не назначен MapViewConfig.", this);
+            }
+
+            return false;
+        }
+
+        /// <summary>Стартовый масштаб из MapViewConfig. Колесо дальше меняет только _mapScale.</summary>
+        private void EnsureRuntimeScale()
+        {
+            if (_runtimeScaleReady || viewConfig == null)
+                return;
+
+            _mapScale = viewConfig.MapScale;
+            _runtimeScaleReady = true;
+        }
+
         private void ApplyMapScale()
         {
             var target = cellsRoot != null ? cellsRoot : transform as RectTransform;
-            if (target == null)
+            if (target == null || viewConfig == null)
                 return;
 
-            var s = Mathf.Clamp(mapScale, mapScaleMin, mapScaleMax);
+            var s = Mathf.Clamp(_mapScale, viewConfig.MapScaleMin, viewConfig.MapScaleMax);
+            _mapScale = s;
             target.localScale = new Vector3(s, s, 1f);
         }
 
@@ -411,22 +424,26 @@ namespace IdleTower.UI.Views
             if (cellsRoot == null || GestureParent == null)
                 return;
 
-            var newScale = Mathf.Clamp(mapScale * factor, mapScaleMin, mapScaleMax);
-            if (Mathf.Approximately(newScale, mapScale))
+            if (viewConfig == null)
+                return;
+
+            var newScale = Mathf.Clamp(_mapScale * factor, viewConfig.MapScaleMin, viewConfig.MapScaleMax);
+            if (Mathf.Approximately(newScale, _mapScale))
                 return;
 
             if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(
                     GestureParent, screenPoint, _uiCamera, out var focusParent))
                 return;
 
-            var oldScale = Mathf.Max(mapScale, 0.0001f);
+            var oldScale = Mathf.Max(_mapScale, 0.0001f);
             // Вектор от текущего смещения карты к центру жеста в координатах viewport, без учёта scale.
             var contentOffset = (focusParent - cellsRoot.anchoredPosition) / oldScale;
 
-            mapScale = newScale;
+            _mapScale = newScale;
+            _runtimeScaleReady = true;
             ApplyMapScale();
             // Та же точка контента под центром жеста, но уже в пропорциях нового scale.
-            cellsRoot.anchoredPosition = focusParent - contentOffset * mapScale;
+            cellsRoot.anchoredPosition = focusParent - contentOffset * _mapScale;
         }
 
         private void PanByParentLocal(Vector2 localDelta)

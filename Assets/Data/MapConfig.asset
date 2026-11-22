@@ -4431,3 +4431,1137 @@ MonoBehaviour:
           Seconds: 0
         PassiveRewards: []
         CapturedSprite: {fileID: 0}
+  - InstanceId: df64530bdb3c4f05a29634356893bd78
+    Coord: {x: 1, y: 1}
+    Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Site:
+      Raid:
+        PreCapture:
+          RequiredUnits: []
+          RequiredStrength: 0
+          Duration:
+            Minutes: 0
+            Seconds: 0
+          Rewards: []
+        MaxCompletedRaids: 1
+        CaptureRewards: []
+        PostCaptureMode: 0
+        FarmConfig:
+          RequiredUnits: []
+          RequiredStrength: 0
+          Duration:
+            Minutes: 0
+            Seconds: 0
+          Rewards: []
+        PassiveInterval:
+          Minutes: 0
+          Seconds: 0
+        PassiveRewards: []
+        CapturedSprite: {fileID: 0}
+  - InstanceId: 1c89ffe4b27c45098b7786ffadbaef03
+    Coord: {x: 0, y: 1}
+    Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Site:
+      Raid:
+        PreCapture:
+          RequiredUnits: []
+          RequiredStrength: 0
+          Duration:
+            Minutes: 0
+            Seconds: 0
+          Rewards: []
+        MaxCompletedRaids: 1
+        CaptureRewards: []
+        PostCaptureMode: 0
+        FarmConfig:
+          RequiredUnits: []
+          RequiredStrength: 0
+          Duration:
+            Minutes: 0
+            Seconds: 0
+          Rewards: []
+        PassiveInterval:
+          Minutes: 0
+          Seconds: 0
+        PassiveRewards: []
+        CapturedSprite: {fileID: 0}
+  - InstanceId: e286cdbb14584a4f96768e8af65c0dcc
+    Coord: {x: 0, y: 2}
+    Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Site:
+      Raid:
+        PreCapture:
+          RequiredUnits: []
+          RequiredStrength: 0
+          Duration:
+            Minutes: 0
+            Seconds: 0
+          Rewards: []
+        MaxCompletedRaids: 1
+        CaptureRewards: []
+        PostCaptureMode: 0
+        FarmConfig:
+          RequiredUnits: []
+          RequiredStrength: 0
+          Duration:
+            Minutes: 0
+            Seconds: 0
+          Rewards: []
+        PassiveInterval:
+          Minutes: 0
+          Seconds: 0
+        PassiveRewards: []
+        CapturedSprite: {fileID: 0}
+  - InstanceId: 1c512038d28d409ba027e0c45b8200cd
+    Coord: {x: -1, y: 1}
+    Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Site:
+      Raid:
+        PreCapture:
+          RequiredUnits: []
+          RequiredStrength: 0
+          Duration:
+            Minutes: 0
+            Seconds: 0
+          Rewards: []
+        MaxCompletedRaids: 1
+        CaptureRewards: []
+        PostCaptureMode: 0
+        FarmConfig:
+          RequiredUnits: []
+          RequiredStrength: 0
+          Duration:
+            Minutes: 0
+            Seconds: 0
+          Rewards: []
+        PassiveInterval:
+          Minutes: 0
+          Seconds: 0
+        PassiveRewards: []
+        CapturedSprite: {fileID: 0}
+  - InstanceId: 86166a238d2e4cc688e1fb5070560bc9
+    Coord: {x: -2, y: 1}
+    Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Site:
+      Raid:
+        PreCapture:
+          RequiredUnits: []
+          RequiredStrength: 0
+          Duration:
+            Minutes: 0
+            Seconds: 0
+          Rewards: []
+        MaxCompletedRaids: 1
+        CaptureRewards: []
+        PostCaptureMode: 0
+        FarmConfig:
+          RequiredUnits: []
+          RequiredStrength: 0
+          Duration:
+            Minutes: 0
+            Seconds: 0
+          Rewards: []
+        PassiveInterval:
+          Minutes: 0
+          Seconds: 0
+        PassiveRewards: []
+        CapturedSprite: {fileID: 0}
+  - InstanceId: 9b8cfb80b75f440f8c2255ca83635f73
+    Coord: {x: -2, y: 0}
+    Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Site:
+      Raid:
+        PreCapture:
+          RequiredUnits: []
+          RequiredStrength: 0
+          Duration:
+            Minutes: 0
+            Seconds: 0
+          Rewards: []
+        MaxCompletedRaids: 1
+        CaptureRewards: []
+        PostCaptureMode: 0
+        FarmConfig:
+          RequiredUnits: []
+          RequiredStrength: 0
+          Duration:
+            Minutes: 0
+            Seconds: 0
+          Rewards: []
+        PassiveInterval:
+          Minutes: 0
+          Seconds: 0
+        PassiveRewards: []
+        CapturedSprite: {fileID: 0}
+  - InstanceId: 95bae24cdb8749419cf7273b185b62d6
+    Coord: {x: -1, y: 0}
+    Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Site:
+      Raid:
+        PreCapture:
+          RequiredUnits: []
+          RequiredStrength: 0
+          Duration:
+            Minutes: 0
+            Seconds: 0
+          Rewards: []
+        MaxCompletedRaids: 1
+        CaptureRewards: []
+        PostCaptureMode: 0
+        FarmConfig:
+          RequiredUnits: []
+          RequiredStrength: 0
+          Duration:
+            Minutes: 0
+            Seconds: 0
+          Rewards: []
+        PassiveInterval:
+          Minutes: 0
+          Seconds: 0
+        PassiveRewards: []
+        CapturedSprite: {fileID: 0}
+  - InstanceId: 443e3ad239fe45e2a6618b9fab4250df
+    Coord: {x: -2, y: -1}
+    Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Site:
+      Raid:
+        PreCapture:
+          RequiredUnits: []
+          RequiredStrength: 0
+          Duration:
+            Minutes: 0
+            Seconds: 0
+          Rewards: []
+        MaxCompletedRaids: 1
+        CaptureRewards: []
+        PostCaptureMode: 0
+        FarmConfig:
+          RequiredUnits: []
+          RequiredStrength: 0
+          Duration:
+            Minutes: 0
+            Seconds: 0
+          Rewards: []
+        PassiveInterval:
+          Minutes: 0
+          Seconds: 0
+        PassiveRewards: []
+        CapturedSprite: {fileID: 0}
+  - InstanceId: 911ae214877d49c3b5b407dfa1b97cba
+    Coord: {x: -3, y: -1}
+    Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Site:
+      Raid:
+        PreCapture:
+          RequiredUnits: []
+          RequiredStrength: 0
+          Duration:
+            Minutes: 0
+            Seconds: 0
+          Rewards: []
+        MaxCompletedRaids: 1
+        CaptureRewards: []
+        PostCaptureMode: 0
+        FarmConfig:
+          RequiredUnits: []
+          RequiredStrength: 0
+          Duration:
+            Minutes: 0
+            Seconds: 0
+          Rewards: []
+        PassiveInterval:
+          Minutes: 0
+          Seconds: 0
+        PassiveRewards: []
+        CapturedSprite: {fileID: 0}
+  - InstanceId: 1fe285a0ee9546cc86a1a01e9857fce0
+    Coord: {x: -4, y: -1}
+    Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Site:
+      Raid:
+        PreCapture:
+          RequiredUnits: []
+          RequiredStrength: 0
+          Duration:
+            Minutes: 0
+            Seconds: 0
+          Rewards: []
+        MaxCompletedRaids: 1
+        CaptureRewards: []
+        PostCaptureMode: 0
+        FarmConfig:
+          RequiredUnits: []
+          RequiredStrength: 0
+          Duration:
+            Minutes: 0
+            Seconds: 0
+          Rewards: []
+        PassiveInterval:
+          Minutes: 0
+          Seconds: 0
+        PassiveRewards: []
+        CapturedSprite: {fileID: 0}
+  - InstanceId: 8e616bcbb3d04d7b920a151b84fa472c
+    Coord: {x: -4, y: 0}
+    Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Site:
+      Raid:
+        PreCapture:
+          RequiredUnits: []
+          RequiredStrength: 0
+          Duration:
+            Minutes: 0
+            Seconds: 0
+          Rewards: []
+        MaxCompletedRaids: 1
+        CaptureRewards: []
+        PostCaptureMode: 0
+        FarmConfig:
+          RequiredUnits: []
+          RequiredStrength: 0
+          Duration:
+            Minutes: 0
+            Seconds: 0
+          Rewards: []
+        PassiveInterval:
+          Minutes: 0
+          Seconds: 0
+        PassiveRewards: []
+        CapturedSprite: {fileID: 0}
+  - InstanceId: 8825dee4de2647a9a8a5fd81b8f5385b
+    Coord: {x: -4, y: 1}
+    Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Site:
+      Raid:
+        PreCapture:
+          RequiredUnits: []
+          RequiredStrength: 0
+          Duration:
+            Minutes: 0
+            Seconds: 0
+          Rewards: []
+        MaxCompletedRaids: 1
+        CaptureRewards: []
+        PostCaptureMode: 0
+        FarmConfig:
+          RequiredUnits: []
+          RequiredStrength: 0
+          Duration:
+            Minutes: 0
+            Seconds: 0
+          Rewards: []
+        PassiveInterval:
+          Minutes: 0
+          Seconds: 0
+        PassiveRewards: []
+        CapturedSprite: {fileID: 0}
+  - InstanceId: 0784c8c876834fea8f9f200fb5ed99bd
+    Coord: {x: -3, y: 1}
+    Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Site:
+      Raid:
+        PreCapture:
+          RequiredUnits: []
+          RequiredStrength: 0
+          Duration:
+            Minutes: 0
+            Seconds: 0
+          Rewards: []
+        MaxCompletedRaids: 1
+        CaptureRewards: []
+        PostCaptureMode: 0
+        FarmConfig:
+          RequiredUnits: []
+          RequiredStrength: 0
+          Duration:
+            Minutes: 0
+            Seconds: 0
+          Rewards: []
+        PassiveInterval:
+          Minutes: 0
+          Seconds: 0
+        PassiveRewards: []
+        CapturedSprite: {fileID: 0}
+  - InstanceId: 3b50bce5731c4b8c9bdfbf18b9229ba7
+    Coord: {x: -3, y: 0}
+    Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Site:
+      Raid:
+        PreCapture:
+          RequiredUnits: []
+          RequiredStrength: 0
+          Duration:
+            Minutes: 0
+            Seconds: 0
+          Rewards: []
+        MaxCompletedRaids: 1
+        CaptureRewards: []
+        PostCaptureMode: 0
+        FarmConfig:
+          RequiredUnits: []
+          RequiredStrength: 0
+          Duration:
+            Minutes: 0
+            Seconds: 0
+          Rewards: []
+        PassiveInterval:
+          Minutes: 0
+          Seconds: 0
+        PassiveRewards: []
+        CapturedSprite: {fileID: 0}
+  - InstanceId: 8348111a4e1144cdb89232ce2b8c0a1f
+    Coord: {x: -3, y: 2}
+    Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Site:
+      Raid:
+        PreCapture:
+          RequiredUnits: []
+          RequiredStrength: 0
+          Duration:
+            Minutes: 0
+            Seconds: 0
+          Rewards: []
+        MaxCompletedRaids: 1
+        CaptureRewards: []
+        PostCaptureMode: 0
+        FarmConfig:
+          RequiredUnits: []
+          RequiredStrength: 0
+          Duration:
+            Minutes: 0
+            Seconds: 0
+          Rewards: []
+        PassiveInterval:
+          Minutes: 0
+          Seconds: 0
+        PassiveRewards: []
+        CapturedSprite: {fileID: 0}
+  - InstanceId: 50351e97424e469bbd7ad5bd50c43eaf
+    Coord: {x: -2, y: 2}
+    Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Site:
+      Raid:
+        PreCapture:
+          RequiredUnits: []
+          RequiredStrength: 0
+          Duration:
+            Minutes: 0
+            Seconds: 0
+          Rewards: []
+        MaxCompletedRaids: 1
+        CaptureRewards: []
+        PostCaptureMode: 0
+        FarmConfig:
+          RequiredUnits: []
+          RequiredStrength: 0
+          Duration:
+            Minutes: 0
+            Seconds: 0
+          Rewards: []
+        PassiveInterval:
+          Minutes: 0
+          Seconds: 0
+        PassiveRewards: []
+        CapturedSprite: {fileID: 0}
+  - InstanceId: 65b54249c9dc473eb11654673c75bbaa
+    Coord: {x: -1, y: 2}
+    Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Site:
+      Raid:
+        PreCapture:
+          RequiredUnits: []
+          RequiredStrength: 0
+          Duration:
+            Minutes: 0
+            Seconds: 0
+          Rewards: []
+        MaxCompletedRaids: 1
+        CaptureRewards: []
+        PostCaptureMode: 0
+        FarmConfig:
+          RequiredUnits: []
+          RequiredStrength: 0
+          Duration:
+            Minutes: 0
+            Seconds: 0
+          Rewards: []
+        PassiveInterval:
+          Minutes: 0
+          Seconds: 0
+        PassiveRewards: []
+        CapturedSprite: {fileID: 0}
+  - InstanceId: 562b1e06680e418e9f7c1658250cc018
+    Coord: {x: 1, y: 2}
+    Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Site:
+      Raid:
+        PreCapture:
+          RequiredUnits: []
+          RequiredStrength: 0
+          Duration:
+            Minutes: 0
+            Seconds: 0
+          Rewards: []
+        MaxCompletedRaids: 1
+        CaptureRewards: []
+        PostCaptureMode: 0
+        FarmConfig:
+          RequiredUnits: []
+          RequiredStrength: 0
+          Duration:
+            Minutes: 0
+            Seconds: 0
+          Rewards: []
+        PassiveInterval:
+          Minutes: 0
+          Seconds: 0
+        PassiveRewards: []
+        CapturedSprite: {fileID: 0}
+  - InstanceId: d1814d56eda24374a39887d89dd0a039
+    Coord: {x: 1, y: 3}
+    Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Site:
+      Raid:
+        PreCapture:
+          RequiredUnits: []
+          RequiredStrength: 0
+          Duration:
+            Minutes: 0
+            Seconds: 0
+          Rewards: []
+        MaxCompletedRaids: 1
+        CaptureRewards: []
+        PostCaptureMode: 0
+        FarmConfig:
+          RequiredUnits: []
+          RequiredStrength: 0
+          Duration:
+            Minutes: 0
+            Seconds: 0
+          Rewards: []
+        PassiveInterval:
+          Minutes: 0
+          Seconds: 0
+        PassiveRewards: []
+        CapturedSprite: {fileID: 0}
+  - InstanceId: 1397b8d9bd8f4fc1a440dc6e0a8d6955
+    Coord: {x: 2, y: 3}
+    Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Site:
+      Raid:
+        PreCapture:
+          RequiredUnits: []
+          RequiredStrength: 0
+          Duration:
+            Minutes: 0
+            Seconds: 0
+          Rewards: []
+        MaxCompletedRaids: 1
+        CaptureRewards: []
+        PostCaptureMode: 0
+        FarmConfig:
+          RequiredUnits: []
+          RequiredStrength: 0
+          Duration:
+            Minutes: 0
+            Seconds: 0
+          Rewards: []
+        PassiveInterval:
+          Minutes: 0
+          Seconds: 0
+        PassiveRewards: []
+        CapturedSprite: {fileID: 0}
+  - InstanceId: c48853a7c1c2497f84463108fe767ead
+    Coord: {x: 0, y: 3}
+    Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Site:
+      Raid:
+        PreCapture:
+          RequiredUnits: []
+          RequiredStrength: 0
+          Duration:
+            Minutes: 0
+            Seconds: 0
+          Rewards: []
+        MaxCompletedRaids: 1
+        CaptureRewards: []
+        PostCaptureMode: 0
+        FarmConfig:
+          RequiredUnits: []
+          RequiredStrength: 0
+          Duration:
+            Minutes: 0
+            Seconds: 0
+          Rewards: []
+        PassiveInterval:
+          Minutes: 0
+          Seconds: 0
+        PassiveRewards: []
+        CapturedSprite: {fileID: 0}
+  - InstanceId: e1d804205295425fa423fac2aa2edb17
+    Coord: {x: -1, y: 3}
+    Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Site:
+      Raid:
+        PreCapture:
+          RequiredUnits: []
+          RequiredStrength: 0
+          Duration:
+            Minutes: 0
+            Seconds: 0
+          Rewards: []
+        MaxCompletedRaids: 1
+        CaptureRewards: []
+        PostCaptureMode: 0
+        FarmConfig:
+          RequiredUnits: []
+          RequiredStrength: 0
+          Duration:
+            Minutes: 0
+            Seconds: 0
+          Rewards: []
+        PassiveInterval:
+          Minutes: 0
+          Seconds: 0
+        PassiveRewards: []
+        CapturedSprite: {fileID: 0}
+  - InstanceId: 8105eec0656542928e85967f3e83eaa2
+    Coord: {x: -2, y: 3}
+    Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Site:
+      Raid:
+        PreCapture:
+          RequiredUnits: []
+          RequiredStrength: 0
+          Duration:
+            Minutes: 0
+            Seconds: 0
+          Rewards: []
+        MaxCompletedRaids: 1
+        CaptureRewards: []
+        PostCaptureMode: 0
+        FarmConfig:
+          RequiredUnits: []
+          RequiredStrength: 0
+          Duration:
+            Minutes: 0
+            Seconds: 0
+          Rewards: []
+        PassiveInterval:
+          Minutes: 0
+          Seconds: 0
+        PassiveRewards: []
+        CapturedSprite: {fileID: 0}
+  - InstanceId: b3571c4bfff648c798122ef479f4f242
+    Coord: {x: -4, y: 2}
+    Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Site:
+      Raid:
+        PreCapture:
+          RequiredUnits: []
+          RequiredStrength: 0
+          Duration:
+            Minutes: 0
+            Seconds: 0
+          Rewards: []
+        MaxCompletedRaids: 1
+        CaptureRewards: []
+        PostCaptureMode: 0
+        FarmConfig:
+          RequiredUnits: []
+          RequiredStrength: 0
+          Duration:
+            Minutes: 0
+            Seconds: 0
+          Rewards: []
+        PassiveInterval:
+          Minutes: 0
+          Seconds: 0
+        PassiveRewards: []
+        CapturedSprite: {fileID: 0}
+  - InstanceId: dc566f466e9a45faa5af6e2cc5678f76
+    Coord: {x: -5, y: 0}
+    Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Site:
+      Raid:
+        PreCapture:
+          RequiredUnits: []
+          RequiredStrength: 0
+          Duration:
+            Minutes: 0
+            Seconds: 0
+          Rewards: []
+        MaxCompletedRaids: 1
+        CaptureRewards: []
+        PostCaptureMode: 0
+        FarmConfig:
+          RequiredUnits: []
+          RequiredStrength: 0
+          Duration:
+            Minutes: 0
+            Seconds: 0
+          Rewards: []
+        PassiveInterval:
+          Minutes: 0
+          Seconds: 0
+        PassiveRewards: []
+        CapturedSprite: {fileID: 0}
+  - InstanceId: c5b652e96a054763bc648a3351179878
+    Coord: {x: -5, y: -1}
+    Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Site:
+      Raid:
+        PreCapture:
+          RequiredUnits: []
+          RequiredStrength: 0
+          Duration:
+            Minutes: 0
+            Seconds: 0
+          Rewards: []
+        MaxCompletedRaids: 1
+        CaptureRewards: []
+        PostCaptureMode: 0
+        FarmConfig:
+          RequiredUnits: []
+          RequiredStrength: 0
+          Duration:
+            Minutes: 0
+            Seconds: 0
+          Rewards: []
+        PassiveInterval:
+          Minutes: 0
+          Seconds: 0
+        PassiveRewards: []
+        CapturedSprite: {fileID: 0}
+  - InstanceId: 36cff642e29c483aac002e88a5ace00c
+    Coord: {x: -5, y: -2}
+    Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Site:
+      Raid:
+        PreCapture:
+          RequiredUnits: []
+          RequiredStrength: 0
+          Duration:
+            Minutes: 0
+            Seconds: 0
+          Rewards: []
+        MaxCompletedRaids: 1
+        CaptureRewards: []
+        PostCaptureMode: 0
+        FarmConfig:
+          RequiredUnits: []
+          RequiredStrength: 0
+          Duration:
+            Minutes: 0
+            Seconds: 0
+          Rewards: []
+        PassiveInterval:
+          Minutes: 0
+          Seconds: 0
+        PassiveRewards: []
+        CapturedSprite: {fileID: 0}
+  - InstanceId: b9f7695afc474d2d8c358444b7864f8b
+    Coord: {x: -4, y: -2}
+    Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Site:
+      Raid:
+        PreCapture:
+          RequiredUnits: []
+          RequiredStrength: 0
+          Duration:
+            Minutes: 0
+            Seconds: 0
+          Rewards: []
+        MaxCompletedRaids: 1
+        CaptureRewards: []
+        PostCaptureMode: 0
+        FarmConfig:
+          RequiredUnits: []
+          RequiredStrength: 0
+          Duration:
+            Minutes: 0
+            Seconds: 0
+          Rewards: []
+        PassiveInterval:
+          Minutes: 0
+          Seconds: 0
+        PassiveRewards: []
+        CapturedSprite: {fileID: 0}
+  - InstanceId: f864e71d30114f7d938da6d65b83bf11
+    Coord: {x: -3, y: -3}
+    Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Site:
+      Raid:
+        PreCapture:
+          RequiredUnits: []
+          RequiredStrength: 0
+          Duration:
+            Minutes: 0
+            Seconds: 0
+          Rewards: []
+        MaxCompletedRaids: 1
+        CaptureRewards: []
+        PostCaptureMode: 0
+        FarmConfig:
+          RequiredUnits: []
+          RequiredStrength: 0
+          Duration:
+            Minutes: 0
+            Seconds: 0
+          Rewards: []
+        PassiveInterval:
+          Minutes: 0
+          Seconds: 0
+        PassiveRewards: []
+        CapturedSprite: {fileID: 0}
+  - InstanceId: 00b9862b0e764541acc4055412ec6a13
+    Coord: {x: -2, y: -3}
+    Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Site:
+      Raid:
+        PreCapture:
+          RequiredUnits: []
+          RequiredStrength: 0
+          Duration:
+            Minutes: 0
+            Seconds: 0
+          Rewards: []
+        MaxCompletedRaids: 1
+        CaptureRewards: []
+        PostCaptureMode: 0
+        FarmConfig:
+          RequiredUnits: []
+          RequiredStrength: 0
+          Duration:
+            Minutes: 0
+            Seconds: 0
+          Rewards: []
+        PassiveInterval:
+          Minutes: 0
+          Seconds: 0
+        PassiveRewards: []
+        CapturedSprite: {fileID: 0}
+  - InstanceId: b65c154eb4254342966d0db9f6262939
+    Coord: {x: -2, y: -2}
+    Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Site:
+      Raid:
+        PreCapture:
+          RequiredUnits: []
+          RequiredStrength: 0
+          Duration:
+            Minutes: 0
+            Seconds: 0
+          Rewards: []
+        MaxCompletedRaids: 1
+        CaptureRewards: []
+        PostCaptureMode: 0
+        FarmConfig:
+          RequiredUnits: []
+          RequiredStrength: 0
+          Duration:
+            Minutes: 0
+            Seconds: 0
+          Rewards: []
+        PassiveInterval:
+          Minutes: 0
+          Seconds: 0
+        PassiveRewards: []
+        CapturedSprite: {fileID: 0}
+  - InstanceId: 871eb3268ec94b27af430f55919c190d
+    Coord: {x: -1, y: -2}
+    Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Site:
+      Raid:
+        PreCapture:
+          RequiredUnits: []
+          RequiredStrength: 0
+          Duration:
+            Minutes: 0
+            Seconds: 0
+          Rewards: []
+        MaxCompletedRaids: 1
+        CaptureRewards: []
+        PostCaptureMode: 0
+        FarmConfig:
+          RequiredUnits: []
+          RequiredStrength: 0
+          Duration:
+            Minutes: 0
+            Seconds: 0
+          Rewards: []
+        PassiveInterval:
+          Minutes: 0
+          Seconds: 0
+        PassiveRewards: []
+        CapturedSprite: {fileID: 0}
+  - InstanceId: c16d77d1467f4211a28d871a495cf546
+    Coord: {x: 0, y: -2}
+    Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Site:
+      Raid:
+        PreCapture:
+          RequiredUnits: []
+          RequiredStrength: 0
+          Duration:
+            Minutes: 0
+            Seconds: 0
+          Rewards: []
+        MaxCompletedRaids: 1
+        CaptureRewards: []
+        PostCaptureMode: 0
+        FarmConfig:
+          RequiredUnits: []
+          RequiredStrength: 0
+          Duration:
+            Minutes: 0
+            Seconds: 0
+          Rewards: []
+        PassiveInterval:
+          Minutes: 0
+          Seconds: 0
+        PassiveRewards: []
+        CapturedSprite: {fileID: 0}
+  - InstanceId: 00491c24e36a4e968644b3dbd11c2e6d
+    Coord: {x: 0, y: -3}
+    Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Site:
+      Raid:
+        PreCapture:
+          RequiredUnits: []
+          RequiredStrength: 0
+          Duration:
+            Minutes: 0
+            Seconds: 0
+          Rewards: []
+        MaxCompletedRaids: 1
+        CaptureRewards: []
+        PostCaptureMode: 0
+        FarmConfig:
+          RequiredUnits: []
+          RequiredStrength: 0
+          Duration:
+            Minutes: 0
+            Seconds: 0
+          Rewards: []
+        PassiveInterval:
+          Minutes: 0
+          Seconds: 0
+        PassiveRewards: []
+        CapturedSprite: {fileID: 0}
+  - InstanceId: 7317826e11e94fbca23dfa5f3762a1c0
+    Coord: {x: 0, y: -4}
+    Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Site:
+      Raid:
+        PreCapture:
+          RequiredUnits: []
+          RequiredStrength: 0
+          Duration:
+            Minutes: 0
+            Seconds: 0
+          Rewards: []
+        MaxCompletedRaids: 1
+        CaptureRewards: []
+        PostCaptureMode: 0
+        FarmConfig:
+          RequiredUnits: []
+          RequiredStrength: 0
+          Duration:
+            Minutes: 0
+            Seconds: 0
+          Rewards: []
+        PassiveInterval:
+          Minutes: 0
+          Seconds: 0
+        PassiveRewards: []
+        CapturedSprite: {fileID: 0}
+  - InstanceId: c7b156d4842d407b928fa096d00921a4
+    Coord: {x: -1, y: -4}
+    Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Site:
+      Raid:
+        PreCapture:
+          RequiredUnits: []
+          RequiredStrength: 0
+          Duration:
+            Minutes: 0
+            Seconds: 0
+          Rewards: []
+        MaxCompletedRaids: 1
+        CaptureRewards: []
+        PostCaptureMode: 0
+        FarmConfig:
+          RequiredUnits: []
+          RequiredStrength: 0
+          Duration:
+            Minutes: 0
+            Seconds: 0
+          Rewards: []
+        PassiveInterval:
+          Minutes: 0
+          Seconds: 0
+        PassiveRewards: []
+        CapturedSprite: {fileID: 0}
+  - InstanceId: 98f19fa9a3664da1a3869045fa7cb720
+    Coord: {x: -1, y: -5}
+    Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Site:
+      Raid:
+        PreCapture:
+          RequiredUnits: []
+          RequiredStrength: 0
+          Duration:
+            Minutes: 0
+            Seconds: 0
+          Rewards: []
+        MaxCompletedRaids: 1
+        CaptureRewards: []
+        PostCaptureMode: 0
+        FarmConfig:
+          RequiredUnits: []
+          RequiredStrength: 0
+          Duration:
+            Minutes: 0
+            Seconds: 0
+          Rewards: []
+        PassiveInterval:
+          Minutes: 0
+          Seconds: 0
+        PassiveRewards: []
+        CapturedSprite: {fileID: 0}
+  - InstanceId: c3175f7ea15c45469d62a0cb26a4a10b
+    Coord: {x: -2, y: -5}
+    Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Site:
+      Raid:
+        PreCapture:
+          RequiredUnits: []
+          RequiredStrength: 0
+          Duration:
+            Minutes: 0
+            Seconds: 0
+          Rewards: []
+        MaxCompletedRaids: 1
+        CaptureRewards: []
+        PostCaptureMode: 0
+        FarmConfig:
+          RequiredUnits: []
+          RequiredStrength: 0
+          Duration:
+            Minutes: 0
+            Seconds: 0
+          Rewards: []
+        PassiveInterval:
+          Minutes: 0
+          Seconds: 0
+        PassiveRewards: []
+        CapturedSprite: {fileID: 0}
+  - InstanceId: 5b827685559247cd9d2e5ce6f9aaa9af
+    Coord: {x: -2, y: -4}
+    Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Site:
+      Raid:
+        PreCapture:
+          RequiredUnits: []
+          RequiredStrength: 0
+          Duration:
+            Minutes: 0
+            Seconds: 0
+          Rewards: []
+        MaxCompletedRaids: 1
+        CaptureRewards: []
+        PostCaptureMode: 0
+        FarmConfig:
+          RequiredUnits: []
+          RequiredStrength: 0
+          Duration:
+            Minutes: 0
+            Seconds: 0
+          Rewards: []
+        PassiveInterval:
+          Minutes: 0
+          Seconds: 0
+        PassiveRewards: []
+        CapturedSprite: {fileID: 0}
+  - InstanceId: 3e61b094553943759c1d1a4d4963d078
+    Coord: {x: -1, y: -3}
+    Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Site:
+      Raid:
+        PreCapture:
+          RequiredUnits: []
+          RequiredStrength: 0
+          Duration:
+            Minutes: 0
+            Seconds: 0
+          Rewards: []
+        MaxCompletedRaids: 1
+        CaptureRewards: []
+        PostCaptureMode: 0
+        FarmConfig:
+          RequiredUnits: []
+          RequiredStrength: 0
+          Duration:
+            Minutes: 0
+            Seconds: 0
+          Rewards: []
+        PassiveInterval:
+          Minutes: 0
+          Seconds: 0
+        PassiveRewards: []
+        CapturedSprite: {fileID: 0}
+  - InstanceId: 4582dc64ff424a218e9c26cb703c7e61
+    Coord: {x: -3, y: -2}
+    Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Site:
+      Raid:
+        PreCapture:
+          RequiredUnits: []
+          RequiredStrength: 0
+          Duration:
+            Minutes: 0
+            Seconds: 0
+          Rewards: []
+        MaxCompletedRaids: 1
+        CaptureRewards: []
+        PostCaptureMode: 0
+        FarmConfig:
+          RequiredUnits: []
+          RequiredStrength: 0
+          Duration:
+            Minutes: 0
+            Seconds: 0
+          Rewards: []
+        PassiveInterval:
+          Minutes: 0
+          Seconds: 0
+        PassiveRewards: []
+        CapturedSprite: {fileID: 0}
+  - InstanceId: 86e393db8038413fa41982814b58064b
+    Coord: {x: 0, y: -5}
+    Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Site:
+      Raid:
+        PreCapture:
+          RequiredUnits: []
+          RequiredStrength: 0
+          Duration:
+            Minutes: 0
+            Seconds: 0
+          Rewards: []
+        MaxCompletedRaids: 1
+        CaptureRewards: []
+        PostCaptureMode: 0
+        FarmConfig:
+          RequiredUnits: []
+          RequiredStrength: 0
+          Duration:
+            Minutes: 0
+            Seconds: 0
+          Rewards: []
+        PassiveInterval:
+          Minutes: 0
+          Seconds: 0
+        PassiveRewards: []
+        CapturedSprite: {fileID: 0}

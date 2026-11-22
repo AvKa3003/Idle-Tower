@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7497be6f1560abc46aeba8dd97aa11a0, type: 3}
+  m_Name: MapViewConfig
+  m_EditorClassIdentifier: Assembly-CSharp::IdleTower.Data.Definitions.MapViewConfig
+  baseWidth: 78
+  baseHeight: 39
+  spacingPixels: 0
+  stepAdjustX: 0.5
+  stepAdjustY: 0.5
+  mapScale: 4
+  mapScaleMin: 4
+  mapScaleMax: 8

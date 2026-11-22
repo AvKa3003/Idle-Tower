@@ -26,20 +26,9 @@ namespace IdleTower.Editor
             if (entries == null)
                 return false;
 
-            var index = FindIndexByCoord(entries, coord);
-            if (index >= 0)
-            {
-                var entry = entries.GetArrayElementAtIndex(index);
-                instanceId = entry.FindPropertyRelative("InstanceId").stringValue ?? string.Empty;
-                var cellProp = entry.FindPropertyRelative("Cell");
-                if (ReferenceEquals(cellProp.objectReferenceValue, definition))
-                    return false;
-
-                // Занято: только Cell. Site и InstanceId остаются.
-                cellProp.objectReferenceValue = definition;
-                so.ApplyModifiedProperties();
-                return true;
-            }
+            // Занятый coord не меняется: тип клетки через Paint не заменяется.
+            if (FindIndexByCoord(entries, coord) >= 0)
+                return false;
 
             instanceId = MapConfigInstanceIdUtility.CreateInstanceId();
             var newIndex = entries.arraySize;

@@ -25,12 +25,8 @@ namespace IdleTower.Editor
 
         private const string MenuPath = "IdleTower/Map Editor";
 
-        // Как на MapView в сцене (SampleScene): 64×32, spacing 0, adjustY 1, scale 4.
-        private float _baseWidth = 64f;
-        private float _baseHeight = 32f;
-        private float _spacingPixels;
-        private float _stepAdjustX;
-        private float _stepAdjustY = 1f;
+        private MapViewConfig _viewConfig;
+        private bool _previewZoomReady;
         private float _zoom = 4f;
         private Vector2 _pan;
         private bool _isPanning;
@@ -43,7 +39,7 @@ namespace IdleTower.Editor
         private string _selectedInstanceId = string.Empty;
         private Vector2Int? _hoverCoord;
         private bool _hoverOccupied;
-        private bool _layoutFoldout;
+        private bool _showMapSettings;
         private MapEditTool _tool = MapEditTool.Select;
         private MapCellDefinition _paintDefinition;
         private bool _strokeActive;
@@ -145,11 +141,20 @@ namespace IdleTower.Editor
                     TryBindConfig(next);
 
                 DrawToolToggle(MapEditTool.Select, "Select", "ЛКМ: выбрать клетку. Горячая клавиша 1.");
-                DrawToolToggle(MapEditTool.Paint, "Paint", "ЛКМ / drag: поставить или заменить Cell. Горячая клавиша 2.");
+                DrawToolToggle(MapEditTool.Paint, "Paint", "ЛКМ / drag: поставить Cell на пустой coord. Занятая клетка не меняется. Горячая клавиша 2.");
                 DrawToolToggle(MapEditTool.Erase, "Erase", "ЛКМ / drag: удалить клетку. Горячая клавиша 3.");
                 DrawToolToggle(MapEditTool.Move, "Move", "ЛКМ по клетке → ЛКМ по пустому coord. InstanceId не меняется. Горячая клавиша 4.");
 
                 GUILayout.FlexibleSpace();
+
+                var centerContent = new GUIContent(
+                    "Center View",
+                    "Сбросить пан: карта по центру окна.");
+                if (GUILayout.Button(centerContent, EditorStyles.toolbarButton))
+                {
+                    _pan = Vector2.zero;
+                    Repaint();
+                }
 
                 var shortcutsContent = new GUIContent(
                     "⇧ Shortcuts",
@@ -158,13 +163,13 @@ namespace IdleTower.Editor
                     "• Зум: колёсико мыши (к курсору)\n" +
                     "• Select / Paint / Erase / Move: 1–4\n" +
                     "• Select: ЛКМ по клетке\n" +
-                    "• Paint: ЛКМ / drag (нужен Brush)\n" +
+                    "• Paint: ЛКМ / drag по пустому coord (нужен Brush). Занято — без изменений\n" +
                     "• Erase: ЛКМ / drag\n" +
                     "• Move: ЛКМ pick → ЛКМ пустой coord (занято — запрет)\n" +
                     "• Esc: снять select\n" +
                     "• Drag MapCellDefinition на coord: add / replace Cell\n" +
                     "• Назначить карту: ObjectField или drag MapConfig в окно\n" +
-                    "• Сброс пана: кнопка в «Превью: шаг / зум»");
+                    "• Center View: сброс пана, карта по центру окна");
                 GUILayout.Label(shortcutsContent, EditorStyles.toolbarButton);
 
                 using (new EditorGUI.DisabledScope(_config == null || !_sessionDirty))
@@ -204,62 +209,82 @@ namespace IdleTower.Editor
 
             if (_serializedConfig != null && _config != null)
             {
-                _serializedConfig.Update();
-                using (new EditorGUILayout.HorizontalScope())
+                _showMapSettings = EditorGUILayout.Foldout(_showMapSettings, "Map Settings", true);
+                if (_showMapSettings)
                 {
+                    _serializedConfig.Update();
+                    using (new EditorGUILayout.HorizontalScope())
+                    {
+                        EditorGUI.BeginChangeCheck();
+                        EditorGUILayout.PropertyField(_serializedConfig.FindProperty("homeCoord"));
+                        if (EditorGUI.EndChangeCheck())
+                        {
+                            _serializedConfig.ApplyModifiedProperties();
+                            MarkSessionDirty();
+                        }
+
+                        using (new EditorGUI.DisabledScope(string.IsNullOrEmpty(_selectedInstanceId)))
+                        {
+                            if (GUILayout.Button("Home ← select", GUILayout.Width(118f)))
+                                SetHomeToSelection();
+                        }
+                    }
+
                     EditorGUI.BeginChangeCheck();
-                    EditorGUILayout.PropertyField(_serializedConfig.FindProperty("homeCoord"));
+                    using (new EditorGUILayout.HorizontalScope())
+                    {
+                        EditorGUILayout.PropertyField(
+                            _serializedConfig.FindProperty("interactionRadius"),
+                            GUILayout.MinWidth(120f));
+                        EditorGUILayout.PropertyField(
+                            _serializedConfig.FindProperty("visionRadius"),
+                            GUILayout.MinWidth(120f));
+                    }
+
                     if (EditorGUI.EndChangeCheck())
                     {
                         _serializedConfig.ApplyModifiedProperties();
                         MarkSessionDirty();
                     }
-
-                    using (new EditorGUI.DisabledScope(string.IsNullOrEmpty(_selectedInstanceId)))
-                    {
-                        if (GUILayout.Button("Home ← select", GUILayout.Width(118f)))
-                            SetHomeToSelection();
-                    }
-                }
-
-                EditorGUI.BeginChangeCheck();
-                using (new EditorGUILayout.HorizontalScope())
-                {
-                    EditorGUILayout.PropertyField(
-                        _serializedConfig.FindProperty("interactionRadius"),
-                        GUILayout.MinWidth(120f));
-                    EditorGUILayout.PropertyField(
-                        _serializedConfig.FindProperty("visionRadius"),
-                        GUILayout.MinWidth(120f));
-                }
-
-                if (EditorGUI.EndChangeCheck())
-                {
-                    _serializedConfig.ApplyModifiedProperties();
-                    MarkSessionDirty();
-                }
-            }
-
-            _layoutFoldout = EditorGUILayout.Foldout(_layoutFoldout, "Превью: шаг / зум", true);
-            if (_layoutFoldout)
-            {
-                EditorGUI.BeginChangeCheck();
-                _baseWidth = EditorGUILayout.FloatField("Base Width", _baseWidth);
-                _baseHeight = EditorGUILayout.FloatField("Base Height", _baseHeight);
-                _spacingPixels = EditorGUILayout.FloatField("Spacing px", _spacingPixels);
-                _stepAdjustX = EditorGUILayout.FloatField("Step Adjust X", _stepAdjustX);
-                _stepAdjustY = EditorGUILayout.FloatField("Step Adjust Y", _stepAdjustY);
-                _zoom = EditorGUILayout.Slider("Zoom", _zoom, 0.25f, 4f);
-                if (EditorGUI.EndChangeCheck())
-                    Repaint();
-
-                if (GUILayout.Button("Сбросить пан / центрировать", GUILayout.Width(200f)))
-                {
-                    _pan = Vector2.zero;
-                    Repaint();
                 }
             }
         }
+
+        /// <summary>Единственный MapViewConfig в проекте. Окно его не показывает и не меняет.</summary>
+        private MapViewConfig ResolveViewConfig()
+        {
+            if (_viewConfig != null)
+                return _viewConfig;
+
+            var guids = AssetDatabase.FindAssets($"t:{nameof(MapViewConfig)}");
+            if (guids.Length != 1)
+                return null;
+
+            _viewConfig = AssetDatabase.LoadAssetAtPath<MapViewConfig>(
+                AssetDatabase.GUIDToAssetPath(guids[0]));
+            return _viewConfig;
+        }
+
+        private void EnsurePreviewZoom(MapViewConfig config)
+        {
+            if (config == null)
+                return;
+
+            if (!_previewZoomReady)
+            {
+                _zoom = config.MapScale;
+                _previewZoomReady = true;
+            }
+
+            var max = PreviewZoomMax(config);
+            _zoom = Mathf.Clamp(_zoom, PreviewZoomMin(config), max);
+        }
+
+        private static float PreviewZoomMin(MapViewConfig config)
+            => Mathf.Min(config.MapScaleMin, 0.25f);
+
+        private static float PreviewZoomMax(MapViewConfig config)
+            => Mathf.Max(config.MapScaleMin, config.MapScaleMax);
 
         private void DrawStatusBar()
         {
@@ -303,9 +328,17 @@ namespace IdleTower.Editor
                     new Color(0.05f, 0.05f, 0.05f, 1f));
             }
 
-            var halfX = IsoMapLayout.HalfStep(_baseWidth, _spacingPixels, _stepAdjustX);
-            var halfY = IsoMapLayout.HalfStep(_baseHeight, _spacingPixels, _stepAdjustY);
+            var layout = ResolveViewConfig();
             var viewCenter = rect.center;
+            if (layout == null)
+            {
+                GUI.Label(rect, "Нет MapViewConfig", EditorStyles.centeredGreyMiniLabel);
+                return;
+            }
+
+            EnsurePreviewZoom(layout);
+            var halfX = layout.HalfStepX;
+            var halfY = layout.HalfStepY;
 
             if (_config == null || _serializedConfig == null)
             {
@@ -413,7 +446,10 @@ namespace IdleTower.Editor
                 // Зум к курсору: content-точка под мышью остаётся на месте.
                 var contentUnderMouse = ViewToContent(e.mousePosition, viewCenter);
                 var factor = e.delta.y > 0f ? 0.9f : 1.1f;
-                _zoom = Mathf.Clamp(_zoom * factor, 0.25f, 4f);
+                var layout = ResolveViewConfig();
+                var minZoom = layout != null ? PreviewZoomMin(layout) : _zoom;
+                var maxZoom = layout != null ? PreviewZoomMax(layout) : _zoom;
+                _zoom = Mathf.Clamp(_zoom * factor, minZoom, maxZoom);
                 var newView = ContentToView(contentUnderMouse, viewCenter);
                 _pan += (Vector2)e.mousePosition - newView;
                 e.Use();
@@ -496,7 +532,10 @@ namespace IdleTower.Editor
                 return;
 
             // Расширяем view в content-space по углам + запас на размер спрайта.
-            var pad = Mathf.Max(_baseWidth, _baseHeight) * _zoom;
+            var layout = ResolveViewConfig();
+            var pad = layout != null
+                ? Mathf.Max(layout.BaseWidth, layout.BaseHeight) * _zoom
+                : 0f;
             var c0 = ViewToContent(new Vector2(rect.xMin - pad, rect.yMin - pad), viewCenter);
             var c1 = ViewToContent(new Vector2(rect.xMax + pad, rect.yMin - pad), viewCenter);
             var c2 = ViewToContent(new Vector2(rect.xMin - pad, rect.yMax + pad), viewCenter);
@@ -530,7 +569,9 @@ namespace IdleTower.Editor
         private void DrawCellSprite(PreviewCell cell, Rect previewRect, Vector2 viewCenter)
         {
             // Как MapCellView: anchored = центр footprint; pivot спрайта на низе footprint.
-            var pivotContent = cell.ContentPos + new Vector2(0f, -_baseHeight * 0.5f);
+            var layout = ResolveViewConfig();
+            var baseHeight = layout != null ? layout.BaseHeight : 0f;
+            var pivotContent = cell.ContentPos + new Vector2(0f, -baseHeight * 0.5f);
             var localPivot = ContentToView(pivotContent, viewCenter) - previewRect.min;
 
             if (cell.Sprite == null || cell.Sprite.texture == null)
@@ -546,7 +587,7 @@ namespace IdleTower.Editor
             var tr = sprite.textureRect;
             var nativeW = Mathf.Max(sprite.rect.width, 0.0001f);
             var nativeH = Mathf.Max(sprite.rect.height, 0.0001f);
-            // 1:1 px спрайта × zoom (= MapView mapScale). Без fit под baseWidth —
+            // 1:1 px спрайта × зум превью. Без fit под baseWidth —
             // иначе дробный upsample ломает стыки pixel-art.
             var w = nativeW * _zoom;
             var h = nativeH * _zoom;
@@ -578,8 +619,11 @@ namespace IdleTower.Editor
             float thickness,
             Rect clip)
         {
-            var hw = _baseWidth * 0.5f * _zoom;
-            var hh = _baseHeight * 0.5f * _zoom;
+            var layout = ResolveViewConfig();
+            var baseWidth = layout != null ? layout.BaseWidth : 0f;
+            var baseHeight = layout != null ? layout.BaseHeight : 0f;
+            var hw = baseWidth * 0.5f * _zoom;
+            var hh = baseHeight * 0.5f * _zoom;
             var top = localCenter + new Vector2(0f, -hh);
             var right = localCenter + new Vector2(hw, 0f);
             var bottom = localCenter + new Vector2(0f, hh);
@@ -767,7 +811,7 @@ namespace IdleTower.Editor
         {
             return _tool switch
             {
-                MapEditTool.Paint => "Пан: СКМ / Alt+ЛКМ   ·   Зум: колесо   ·   Paint: ЛКМ / drag",
+                MapEditTool.Paint => "Пан: СКМ / Alt+ЛКМ   ·   Зум: колесо   ·   Paint: ЛКМ / drag по пустому coord",
                 MapEditTool.Erase => "Пан: СКМ / Alt+ЛКМ   ·   Зум: колесо   ·   Erase: ЛКМ / drag",
                 MapEditTool.Move => "Пан: СКМ / Alt+ЛКМ   ·   Зум: колесо   ·   Move: pick → пустой coord",
                 _ => "Пан: СКМ / Alt+ЛКМ   ·   Зум: колесо   ·   Select: ЛКМ"
@@ -816,16 +860,18 @@ namespace IdleTower.Editor
                 return false;
             }
 
-            if (!MapConfigEntriesEditor.TryPaintCell(
-                    _serializedConfig, coord, _paintDefinition, out var instanceId))
+            if (_coordToEntry.ContainsKey(coord))
             {
-                if (!string.IsNullOrEmpty(instanceId))
-                    SetSelectedInstanceId(instanceId, true);
+                _statusHint = $"Paint: {coord} занята.";
                 return false;
             }
 
+            if (!MapConfigEntriesEditor.TryPaintCell(
+                    _serializedConfig, coord, _paintDefinition, out var instanceId))
+                return false;
+
             SetSelectedInstanceId(instanceId, true);
-            _statusHint = _coordToEntry.ContainsKey(coord) ? $"replace {coord}" : $"add {coord}";
+            _statusHint = $"add {coord}";
             MarkSessionDirty();
             return true;
         }

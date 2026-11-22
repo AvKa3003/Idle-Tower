@@ -3545,11 +3545,11 @@ MonoBehaviour:
   cellsRoot: {fileID: 934050103}
   cellPrefab: {fileID: 3360157428176800733, guid: 180ace91e124ce7478a1cd4fcc0752ac, type: 3}
   fogSprite: {fileID: -1766006069671443837, guid: ec2e97f776ee2af4c87bef8c0e48229c, type: 3}
-  baseWidth: 64
-  baseHeight: 32
+  baseWidth: 78
+  baseHeight: 39
   spacingPixels: 0
-  stepAdjustX: 0
-  stepAdjustY: 1
+  stepAdjustX: 0.5
+  stepAdjustY: 0.5
   mapScale: 4
   mapScaleMin: 4
   mapScaleMax: 8
