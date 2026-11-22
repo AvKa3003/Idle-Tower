@@ -6,8 +6,8 @@ namespace IdleTower.Editor
 {
     /// <summary>
     /// Правки массива MapConfig.entries через SerializedObject.
-    /// Увеличение arraySize копирует предыдущий элемент — новые entry всегда
-    /// перезаписываются целиком (новый InstanceId, пустой Site).
+    /// Увеличение arraySize копирует предыдущий элемент — новая entry перезаписывается.
+    /// Brush: новый InstanceId и пустой Site. Sample: копия Cell, Decal и Site, новый InstanceId.
     /// </summary>
     internal static class MapConfigEntriesEditor
     {
@@ -34,6 +34,61 @@ namespace IdleTower.Editor
             var newIndex = entries.arraySize;
             entries.arraySize = newIndex + 1;
             WriteNewEntry(entries.GetArrayElementAtIndex(newIndex), coord, definition, instanceId);
+            so.ApplyModifiedProperties();
+            return true;
+        }
+
+        /// <summary>
+        /// Пустой coord получает копию шаблона: Cell, Decal и Site те же, InstanceId новый.
+        /// </summary>
+        public static bool TryPaintCopy(
+            SerializedObject so,
+            Vector2Int coord,
+            string templateInstanceId,
+            out string instanceId,
+            out string error)
+        {
+            instanceId = string.Empty;
+            error = string.Empty;
+            if (so == null || string.IsNullOrEmpty(templateInstanceId))
+            {
+                error = "Sample: шаблон не выбран.";
+                return false;
+            }
+
+            so.Update();
+            var entries = Entries(so);
+            if (entries == null)
+            {
+                error = "Sample: нет entries.";
+                return false;
+            }
+
+            if (FindIndexByCoord(entries, coord) >= 0)
+            {
+                error = $"Paint: {coord} занята.";
+                return false;
+            }
+
+            var sourceIndex = FindIndexByInstanceId(entries, templateInstanceId);
+            if (sourceIndex < 0)
+            {
+                error = "Sample: клетка шаблона не найдена.";
+                return false;
+            }
+
+            instanceId = MapConfigInstanceIdUtility.CreateInstanceId();
+            var newIndex = entries.arraySize;
+            entries.arraySize = newIndex + 1;
+            var source = entries.GetArrayElementAtIndex(sourceIndex);
+            var destination = entries.GetArrayElementAtIndex(newIndex);
+            var template = source.boxedValue as MapConfigEntry;
+            var copy = template == null
+                ? new MapConfigEntry()
+                : JsonUtility.FromJson<MapConfigEntry>(JsonUtility.ToJson(template));
+            copy.InstanceId = instanceId;
+            copy.Coord = coord;
+            destination.boxedValue = copy;
             so.ApplyModifiedProperties();
             return true;
         }
