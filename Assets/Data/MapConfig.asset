@@ -4822,7 +4822,7 @@ MonoBehaviour:
   - InstanceId: d1814d56eda24374a39887d89dd0a039
     Coord: {x: 1, y: 3}
     Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
-    Decal: {fileID: 0}
+    Decal: {fileID: -3389857664573656437, guid: a36e080e5b9b3af419b58a1b2bef2d34, type: 3}
     Site:
       Raid:
         PreCapture:

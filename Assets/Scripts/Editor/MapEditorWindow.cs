@@ -605,7 +605,8 @@ namespace IdleTower.Editor
             }
 
             var sprite = cell.Sprite;
-            var tr = sprite.textureRect;
+            // Полный rect спрайта, вместе с прозрачными полями — как у UI Image.
+            var tr = sprite.rect;
             var nativeW = Mathf.Max(sprite.rect.width, 0.0001f);
             var nativeH = Mathf.Max(sprite.rect.height, 0.0001f);
             // 1:1 px спрайта × зум превью. Без fit под baseWidth —
