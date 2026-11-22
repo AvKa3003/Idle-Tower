@@ -41,6 +41,11 @@ namespace IdleTower.Editor
         private Vector2Int? _hoverCoord;
         private bool _hoverOccupied;
         private bool _showMapSettings;
+        private bool _showRevealDebug;
+        [System.NonSerialized] private Texture2D _revealOutlineTex;
+        [System.NonSerialized] private float _revealOutlineZoom = float.NaN;
+        [System.NonSerialized] private int _revealOutlineWidth = -1;
+        [System.NonSerialized] private int _revealOutlineHeight = -1;
         private MapEditTool _tool = MapEditTool.Select;
         private MapCellDefinition _paintDefinition;
         private string _templateInstanceId = string.Empty;
@@ -59,6 +64,8 @@ namespace IdleTower.Editor
             public Sprite Decal;
             public Vector2 ContentPos;
             public bool Ghost;
+            public bool HasBehavior;
+            public bool RevealsNeighbors;
         }
 
         [MenuItem(MenuPath)]
@@ -87,6 +94,7 @@ namespace IdleTower.Editor
 
         private void OnDisable()
         {
+            DestroyRevealOutline();
             Undo.undoRedoPerformed -= OnUndoRedo;
             // Закрытие окна: Unity спросит через hasUnsavedChanges + SaveChanges/DiscardChanges.
             if (ReferenceEquals(MapEditorSelection.Window, this))
@@ -152,6 +160,19 @@ namespace IdleTower.Editor
 
                 GUILayout.FlexibleSpace();
 
+                var debugContent = new GUIContent(
+                    "Debug",
+                    "Рамка внутри клетки: бирюза — reveal включён, фиолетовый — выключен.");
+                var debugBg = GUI.backgroundColor;
+                if (_showRevealDebug)
+                    GUI.backgroundColor = new Color(0.55f, 0.8f, 1f);
+                _showRevealDebug = GUILayout.Toggle(
+                    _showRevealDebug,
+                    debugContent,
+                    EditorStyles.toolbarButton,
+                    GUILayout.Width(56f));
+                GUI.backgroundColor = debugBg;
+
                 var centerContent = new GUIContent(
                     "Center View",
                     "Сбросить пан: карта по центру окна.");
@@ -175,7 +196,8 @@ namespace IdleTower.Editor
                     "• Esc: снять select\n" +
                     "• Drag MapCellDefinition на coord: add / replace Cell\n" +
                     "• Назначить карту: ObjectField или drag MapConfig в окно\n" +
-                    "• Center View: сброс пана, карта по центру окна");
+                    "• Center View: сброс пана, карта по центру окна\n" +
+                    "• Debug: рамка reveal (бирюза — включён, фиолетовый — выключен)");
                 GUILayout.Label(shortcutsContent, EditorStyles.toolbarButton);
 
                 using (new EditorGUI.DisabledScope(_config == null || !_sessionDirty))
@@ -415,6 +437,9 @@ namespace IdleTower.Editor
                     }
                 }
 
+                if (_showRevealDebug)
+                    DrawRevealDebugOutlines(viewCenter, rect);
+
                 if (!string.IsNullOrEmpty(_selectedInstanceId)
                     && _selectedInstanceId != _templateInstanceId)
                 {
@@ -589,13 +614,16 @@ namespace IdleTower.Editor
                     continue;
 
                 var cell = entry.FindPropertyRelative("Cell").objectReferenceValue as MapCellDefinition;
+                var behavior = cell != null ? cell.Behavior : null;
                 _drawBuffer.Add(new PreviewCell
                 {
                     Coord = coord,
                     InstanceId = entry.FindPropertyRelative("InstanceId").stringValue ?? string.Empty,
                     Sprite = cell != null ? cell.Sprite : null,
                     Decal = entry.FindPropertyRelative("Decal")?.objectReferenceValue as Sprite,
-                    ContentPos = content
+                    ContentPos = content,
+                    HasBehavior = behavior != null,
+                    RevealsNeighbors = behavior != null && behavior.RevealsNeighborsWhenInteractive
                 });
             }
 
@@ -654,6 +682,124 @@ namespace IdleTower.Editor
                     clip);
                 return;
             }
+        }
+
+        /// <summary>
+        /// Ромб чуть внутри footprint: снаружи остаётся рамка выделения.
+        /// Один и тот же контур на все клетки, цвет — множитель GUI.color.
+        /// </summary>
+        private void DrawRevealDebugOutlines(Vector2 viewCenter, Rect previewRect)
+        {
+            var outline = EnsureRevealOutlineTexture();
+            if (outline == null)
+                return;
+
+            var revealOn = new Color(0.15f, 0.78f, 0.82f, 1f);
+            var revealOff = new Color(0.62f, 0.32f, 0.95f, 1f);
+            var prevColor = GUI.color;
+            for (var i = 0; i < _drawBuffer.Count; i++)
+            {
+                var cell = _drawBuffer[i];
+                if (cell.Ghost || !cell.HasBehavior)
+                    continue;
+
+                var center = ContentToView(cell.ContentPos, viewCenter) - previewRect.min;
+                GUI.color = cell.RevealsNeighbors ? revealOn : revealOff;
+                GUI.DrawTexture(
+                    new Rect(
+                        center.x - outline.width * 0.5f,
+                        center.y - outline.height * 0.5f,
+                        outline.width,
+                        outline.height),
+                    outline,
+                    ScaleMode.StretchToFill,
+                    true);
+            }
+
+            GUI.color = prevColor;
+        }
+
+        /// <summary>Контур пересобирается при смене зума или размера footprint.</summary>
+        private Texture2D EnsureRevealOutlineTexture()
+        {
+            const float inset = 5f;
+            var layout = ResolveViewConfig();
+            if (layout == null)
+                return null;
+
+            var hw0 = layout.BaseWidth * 0.5f * _zoom;
+            var hh0 = layout.BaseHeight * 0.5f * _zoom;
+            var width = Mathf.Max(1, Mathf.CeilToInt(hw0 * 2f));
+            var height = Mathf.Max(1, Mathf.CeilToInt(hh0 * 2f));
+            if (_revealOutlineTex != null
+                && _revealOutlineZoom == _zoom
+                && _revealOutlineWidth == width
+                && _revealOutlineHeight == height)
+                return _revealOutlineTex;
+
+            DestroyRevealOutline();
+            var pixels = new Color[width * height];
+            var center = new Vector2(width * 0.5f, height * 0.5f);
+            var hw = Mathf.Max(0f, hw0 - inset);
+            var hh = Mathf.Max(0f, hh0 - inset);
+            var top = center + new Vector2(0f, -hh);
+            var right = center + new Vector2(hw, 0f);
+            var bottom = center + new Vector2(0f, hh);
+            var left = center + new Vector2(-hw, 0f);
+            StampOutlineSegment(pixels, width, height, top, right);
+            StampOutlineSegment(pixels, width, height, right, bottom);
+            StampOutlineSegment(pixels, width, height, bottom, left);
+            StampOutlineSegment(pixels, width, height, left, top);
+
+            var texture = new Texture2D(width, height, TextureFormat.RGBA32, false)
+            {
+                hideFlags = HideFlags.HideAndDontSave,
+                filterMode = FilterMode.Point,
+                wrapMode = TextureWrapMode.Clamp
+            };
+            texture.SetPixels(pixels);
+            texture.Apply(false, true);
+            _revealOutlineTex = texture;
+            _revealOutlineZoom = _zoom;
+            _revealOutlineWidth = width;
+            _revealOutlineHeight = height;
+            return texture;
+        }
+
+        private static void StampOutlineSegment(Color[] pixels, int width, int height, Vector2 from, Vector2 to)
+        {
+            var length = Vector2.Distance(from, to);
+            var steps = Mathf.Max(1, Mathf.CeilToInt(length));
+            const float half = 1f;
+            for (var i = 0; i <= steps; i++)
+            {
+                var p = Vector2.Lerp(from, to, i / (float)Mathf.Max(steps, 1));
+                var x0 = Mathf.FloorToInt(p.x - half);
+                var y0 = Mathf.FloorToInt(p.y - half);
+                for (var y = y0; y < y0 + 2; y++)
+                {
+                    if ((uint)y >= (uint)height)
+                        continue;
+                    var row = (height - 1 - y) * width;
+                    for (var x = x0; x < x0 + 2; x++)
+                    {
+                        if ((uint)x >= (uint)width)
+                            continue;
+                        pixels[row + x] = Color.white;
+                    }
+                }
+            }
+        }
+
+        private void DestroyRevealOutline()
+        {
+            if (_revealOutlineTex == null)
+                return;
+            DestroyImmediate(_revealOutlineTex);
+            _revealOutlineTex = null;
+            _revealOutlineZoom = float.NaN;
+            _revealOutlineWidth = -1;
+            _revealOutlineHeight = -1;
         }
 
         private bool TryGetTemplateVisual(out Sprite sprite, out Sprite decal)
@@ -735,13 +881,14 @@ namespace IdleTower.Editor
             Vector2 localCenter,
             Color color,
             float thickness,
-            Rect clip)
+            Rect clip,
+            float inset = 0f)
         {
             var layout = ResolveViewConfig();
             var baseWidth = layout != null ? layout.BaseWidth : 0f;
             var baseHeight = layout != null ? layout.BaseHeight : 0f;
-            var hw = baseWidth * 0.5f * _zoom;
-            var hh = baseHeight * 0.5f * _zoom;
+            var hw = Mathf.Max(0f, baseWidth * 0.5f * _zoom - inset);
+            var hh = Mathf.Max(0f, baseHeight * 0.5f * _zoom - inset);
             var top = localCenter + new Vector2(0f, -hh);
             var right = localCenter + new Vector2(hw, 0f);
             var bottom = localCenter + new Vector2(0f, hh);
