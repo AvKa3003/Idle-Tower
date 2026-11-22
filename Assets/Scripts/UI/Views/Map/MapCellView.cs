@@ -12,6 +12,8 @@ namespace IdleTower.UI.Views
         [SerializeField] private Button button;
         [SerializeField] private CanvasGroup canvasGroup;
 
+        private Image _decal;
+
         [SerializeField] [Range(0f, 1f)] private float visibleOnlyDimAlpha = 0.75f;
 
         [Header("Сетка")]
@@ -46,6 +48,7 @@ namespace IdleTower.UI.Views
         public void Setup(
             Vector2Int coord,
             Sprite sprite,
+            Sprite decal,
             MapPresence presence,
             bool hasFunctionalClick,
             bool canClick)
@@ -54,15 +57,17 @@ namespace IdleTower.UI.Views
             gameObject.SetActive(true);
 
             var showDim = presence == MapPresence.VisibleOnly && hasFunctionalClick;
+            var tint = showDim
+                ? new Color(visibleOnlyDimAlpha, visibleOnlyDimAlpha, visibleOnlyDimAlpha, 1f)
+                : Color.white;
             if (icon != null)
             {
                 icon.enabled = sprite != null;
                 icon.sprite = sprite;
-                icon.color = showDim
-                    ? new Color(visibleOnlyDimAlpha, visibleOnlyDimAlpha, visibleOnlyDimAlpha, 1f)
-                    : Color.white;
+                icon.color = tint;
             }
 
+            ApplyDecal(decal, tint);
             ApplyIconToFootprint();
 
             // Затемнение VisibleOnly — цвет спрайта. Прямоугольник CanvasGroup не показывается.
@@ -106,34 +111,79 @@ namespace IdleTower.UI.Views
             ApplyIconToFootprint();
         }
 
+        /// <summary>Декаль поверх спрайта клетки, клики не перехватывает.</summary>
+        private void ApplyDecal(Sprite sprite, Color tint)
+        {
+            if (sprite == null)
+            {
+                if (_decal != null)
+                    _decal.enabled = false;
+                return;
+            }
+
+            var image = EnsureDecalImage();
+            if (image == null)
+                return;
+
+            image.enabled = true;
+            image.sprite = sprite;
+            image.color = tint;
+            image.raycastTarget = false;
+        }
+
+        private Image EnsureDecalImage()
+        {
+            if (_decal != null)
+                return _decal;
+
+            if (icon == null)
+                return null;
+
+            var go = new GameObject("Decal", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
+            go.transform.SetParent(icon.transform.parent, false);
+            go.transform.SetAsLastSibling();
+            _decal = go.GetComponent<Image>();
+            _decal.raycastTarget = false;
+            return _decal;
+        }
+
         /// <summary>
         /// Оригинальный размер спрайта; pivot из Texture совпадает с центром нижней грани footprint.
         /// </summary>
         private void ApplyIconToFootprint()
         {
-            if (icon == null || root == null)
+            if (root == null)
                 return;
 
-            var sprite = icon.sprite;
+            var footprintHeight = root.rect.height;
+            PlaceOnFootprint(icon, footprintHeight);
+            PlaceOnFootprint(_decal, footprintHeight);
+        }
+
+        private static void PlaceOnFootprint(Image image, float footprintHeight)
+        {
+            if (image == null)
+                return;
+
+            var sprite = image.sprite;
             if (sprite == null)
                 return;
 
-            var iconRt = icon.rectTransform;
+            var rt = image.rectTransform;
             var spriteW = sprite.rect.width;
             var spriteH = sprite.rect.height;
             if (spriteW <= 0f || spriteH <= 0f)
                 return;
 
-            iconRt.anchorMin = new Vector2(0.5f, 0.5f);
-            iconRt.anchorMax = new Vector2(0.5f, 0.5f);
-            iconRt.localScale = Vector3.one;
-            iconRt.pivot = new Vector2(sprite.pivot.x / spriteW, sprite.pivot.y / spriteH);
-            iconRt.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, spriteW);
-            iconRt.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, spriteH);
+            rt.anchorMin = new Vector2(0.5f, 0.5f);
+            rt.anchorMax = new Vector2(0.5f, 0.5f);
+            rt.localScale = Vector3.one;
+            rt.pivot = new Vector2(sprite.pivot.x / spriteW, sprite.pivot.y / spriteH);
+            rt.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, spriteW);
+            rt.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, spriteH);
 
             // Не вписываем в хитбокс — 1:1 px спрайта в UI-единицах (как baseWidth/Height).
-            var footprintHeight = root.rect.height;
-            iconRt.anchoredPosition = new Vector2(0f, -footprintHeight * 0.5f);
+            rt.anchoredPosition = new Vector2(0f, -footprintHeight * 0.5f);
         }
 
         private void HandleClick()

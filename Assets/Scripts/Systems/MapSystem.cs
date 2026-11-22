@@ -331,7 +331,8 @@ namespace IdleTower.Systems
                 runtime.Presence,
                 HasFunctionalClick(runtime),
                 CanAcceptClick(runtime),
-                sprite);
+                sprite,
+                runtime.Decal);
         }
 
         private bool AdvanceActiveRaids(float tickDelta)
@@ -644,6 +645,7 @@ namespace IdleTower.Systems
         public bool HasFunctionalClick { get; }
         public bool CanClick { get; }
         public Sprite Sprite { get; }
+        public Sprite Decal { get; }
 
         public MapCellDisplayInfo(
             Vector2Int coord,
@@ -651,7 +653,8 @@ namespace IdleTower.Systems
             MapPresence presence,
             bool hasFunctionalClick,
             bool canClick,
-            Sprite sprite)
+            Sprite sprite,
+            Sprite decal)
         {
             Coord = coord;
             Definition = definition;
@@ -659,6 +662,7 @@ namespace IdleTower.Systems
             HasFunctionalClick = hasFunctionalClick;
             CanClick = canClick;
             Sprite = sprite;
+            Decal = decal;
         }
     }
 }

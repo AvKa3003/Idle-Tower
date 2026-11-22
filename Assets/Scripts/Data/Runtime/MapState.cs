@@ -45,7 +45,8 @@ namespace IdleTower.Data.Runtime
                     entry.InstanceId,
                     entry.Cell,
                     state,
-                    entry.Site);
+                    entry.Site,
+                    entry.Decal);
             }
         }
 

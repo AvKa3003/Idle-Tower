@@ -20,6 +20,7 @@ MonoBehaviour:
   - InstanceId: 8792a1c478c64c34a363db2418a2b0f9
     Coord: {x: 0, y: 0}
     Cell: {fileID: 11400000, guid: 9d077f4604fda5945b2d5e0f64fa56a2, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -47,6 +48,7 @@ MonoBehaviour:
   - InstanceId: 65c0e01a43194fb0820dc84fcfb91584
     Coord: {x: 1, y: 0}
     Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -74,6 +76,7 @@ MonoBehaviour:
   - InstanceId: ff6a4c96f2e14a16ae371e2b646368a0
     Coord: {x: 2, y: 0}
     Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -101,6 +104,7 @@ MonoBehaviour:
   - InstanceId: d842bef7a8c44619903ee6863d29a5c7
     Coord: {x: 2, y: 1}
     Cell: {fileID: 11400000, guid: e7e4f9c271529b4479864d417c2384cb, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -128,6 +132,7 @@ MonoBehaviour:
   - InstanceId: ab2d179ea8c34cf98581a23ed4aa560c
     Coord: {x: 0, y: -1}
     Cell: {fileID: 11400000, guid: 2aa14af92765da748b60133c95bf6468, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -163,6 +168,7 @@ MonoBehaviour:
   - InstanceId: a3df998660d64b7aa43702ba6171ef84
     Coord: {x: 1, y: -1}
     Cell: {fileID: 11400000, guid: 2aa14af92765da748b60133c95bf6468, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -194,6 +200,7 @@ MonoBehaviour:
   - InstanceId: b6453b33e59248628d2b650a28c9ae81
     Coord: {x: -1, y: -1}
     Cell: {fileID: 11400000, guid: 2aa14af92765da748b60133c95bf6468, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -227,6 +234,7 @@ MonoBehaviour:
   - InstanceId: ec73af3a463649a0a749cdaee4ad61a1
     Coord: {x: 2, y: 2}
     Cell: {fileID: 11400000, guid: 2aa14af92765da748b60133c95bf6468, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -260,6 +268,7 @@ MonoBehaviour:
   - InstanceId: ddca1129588a49f49e007329f22f3a2e
     Coord: {x: 3, y: 1}
     Cell: {fileID: 11400000, guid: 2aa14af92765da748b60133c95bf6468, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -293,6 +302,7 @@ MonoBehaviour:
   - InstanceId: 404cd76107dd4adbbb8a733c16a332da
     Coord: {x: 3, y: 2}
     Cell: {fileID: 11400000, guid: 2aa14af92765da748b60133c95bf6468, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -326,6 +336,7 @@ MonoBehaviour:
   - InstanceId: ec9a5e9af6a6424eb3af03831b6d6d13
     Coord: {x: 3, y: 0}
     Cell: {fileID: 11400000, guid: 2aa14af92765da748b60133c95bf6468, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -353,6 +364,7 @@ MonoBehaviour:
   - InstanceId: fcf81df93ccc458f908d7d1126c9d798
     Coord: {x: 3, y: -1}
     Cell: {fileID: 11400000, guid: e7e4f9c271529b4479864d417c2384cb, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -380,6 +392,7 @@ MonoBehaviour:
   - InstanceId: b61be10199a94ce0a6d9575934781662
     Coord: {x: 2, y: -1}
     Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -407,6 +420,7 @@ MonoBehaviour:
   - InstanceId: e50ba6e3a96d4bf98bc7cdc071882e09
     Coord: {x: 2, y: -2}
     Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -434,6 +448,7 @@ MonoBehaviour:
   - InstanceId: 2fa0ece795584779b026d54eaf8566bf
     Coord: {x: 2, y: -3}
     Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -461,6 +476,7 @@ MonoBehaviour:
   - InstanceId: 445d8678f4f0495a8684e72a43415ac9
     Coord: {x: 4, y: -4}
     Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -488,6 +504,7 @@ MonoBehaviour:
   - InstanceId: d088ed0d310a483c94b0520a5bd91032
     Coord: {x: 5, y: -4}
     Cell: {fileID: 11400000, guid: e7e4f9c271529b4479864d417c2384cb, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -515,6 +532,7 @@ MonoBehaviour:
   - InstanceId: 589989bf193141079ba6cef7286f2eb4
     Coord: {x: 5, y: -3}
     Cell: {fileID: 11400000, guid: abe681d6596fe54489c5850d5fcac9b1, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -542,6 +560,7 @@ MonoBehaviour:
   - InstanceId: ab95589b8a9241f5a7e9ecc0105960f6
     Coord: {x: 6, y: -3}
     Cell: {fileID: 11400000, guid: abe681d6596fe54489c5850d5fcac9b1, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -569,6 +588,7 @@ MonoBehaviour:
   - InstanceId: 4afdaa54a46946e2a99737ba298baac1
     Coord: {x: 3, y: -3}
     Cell: {fileID: 11400000, guid: abe681d6596fe54489c5850d5fcac9b1, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -596,6 +616,7 @@ MonoBehaviour:
   - InstanceId: e27815ebbd1045789e181d989193cfc1
     Coord: {x: 4, y: -3}
     Cell: {fileID: 11400000, guid: abe681d6596fe54489c5850d5fcac9b1, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -623,6 +644,7 @@ MonoBehaviour:
   - InstanceId: bd477311f9b74c64abcf07e1702a0fe9
     Coord: {x: 4, y: -2}
     Cell: {fileID: 11400000, guid: abe681d6596fe54489c5850d5fcac9b1, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -650,6 +672,7 @@ MonoBehaviour:
   - InstanceId: 327ae92afc2245ca885191e199a3114c
     Coord: {x: 5, y: -2}
     Cell: {fileID: 11400000, guid: abe681d6596fe54489c5850d5fcac9b1, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -677,6 +700,7 @@ MonoBehaviour:
   - InstanceId: 64e6d4500d6e473597757c7c981b80a5
     Coord: {x: 6, y: -2}
     Cell: {fileID: 11400000, guid: abe681d6596fe54489c5850d5fcac9b1, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -704,6 +728,7 @@ MonoBehaviour:
   - InstanceId: e8da73a94ac84a41a7458eb86dd54f25
     Coord: {x: 7, y: -2}
     Cell: {fileID: 11400000, guid: abe681d6596fe54489c5850d5fcac9b1, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -731,6 +756,7 @@ MonoBehaviour:
   - InstanceId: a195030595a04578900c6e5719343179
     Coord: {x: 3, y: -5}
     Cell: {fileID: 11400000, guid: abe681d6596fe54489c5850d5fcac9b1, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -758,6 +784,7 @@ MonoBehaviour:
   - InstanceId: 3c0a957f82434376a79b5d94e634d8b7
     Coord: {x: 4, y: -5}
     Cell: {fileID: 11400000, guid: abe681d6596fe54489c5850d5fcac9b1, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -785,6 +812,7 @@ MonoBehaviour:
   - InstanceId: 07e2306f7c7245d5bf7c618856bb78fd
     Coord: {x: 4, y: -6}
     Cell: {fileID: 11400000, guid: abe681d6596fe54489c5850d5fcac9b1, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -812,6 +840,7 @@ MonoBehaviour:
   - InstanceId: 9d0e299094a543158e228ce648470042
     Coord: {x: 2, y: -6}
     Cell: {fileID: 11400000, guid: abe681d6596fe54489c5850d5fcac9b1, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -839,6 +868,7 @@ MonoBehaviour:
   - InstanceId: 0b9e921765f64ac790ad5f1ee538fbf7
     Coord: {x: 2, y: -5}
     Cell: {fileID: 11400000, guid: abe681d6596fe54489c5850d5fcac9b1, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -866,6 +896,7 @@ MonoBehaviour:
   - InstanceId: 8252f970bb0f42edbfcfc03523098cab
     Coord: {x: 1, y: -5}
     Cell: {fileID: 11400000, guid: abe681d6596fe54489c5850d5fcac9b1, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -893,6 +924,7 @@ MonoBehaviour:
   - InstanceId: 594fe0a2b9f34d52b54dfad202f0c56b
     Coord: {x: 1, y: -4}
     Cell: {fileID: 11400000, guid: abe681d6596fe54489c5850d5fcac9b1, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -920,6 +952,7 @@ MonoBehaviour:
   - InstanceId: 76a0360269524755b7b1e43b634297b2
     Coord: {x: 1, y: -3}
     Cell: {fileID: 11400000, guid: abe681d6596fe54489c5850d5fcac9b1, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -947,6 +980,7 @@ MonoBehaviour:
   - InstanceId: d03e0acfbf7c4e458b70fbfcecdb45fe
     Coord: {x: 1, y: -2}
     Cell: {fileID: 11400000, guid: abe681d6596fe54489c5850d5fcac9b1, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -974,6 +1008,7 @@ MonoBehaviour:
   - InstanceId: a5303eb00a6245ab819a9cefd273b362
     Coord: {x: 3, y: -2}
     Cell: {fileID: 11400000, guid: abe681d6596fe54489c5850d5fcac9b1, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -1001,6 +1036,7 @@ MonoBehaviour:
   - InstanceId: 53d7f1708e454d72a8df24755db62057
     Coord: {x: 6, y: -4}
     Cell: {fileID: 11400000, guid: e7e4f9c271529b4479864d417c2384cb, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -1028,6 +1064,7 @@ MonoBehaviour:
   - InstanceId: d68dfe2d62c14698853384557bb0183f
     Coord: {x: 5, y: -5}
     Cell: {fileID: 11400000, guid: e7e4f9c271529b4479864d417c2384cb, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -1055,6 +1092,7 @@ MonoBehaviour:
   - InstanceId: c17ff91b37814ea3b138468b1dee2d38
     Coord: {x: 5, y: -6}
     Cell: {fileID: 11400000, guid: e7e4f9c271529b4479864d417c2384cb, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -1082,6 +1120,7 @@ MonoBehaviour:
   - InstanceId: 75b6f47b96d1411c9b0395eb467844bd
     Coord: {x: 6, y: -5}
     Cell: {fileID: 11400000, guid: e7e4f9c271529b4479864d417c2384cb, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -1109,6 +1148,7 @@ MonoBehaviour:
   - InstanceId: 5d78c602584b487fb2a5a81c79ad8bd0
     Coord: {x: 7, y: -4}
     Cell: {fileID: 11400000, guid: e7e4f9c271529b4479864d417c2384cb, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -1136,6 +1176,7 @@ MonoBehaviour:
   - InstanceId: 505c6cded17747a6a0d41d35307d2e54
     Coord: {x: 7, y: -3}
     Cell: {fileID: 11400000, guid: abe681d6596fe54489c5850d5fcac9b1, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -1163,6 +1204,7 @@ MonoBehaviour:
   - InstanceId: 5caddf6b7d324251adacc52d9f9661c2
     Coord: {x: 8, y: -3}
     Cell: {fileID: 11400000, guid: abe681d6596fe54489c5850d5fcac9b1, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -1190,6 +1232,7 @@ MonoBehaviour:
   - InstanceId: 63558287fb414637b598285f42520182
     Coord: {x: 7, y: -5}
     Cell: {fileID: 11400000, guid: e7e4f9c271529b4479864d417c2384cb, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -1217,6 +1260,7 @@ MonoBehaviour:
   - InstanceId: 4bba8aa27a3447de98e5ea6bd96d7ae4
     Coord: {x: 6, y: -6}
     Cell: {fileID: 11400000, guid: e7e4f9c271529b4479864d417c2384cb, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -1244,6 +1288,7 @@ MonoBehaviour:
   - InstanceId: f7065dda6e9e4e8588dd660485df9b33
     Coord: {x: 6, y: -7}
     Cell: {fileID: 11400000, guid: e7e4f9c271529b4479864d417c2384cb, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -1271,6 +1316,7 @@ MonoBehaviour:
   - InstanceId: 9361ff6087c741fcad65d6a6918200ed
     Coord: {x: 6, y: -8}
     Cell: {fileID: 11400000, guid: e7e4f9c271529b4479864d417c2384cb, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -1298,6 +1344,7 @@ MonoBehaviour:
   - InstanceId: a38dc400c06f4286ad9d4d9d3a779090
     Coord: {x: 5, y: -7}
     Cell: {fileID: 11400000, guid: 2aa14af92765da748b60133c95bf6468, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -1331,6 +1378,7 @@ MonoBehaviour:
   - InstanceId: b3b235e656b14d2aa1ccbabe1c6c15e8
     Coord: {x: 3, y: -4}
     Cell: {fileID: 11400000, guid: 2aa14af92765da748b60133c95bf6468, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -1358,6 +1406,7 @@ MonoBehaviour:
   - InstanceId: 684955681b1e46f6802f426057a59808
     Coord: {x: 2, y: -4}
     Cell: {fileID: 11400000, guid: 2aa14af92765da748b60133c95bf6468, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -1385,6 +1434,7 @@ MonoBehaviour:
   - InstanceId: 128781834a09431bb694c4cd2546d94b
     Coord: {x: 4, y: -1}
     Cell: {fileID: 11400000, guid: abe681d6596fe54489c5850d5fcac9b1, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -1412,6 +1462,7 @@ MonoBehaviour:
   - InstanceId: 15756daea22748478243b0ca91189d31
     Coord: {x: 4, y: 0}
     Cell: {fileID: 11400000, guid: abe681d6596fe54489c5850d5fcac9b1, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -1439,6 +1490,7 @@ MonoBehaviour:
   - InstanceId: 67fede999b23467a980be78e1af8c1a4
     Coord: {x: 5, y: 0}
     Cell: {fileID: 11400000, guid: abe681d6596fe54489c5850d5fcac9b1, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -1466,6 +1518,7 @@ MonoBehaviour:
   - InstanceId: b2b7d9c92b984d3b860e80849062b4e0
     Coord: {x: 5, y: 1}
     Cell: {fileID: 11400000, guid: abe681d6596fe54489c5850d5fcac9b1, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -1493,6 +1546,7 @@ MonoBehaviour:
   - InstanceId: 851bea3541be4a39a7de75d3c0622c03
     Coord: {x: 5, y: 2}
     Cell: {fileID: 11400000, guid: abe681d6596fe54489c5850d5fcac9b1, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -1520,6 +1574,7 @@ MonoBehaviour:
   - InstanceId: ceaf9b652e574af08ce28a837ae4c185
     Coord: {x: 5, y: 3}
     Cell: {fileID: 11400000, guid: abe681d6596fe54489c5850d5fcac9b1, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -1547,6 +1602,7 @@ MonoBehaviour:
   - InstanceId: ef4db13ca8eb47f4b90105802436f882
     Coord: {x: 4, y: 2}
     Cell: {fileID: 11400000, guid: abe681d6596fe54489c5850d5fcac9b1, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -1574,6 +1630,7 @@ MonoBehaviour:
   - InstanceId: 4adff38224204fd8ada9473dd7c5a9b8
     Coord: {x: 4, y: 1}
     Cell: {fileID: 11400000, guid: abe681d6596fe54489c5850d5fcac9b1, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -1601,6 +1658,7 @@ MonoBehaviour:
   - InstanceId: c5f2f1b5c4bb4587b8b7e6a20ed15994
     Coord: {x: 4, y: 3}
     Cell: {fileID: 11400000, guid: abe681d6596fe54489c5850d5fcac9b1, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -1628,6 +1686,7 @@ MonoBehaviour:
   - InstanceId: bf23fa9c4e5045f393c2b5918787a2f2
     Coord: {x: 6, y: 3}
     Cell: {fileID: 11400000, guid: abe681d6596fe54489c5850d5fcac9b1, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -1655,6 +1714,7 @@ MonoBehaviour:
   - InstanceId: b73307239ada4336aaf8c8ae63f24ae7
     Coord: {x: 6, y: 4}
     Cell: {fileID: 11400000, guid: abe681d6596fe54489c5850d5fcac9b1, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -1682,6 +1742,7 @@ MonoBehaviour:
   - InstanceId: e029863fadb04e5b9c21c12c87ccfacd
     Coord: {x: 7, y: 4}
     Cell: {fileID: 11400000, guid: abe681d6596fe54489c5850d5fcac9b1, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -1709,6 +1770,7 @@ MonoBehaviour:
   - InstanceId: 6fbd197e17174a29918d37e37955154d
     Coord: {x: 8, y: 4}
     Cell: {fileID: 11400000, guid: abe681d6596fe54489c5850d5fcac9b1, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -1736,6 +1798,7 @@ MonoBehaviour:
   - InstanceId: a9b6371a8190468cbf3112381b9ae809
     Coord: {x: 7, y: 3}
     Cell: {fileID: 11400000, guid: abe681d6596fe54489c5850d5fcac9b1, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -1763,6 +1826,7 @@ MonoBehaviour:
   - InstanceId: 8aa9e9b6b29943c0a3c11fa0643024c2
     Coord: {x: 5, y: 4}
     Cell: {fileID: 11400000, guid: abe681d6596fe54489c5850d5fcac9b1, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -1790,6 +1854,7 @@ MonoBehaviour:
   - InstanceId: 01f90ac31ef0472cb8ffd65d25981fb9
     Coord: {x: 5, y: 5}
     Cell: {fileID: 11400000, guid: abe681d6596fe54489c5850d5fcac9b1, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -1817,6 +1882,7 @@ MonoBehaviour:
   - InstanceId: 310fd732d00e48c5ad883f1c5ee7a7c9
     Coord: {x: 6, y: 6}
     Cell: {fileID: 11400000, guid: abe681d6596fe54489c5850d5fcac9b1, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -1844,6 +1910,7 @@ MonoBehaviour:
   - InstanceId: a4e18e2f098d42808d63ade0619361fb
     Coord: {x: 7, y: 6}
     Cell: {fileID: 11400000, guid: abe681d6596fe54489c5850d5fcac9b1, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -1871,6 +1938,7 @@ MonoBehaviour:
   - InstanceId: a3d8d0b2b1aa4df086ccd8bcfddd2cf2
     Coord: {x: 8, y: 6}
     Cell: {fileID: 11400000, guid: abe681d6596fe54489c5850d5fcac9b1, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -1898,6 +1966,7 @@ MonoBehaviour:
   - InstanceId: 7ed03f55f08b488fb8962f6cee39b5ae
     Coord: {x: 9, y: 6}
     Cell: {fileID: 11400000, guid: abe681d6596fe54489c5850d5fcac9b1, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -1925,6 +1994,7 @@ MonoBehaviour:
   - InstanceId: a89724af9f024ca9af7f44131b74a577
     Coord: {x: 9, y: 5}
     Cell: {fileID: 11400000, guid: abe681d6596fe54489c5850d5fcac9b1, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -1952,6 +2022,7 @@ MonoBehaviour:
   - InstanceId: ee8db9ba19a043b983d30303ffab43ce
     Coord: {x: 10, y: 5}
     Cell: {fileID: 11400000, guid: abe681d6596fe54489c5850d5fcac9b1, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -1979,6 +2050,7 @@ MonoBehaviour:
   - InstanceId: 72edc51d90434b0e8d60b072b2152a5a
     Coord: {x: 10, y: 4}
     Cell: {fileID: 11400000, guid: abe681d6596fe54489c5850d5fcac9b1, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -2006,6 +2078,7 @@ MonoBehaviour:
   - InstanceId: ba38946252a248c6b47dcf7dc94b08bf
     Coord: {x: 8, y: 5}
     Cell: {fileID: 11400000, guid: abe681d6596fe54489c5850d5fcac9b1, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -2033,6 +2106,7 @@ MonoBehaviour:
   - InstanceId: e8fbc9ca30db423eb87e205982a8451e
     Coord: {x: 7, y: 5}
     Cell: {fileID: 11400000, guid: abe681d6596fe54489c5850d5fcac9b1, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -2060,6 +2134,7 @@ MonoBehaviour:
   - InstanceId: 5de15be613dd45c8a7451888ae0fa616
     Coord: {x: 6, y: 5}
     Cell: {fileID: 11400000, guid: abe681d6596fe54489c5850d5fcac9b1, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -2087,6 +2162,7 @@ MonoBehaviour:
   - InstanceId: 651a100e7c044e4bb2137cb458c621b1
     Coord: {x: 9, y: 4}
     Cell: {fileID: 11400000, guid: abe681d6596fe54489c5850d5fcac9b1, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -2114,6 +2190,7 @@ MonoBehaviour:
   - InstanceId: aed799cbd2484a318b7f3d1409578c65
     Coord: {x: 10, y: 3}
     Cell: {fileID: 11400000, guid: abe681d6596fe54489c5850d5fcac9b1, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -2141,6 +2218,7 @@ MonoBehaviour:
   - InstanceId: 740e68e7012d490291d9cc02d039c0f1
     Coord: {x: 10, y: 2}
     Cell: {fileID: 11400000, guid: abe681d6596fe54489c5850d5fcac9b1, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -2168,6 +2246,7 @@ MonoBehaviour:
   - InstanceId: ce79cbf439894148b9b736155d8af31f
     Coord: {x: 11, y: 2}
     Cell: {fileID: 11400000, guid: abe681d6596fe54489c5850d5fcac9b1, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -2195,6 +2274,7 @@ MonoBehaviour:
   - InstanceId: 3d1263562e32430ba10475f1297854f8
     Coord: {x: 11, y: 1}
     Cell: {fileID: 11400000, guid: abe681d6596fe54489c5850d5fcac9b1, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -2222,6 +2302,7 @@ MonoBehaviour:
   - InstanceId: aef81b7193fc4befaa9d3f058d930bbf
     Coord: {x: 10, y: 1}
     Cell: {fileID: 11400000, guid: abe681d6596fe54489c5850d5fcac9b1, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -2249,6 +2330,7 @@ MonoBehaviour:
   - InstanceId: 3fc022be4b5e4086bf13b249216ac941
     Coord: {x: 10, y: 0}
     Cell: {fileID: 11400000, guid: abe681d6596fe54489c5850d5fcac9b1, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -2276,6 +2358,7 @@ MonoBehaviour:
   - InstanceId: 1482daf9ccfd46629d6bc9acaf061379
     Coord: {x: 9, y: -1}
     Cell: {fileID: 11400000, guid: abe681d6596fe54489c5850d5fcac9b1, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -2303,6 +2386,7 @@ MonoBehaviour:
   - InstanceId: 75ec195f74d64da69429db7641412106
     Coord: {x: 8, y: -1}
     Cell: {fileID: 11400000, guid: abe681d6596fe54489c5850d5fcac9b1, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -2330,6 +2414,7 @@ MonoBehaviour:
   - InstanceId: 9dd86a1895d44f949689ead41ed791e0
     Coord: {x: 7, y: -1}
     Cell: {fileID: 11400000, guid: abe681d6596fe54489c5850d5fcac9b1, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -2357,6 +2442,7 @@ MonoBehaviour:
   - InstanceId: 8b3cc447c305409c88ae3d69a62b5438
     Coord: {x: 8, y: -2}
     Cell: {fileID: 11400000, guid: abe681d6596fe54489c5850d5fcac9b1, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -2384,6 +2470,7 @@ MonoBehaviour:
   - InstanceId: ad59982fbfc6460d8477905b452c3083
     Coord: {x: 6, y: -1}
     Cell: {fileID: 11400000, guid: abe681d6596fe54489c5850d5fcac9b1, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -2411,6 +2498,7 @@ MonoBehaviour:
   - InstanceId: 1904796a7d9c4de79fc8061b40f7beb2
     Coord: {x: 5, y: -1}
     Cell: {fileID: 11400000, guid: abe681d6596fe54489c5850d5fcac9b1, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -2438,6 +2526,7 @@ MonoBehaviour:
   - InstanceId: 4309c6346d134adbb2feb4dc4994fec7
     Coord: {x: 6, y: 0}
     Cell: {fileID: 11400000, guid: abe681d6596fe54489c5850d5fcac9b1, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -2465,6 +2554,7 @@ MonoBehaviour:
   - InstanceId: 984e0bfcb9144b688319bcba31474027
     Coord: {x: 9, y: 0}
     Cell: {fileID: 11400000, guid: abe681d6596fe54489c5850d5fcac9b1, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -2492,6 +2582,7 @@ MonoBehaviour:
   - InstanceId: 88e9af778aef4d8c831a632245c08b1c
     Coord: {x: 10, y: -1}
     Cell: {fileID: 11400000, guid: abe681d6596fe54489c5850d5fcac9b1, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -2519,6 +2610,7 @@ MonoBehaviour:
   - InstanceId: 74f820e941c94bf28ad5badd299481d0
     Coord: {x: 9, y: -2}
     Cell: {fileID: 11400000, guid: abe681d6596fe54489c5850d5fcac9b1, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -2546,6 +2638,7 @@ MonoBehaviour:
   - InstanceId: b18e52c2703c46e380a2559420bcee97
     Coord: {x: 11, y: 3}
     Cell: {fileID: 11400000, guid: abe681d6596fe54489c5850d5fcac9b1, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -2573,6 +2666,7 @@ MonoBehaviour:
   - InstanceId: f0ef219bd89546ebada1c46c130eebc1
     Coord: {x: 11, y: 4}
     Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -2600,6 +2694,7 @@ MonoBehaviour:
   - InstanceId: 10a56912aa4e4e3b9274e8a02f7413d0
     Coord: {x: 9, y: -3}
     Cell: {fileID: 11400000, guid: abe681d6596fe54489c5850d5fcac9b1, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -2627,6 +2722,7 @@ MonoBehaviour:
   - InstanceId: 309697a5b79641de80e79e17e70606dd
     Coord: {x: 10, y: -3}
     Cell: {fileID: 11400000, guid: abe681d6596fe54489c5850d5fcac9b1, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -2654,6 +2750,7 @@ MonoBehaviour:
   - InstanceId: 638dc1d7cb904e219d1b40cb533b4d6e
     Coord: {x: 10, y: -2}
     Cell: {fileID: 11400000, guid: abe681d6596fe54489c5850d5fcac9b1, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -2681,6 +2778,7 @@ MonoBehaviour:
   - InstanceId: 06fcdcfc64e24e629f148ad3be631844
     Coord: {x: 11, y: -2}
     Cell: {fileID: 11400000, guid: abe681d6596fe54489c5850d5fcac9b1, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -2708,6 +2806,7 @@ MonoBehaviour:
   - InstanceId: 8bb44113769c4ddf8c86f709bd939488
     Coord: {x: 11, y: -1}
     Cell: {fileID: 11400000, guid: abe681d6596fe54489c5850d5fcac9b1, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -2735,6 +2834,7 @@ MonoBehaviour:
   - InstanceId: 1f7db0e401a849028ee4d0c8da39bfd1
     Coord: {x: 12, y: -1}
     Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -2762,6 +2862,7 @@ MonoBehaviour:
   - InstanceId: 408c1bbfe7a0499a9c83d01307e77b8b
     Coord: {x: 12, y: 0}
     Cell: {fileID: 11400000, guid: abe681d6596fe54489c5850d5fcac9b1, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -2789,6 +2890,7 @@ MonoBehaviour:
   - InstanceId: 9ffff29e0aa749a2bd71d5b8733b2cf4
     Coord: {x: 11, y: 0}
     Cell: {fileID: 11400000, guid: abe681d6596fe54489c5850d5fcac9b1, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -2816,6 +2918,7 @@ MonoBehaviour:
   - InstanceId: 235f8d49cd2642c6ae9e49c2a5e398f1
     Coord: {x: 12, y: 1}
     Cell: {fileID: 11400000, guid: abe681d6596fe54489c5850d5fcac9b1, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -2843,6 +2946,7 @@ MonoBehaviour:
   - InstanceId: b2a719a9e3174683864f2af5354a451b
     Coord: {x: 12, y: 2}
     Cell: {fileID: 11400000, guid: abe681d6596fe54489c5850d5fcac9b1, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -2870,6 +2974,7 @@ MonoBehaviour:
   - InstanceId: 778e7ce5ee0a4732929adcc384933a97
     Coord: {x: 12, y: 3}
     Cell: {fileID: 11400000, guid: abe681d6596fe54489c5850d5fcac9b1, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -2897,6 +3002,7 @@ MonoBehaviour:
   - InstanceId: 09fddfb813c34b75b4fde3d2ceeb23a5
     Coord: {x: 12, y: 4}
     Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -2924,6 +3030,7 @@ MonoBehaviour:
   - InstanceId: 680a9383d111448e9b1634532753bf38
     Coord: {x: 11, y: 5}
     Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -2951,6 +3058,7 @@ MonoBehaviour:
   - InstanceId: fb35569964454865854ec95f7782a7c7
     Coord: {x: 12, y: 5}
     Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -2978,6 +3086,7 @@ MonoBehaviour:
   - InstanceId: 06a93890bd4849f7bfccf37c9784c287
     Coord: {x: 12, y: 6}
     Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -3005,6 +3114,7 @@ MonoBehaviour:
   - InstanceId: 921724758c2e4108b8df557d6c4c9d87
     Coord: {x: 11, y: 6}
     Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -3032,6 +3142,7 @@ MonoBehaviour:
   - InstanceId: 012fa47152f543329273600ab8fa5f1c
     Coord: {x: 10, y: 6}
     Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -3059,6 +3170,7 @@ MonoBehaviour:
   - InstanceId: 9336aca6955e46a2bca3f5be4d3f7f68
     Coord: {x: 10, y: 7}
     Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -3086,6 +3198,7 @@ MonoBehaviour:
   - InstanceId: 6154b3f0568946e293216c22ff1f33db
     Coord: {x: 9, y: 7}
     Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -3113,6 +3226,7 @@ MonoBehaviour:
   - InstanceId: 3bf28f8a147a4cd6a4fed4f8463b17ee
     Coord: {x: 8, y: 7}
     Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -3140,6 +3254,7 @@ MonoBehaviour:
   - InstanceId: 2814199675e34fd99807e70f12ce2ab7
     Coord: {x: 7, y: 7}
     Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -3167,6 +3282,7 @@ MonoBehaviour:
   - InstanceId: 00a23bb6dd444c0d91bd922cf10b391d
     Coord: {x: 6, y: 7}
     Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -3194,6 +3310,7 @@ MonoBehaviour:
   - InstanceId: 09240c70e9684b019addc9a2dece7ee9
     Coord: {x: 5, y: 7}
     Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -3221,6 +3338,7 @@ MonoBehaviour:
   - InstanceId: c7d7c0b86975491aaf54b412996b8dfd
     Coord: {x: 4, y: 7}
     Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -3248,6 +3366,7 @@ MonoBehaviour:
   - InstanceId: 8cb043282fc34b4e8d72b1d29e6c0369
     Coord: {x: 4, y: 6}
     Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -3275,6 +3394,7 @@ MonoBehaviour:
   - InstanceId: 8df77892da6940f9bc8fa98bd8382589
     Coord: {x: 4, y: 5}
     Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -3302,6 +3422,7 @@ MonoBehaviour:
   - InstanceId: 72bd83e3f5b9416180a9ea667467ab1f
     Coord: {x: 5, y: 6}
     Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -3329,6 +3450,7 @@ MonoBehaviour:
   - InstanceId: faa1f70dd5c9457eaded657bbc654059
     Coord: {x: 4, y: 4}
     Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -3356,6 +3478,7 @@ MonoBehaviour:
   - InstanceId: 7d08106bcb254a76858c13351fa76fcb
     Coord: {x: 3, y: 4}
     Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -3383,6 +3506,7 @@ MonoBehaviour:
   - InstanceId: f1e07f74939d4660944b9055c5cba7e0
     Coord: {x: 3, y: 3}
     Cell: {fileID: 11400000, guid: 2aa14af92765da748b60133c95bf6468, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -3410,6 +3534,7 @@ MonoBehaviour:
   - InstanceId: a0b08ab75be7419e8c3f48f431dd0c86
     Coord: {x: 6, y: 2}
     Cell: {fileID: 11400000, guid: abe681d6596fe54489c5850d5fcac9b1, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -3437,6 +3562,7 @@ MonoBehaviour:
   - InstanceId: b90cccfe00634b18a3f0e7a84698d4cb
     Coord: {x: 7, y: 2}
     Cell: {fileID: 11400000, guid: abe681d6596fe54489c5850d5fcac9b1, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -3464,6 +3590,7 @@ MonoBehaviour:
   - InstanceId: e616dd444bcf4f1b99fe0f0575ae617f
     Coord: {x: 7, y: 1}
     Cell: {fileID: 11400000, guid: abe681d6596fe54489c5850d5fcac9b1, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -3491,6 +3618,7 @@ MonoBehaviour:
   - InstanceId: f25b170623b242fba33482db7f266583
     Coord: {x: 8, y: 1}
     Cell: {fileID: 11400000, guid: abe681d6596fe54489c5850d5fcac9b1, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -3518,6 +3646,7 @@ MonoBehaviour:
   - InstanceId: 43cba32fc9e04127b2a7e3c835987000
     Coord: {x: 9, y: 1}
     Cell: {fileID: 11400000, guid: abe681d6596fe54489c5850d5fcac9b1, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -3545,6 +3674,7 @@ MonoBehaviour:
   - InstanceId: e33148f5cff14ef491dcbb0a95d61b7b
     Coord: {x: 9, y: 2}
     Cell: {fileID: 11400000, guid: abe681d6596fe54489c5850d5fcac9b1, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -3572,6 +3702,7 @@ MonoBehaviour:
   - InstanceId: 507ab1b89b104b8a8c59ee99e63c3835
     Coord: {x: 7, y: 0}
     Cell: {fileID: 11400000, guid: abe681d6596fe54489c5850d5fcac9b1, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -3599,6 +3730,7 @@ MonoBehaviour:
   - InstanceId: 0eed3a25108c4da3ba15619b7787ae44
     Coord: {x: 8, y: 0}
     Cell: {fileID: 11400000, guid: abe681d6596fe54489c5850d5fcac9b1, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -3626,6 +3758,7 @@ MonoBehaviour:
   - InstanceId: ffaa41fc1fdb4012887267ed225f7db0
     Coord: {x: 12, y: -2}
     Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -3653,6 +3786,7 @@ MonoBehaviour:
   - InstanceId: 054dcec3770d43c7b2a9d86070a50b12
     Coord: {x: 11, y: -3}
     Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -3680,6 +3814,7 @@ MonoBehaviour:
   - InstanceId: 38e45844b6b64da69294fd41e8163e3c
     Coord: {x: 11, y: -4}
     Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -3707,6 +3842,7 @@ MonoBehaviour:
   - InstanceId: 42070838be9a46ab80afc2cc0951621b
     Coord: {x: 10, y: -4}
     Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -3734,6 +3870,7 @@ MonoBehaviour:
   - InstanceId: ee0155df42cb4f07bfd8f7f72073fbd2
     Coord: {x: 10, y: -5}
     Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -3761,6 +3898,7 @@ MonoBehaviour:
   - InstanceId: 569ec0c15e5641d2a67c259d52bf081f
     Coord: {x: 9, y: -5}
     Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -3788,6 +3926,7 @@ MonoBehaviour:
   - InstanceId: 8cd7ee27cbbf4ed3aef9526b7f1b1995
     Coord: {x: 8, y: -5}
     Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -3815,6 +3954,7 @@ MonoBehaviour:
   - InstanceId: 68c6c36beec34209a429e56039897314
     Coord: {x: 8, y: -4}
     Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -3842,6 +3982,7 @@ MonoBehaviour:
   - InstanceId: bf2feb7a0e97402297cc9abb2f341e38
     Coord: {x: 9, y: -4}
     Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -3869,6 +4010,7 @@ MonoBehaviour:
   - InstanceId: e6be431b6cdb440a82e40b20899b0a3c
     Coord: {x: 11, y: -5}
     Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -3896,6 +4038,7 @@ MonoBehaviour:
   - InstanceId: 809093832f994129bce3c7551f466dd3
     Coord: {x: 12, y: -4}
     Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -3923,6 +4066,7 @@ MonoBehaviour:
   - InstanceId: 9c33f1273e8845bd8ea9aaf8e7441e06
     Coord: {x: 12, y: -3}
     Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -3950,6 +4094,7 @@ MonoBehaviour:
   - InstanceId: 8fbc713e426c4e37911c8234fed4589e
     Coord: {x: 13, y: -2}
     Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -3977,6 +4122,7 @@ MonoBehaviour:
   - InstanceId: 9b94c4d214c045b489f052e726c4e1c3
     Coord: {x: 13, y: -1}
     Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -4004,6 +4150,7 @@ MonoBehaviour:
   - InstanceId: cab24a9213c146b8b44f442a985491af
     Coord: {x: 14, y: -1}
     Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -4031,6 +4178,7 @@ MonoBehaviour:
   - InstanceId: 2e8c76e24bc64c229000213fc204702b
     Coord: {x: 14, y: 0}
     Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -4058,6 +4206,7 @@ MonoBehaviour:
   - InstanceId: 7e413160f79b4a7ba39c7d1bf6737de3
     Coord: {x: 14, y: 1}
     Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -4085,6 +4234,7 @@ MonoBehaviour:
   - InstanceId: 90eb178bd3724bed9070f40e16286c9e
     Coord: {x: 13, y: 1}
     Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -4112,6 +4262,7 @@ MonoBehaviour:
   - InstanceId: c7a7ae16114041eab0cd7b5f679a7b32
     Coord: {x: 13, y: 0}
     Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -4139,6 +4290,7 @@ MonoBehaviour:
   - InstanceId: 05e024e253114ccca23c7ae19b87020d
     Coord: {x: 13, y: 2}
     Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -4166,6 +4318,7 @@ MonoBehaviour:
   - InstanceId: bc21dfaf07e24be9be583654b7591307
     Coord: {x: 14, y: 2}
     Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -4193,6 +4346,7 @@ MonoBehaviour:
   - InstanceId: 7b6f91708a9243469f0fe36d57eb39e4
     Coord: {x: 14, y: 3}
     Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -4220,6 +4374,7 @@ MonoBehaviour:
   - InstanceId: 4bdb1813076b435cbdd25b96b37425bd
     Coord: {x: 13, y: 3}
     Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -4247,6 +4402,7 @@ MonoBehaviour:
   - InstanceId: 7b54df9f315a472c9ff51d792325615b
     Coord: {x: 13, y: 4}
     Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -4274,6 +4430,7 @@ MonoBehaviour:
   - InstanceId: 470ce835c9b4414e969b3b424314b9d0
     Coord: {x: 13, y: 5}
     Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -4301,6 +4458,7 @@ MonoBehaviour:
   - InstanceId: b198f04c3cef41c48c61da80c51094b7
     Coord: {x: 14, y: 4}
     Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -4328,6 +4486,7 @@ MonoBehaviour:
   - InstanceId: df4ccc72989042329dc0d00c9815de39
     Coord: {x: 9, y: 3}
     Cell: {fileID: 11400000, guid: abe681d6596fe54489c5850d5fcac9b1, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -4355,6 +4514,7 @@ MonoBehaviour:
   - InstanceId: 2de51591711845149a4b0ae8ab539e2e
     Coord: {x: 8, y: 3}
     Cell: {fileID: 11400000, guid: abe681d6596fe54489c5850d5fcac9b1, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -4382,6 +4542,7 @@ MonoBehaviour:
   - InstanceId: c29f6df988db4fd99278190fac4ad877
     Coord: {x: 8, y: 2}
     Cell: {fileID: 11400000, guid: abe681d6596fe54489c5850d5fcac9b1, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -4409,6 +4570,7 @@ MonoBehaviour:
   - InstanceId: cc8982884ea047468925ffa1358c4aab
     Coord: {x: 6, y: 1}
     Cell: {fileID: 11400000, guid: abe681d6596fe54489c5850d5fcac9b1, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -4436,6 +4598,7 @@ MonoBehaviour:
   - InstanceId: df64530bdb3c4f05a29634356893bd78
     Coord: {x: 1, y: 1}
     Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -4463,6 +4626,7 @@ MonoBehaviour:
   - InstanceId: 1c89ffe4b27c45098b7786ffadbaef03
     Coord: {x: 0, y: 1}
     Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -4490,6 +4654,7 @@ MonoBehaviour:
   - InstanceId: e286cdbb14584a4f96768e8af65c0dcc
     Coord: {x: 0, y: 2}
     Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -4517,6 +4682,7 @@ MonoBehaviour:
   - InstanceId: 1c512038d28d409ba027e0c45b8200cd
     Coord: {x: -1, y: 1}
     Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -4544,6 +4710,7 @@ MonoBehaviour:
   - InstanceId: 9b8cfb80b75f440f8c2255ca83635f73
     Coord: {x: -2, y: 0}
     Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -4571,6 +4738,7 @@ MonoBehaviour:
   - InstanceId: 95bae24cdb8749419cf7273b185b62d6
     Coord: {x: -1, y: 0}
     Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -4598,6 +4766,7 @@ MonoBehaviour:
   - InstanceId: 443e3ad239fe45e2a6618b9fab4250df
     Coord: {x: -2, y: -1}
     Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -4625,6 +4794,7 @@ MonoBehaviour:
   - InstanceId: 562b1e06680e418e9f7c1658250cc018
     Coord: {x: 1, y: 2}
     Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Decal: {fileID: -3389857664573656437, guid: a36e080e5b9b3af419b58a1b2bef2d34, type: 3}
     Site:
       Raid:
         PreCapture:
@@ -4652,6 +4822,7 @@ MonoBehaviour:
   - InstanceId: d1814d56eda24374a39887d89dd0a039
     Coord: {x: 1, y: 3}
     Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -4679,6 +4850,7 @@ MonoBehaviour:
   - InstanceId: 1397b8d9bd8f4fc1a440dc6e0a8d6955
     Coord: {x: 2, y: 3}
     Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -4706,6 +4878,7 @@ MonoBehaviour:
   - InstanceId: f864e71d30114f7d938da6d65b83bf11
     Coord: {x: -3, y: -3}
     Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -4733,6 +4906,7 @@ MonoBehaviour:
   - InstanceId: 00b9862b0e764541acc4055412ec6a13
     Coord: {x: -2, y: -3}
     Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -4760,6 +4934,7 @@ MonoBehaviour:
   - InstanceId: b65c154eb4254342966d0db9f6262939
     Coord: {x: -2, y: -2}
     Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -4787,6 +4962,7 @@ MonoBehaviour:
   - InstanceId: 871eb3268ec94b27af430f55919c190d
     Coord: {x: -1, y: -2}
     Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -4814,6 +4990,7 @@ MonoBehaviour:
   - InstanceId: c16d77d1467f4211a28d871a495cf546
     Coord: {x: 0, y: -2}
     Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -4841,6 +5018,7 @@ MonoBehaviour:
   - InstanceId: 00491c24e36a4e968644b3dbd11c2e6d
     Coord: {x: 0, y: -3}
     Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -4868,6 +5046,7 @@ MonoBehaviour:
   - InstanceId: 7317826e11e94fbca23dfa5f3762a1c0
     Coord: {x: 0, y: -4}
     Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -4895,6 +5074,7 @@ MonoBehaviour:
   - InstanceId: c7b156d4842d407b928fa096d00921a4
     Coord: {x: -1, y: -4}
     Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -4922,6 +5102,7 @@ MonoBehaviour:
   - InstanceId: 98f19fa9a3664da1a3869045fa7cb720
     Coord: {x: -1, y: -5}
     Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -4949,6 +5130,7 @@ MonoBehaviour:
   - InstanceId: c3175f7ea15c45469d62a0cb26a4a10b
     Coord: {x: -2, y: -5}
     Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -4976,6 +5158,7 @@ MonoBehaviour:
   - InstanceId: 5b827685559247cd9d2e5ce6f9aaa9af
     Coord: {x: -2, y: -4}
     Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -5003,6 +5186,7 @@ MonoBehaviour:
   - InstanceId: 3e61b094553943759c1d1a4d4963d078
     Coord: {x: -1, y: -3}
     Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -5030,6 +5214,7 @@ MonoBehaviour:
   - InstanceId: 4582dc64ff424a218e9c26cb703c7e61
     Coord: {x: -3, y: -2}
     Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -5057,6 +5242,7 @@ MonoBehaviour:
   - InstanceId: 86e393db8038413fa41982814b58064b
     Coord: {x: 0, y: -5}
     Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -5084,6 +5270,7 @@ MonoBehaviour:
   - InstanceId: 0dccbb6d3f534283b20d81cf3c435030
     Coord: {x: 2, y: 4}
     Cell: {fileID: 11400000, guid: e7e4f9c271529b4479864d417c2384cb, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -5111,6 +5298,7 @@ MonoBehaviour:
   - InstanceId: 6bc267cd854d46c085b0b5d6ed98379b
     Coord: {x: 2, y: 5}
     Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -5138,6 +5326,7 @@ MonoBehaviour:
   - InstanceId: b20167db31da437bb125696a93eea3e3
     Coord: {x: 3, y: 6}
     Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -5165,6 +5354,7 @@ MonoBehaviour:
   - InstanceId: 67e9f414a976412890b9677e4c953679
     Coord: {x: 3, y: 7}
     Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -5192,6 +5382,7 @@ MonoBehaviour:
   - InstanceId: ccbc46fdddf444669c4ef20a6d006fde
     Coord: {x: 2, y: 6}
     Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -5219,6 +5410,7 @@ MonoBehaviour:
   - InstanceId: b4f50e41df664faa9cdd1a5c859471ad
     Coord: {x: 1, y: 5}
     Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -5246,6 +5438,7 @@ MonoBehaviour:
   - InstanceId: d3009e497eb641aeaf385975f4334997
     Coord: {x: 3, y: 5}
     Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -5273,6 +5466,7 @@ MonoBehaviour:
   - InstanceId: e4f5d20b1c8f4790905c2e9bb248e391
     Coord: {x: 1, y: 4}
     Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -5300,6 +5494,7 @@ MonoBehaviour:
   - InstanceId: fe06c05133264034ae98f1620f3ba085
     Coord: {x: 0, y: 4}
     Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -5327,6 +5522,7 @@ MonoBehaviour:
   - InstanceId: 25504b2c25a043f986b9eb4cd4ccf4d1
     Coord: {x: -1, y: 2}
     Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -5354,6 +5550,7 @@ MonoBehaviour:
   - InstanceId: 8b10baee8fa7450384c36dfec979265e
     Coord: {x: -1, y: 3}
     Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -5381,6 +5578,7 @@ MonoBehaviour:
   - InstanceId: 03f1645f96c84550b894f62a62dc06b1
     Coord: {x: -2, y: 2}
     Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -5408,6 +5606,7 @@ MonoBehaviour:
   - InstanceId: 547a54d0ca5547cb94584d395185a2d9
     Coord: {x: -3, y: 0}
     Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -5435,6 +5634,7 @@ MonoBehaviour:
   - InstanceId: 496c0c46deca461887b84d8ae7380584
     Coord: {x: -2, y: 1}
     Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -5462,6 +5662,7 @@ MonoBehaviour:
   - InstanceId: 1e18c7a027514e80a0c596dde37e8441
     Coord: {x: 0, y: 3}
     Cell: {fileID: 11400000, guid: 6713fae491cd9f94081cc37d30c5659e, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -5489,6 +5690,7 @@ MonoBehaviour:
   - InstanceId: 9fb1dde78f3645b69cf1c7a02bbb1984
     Coord: {x: 2, y: 8}
     Cell: {fileID: 11400000, guid: e7e4f9c271529b4479864d417c2384cb, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -5516,6 +5718,7 @@ MonoBehaviour:
   - InstanceId: 93bef8cdcfd04cdd9f54eddc0ea21c11
     Coord: {x: 2, y: 7}
     Cell: {fileID: 11400000, guid: e7e4f9c271529b4479864d417c2384cb, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -5543,6 +5746,7 @@ MonoBehaviour:
   - InstanceId: 0ee23910ba35448ca91189686207644a
     Coord: {x: 1, y: 7}
     Cell: {fileID: 11400000, guid: e7e4f9c271529b4479864d417c2384cb, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -5570,6 +5774,7 @@ MonoBehaviour:
   - InstanceId: 34dda363dfcc4604aa6623ca2e35ab6e
     Coord: {x: 1, y: 6}
     Cell: {fileID: 11400000, guid: e7e4f9c271529b4479864d417c2384cb, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -5597,6 +5802,7 @@ MonoBehaviour:
   - InstanceId: 730a3be0695f496691d0a823d3936b47
     Coord: {x: 0, y: 6}
     Cell: {fileID: 11400000, guid: e7e4f9c271529b4479864d417c2384cb, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -5624,6 +5830,7 @@ MonoBehaviour:
   - InstanceId: a94e8146912e4559903aae6fdc249333
     Coord: {x: 0, y: 5}
     Cell: {fileID: 11400000, guid: e7e4f9c271529b4479864d417c2384cb, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -5651,6 +5858,7 @@ MonoBehaviour:
   - InstanceId: 9b8fd4869a004c6a86feae653c13e558
     Coord: {x: -1, y: 4}
     Cell: {fileID: 11400000, guid: e7e4f9c271529b4479864d417c2384cb, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -5678,6 +5886,7 @@ MonoBehaviour:
   - InstanceId: e5c4a3301ebe400b82fda035c2b2827b
     Coord: {x: -3, y: 2}
     Cell: {fileID: 11400000, guid: e7e4f9c271529b4479864d417c2384cb, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -5705,6 +5914,7 @@ MonoBehaviour:
   - InstanceId: f90fd680ca1941dea63d9ffa1f69112b
     Coord: {x: -4, y: 1}
     Cell: {fileID: 11400000, guid: e7e4f9c271529b4479864d417c2384cb, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -5732,6 +5942,7 @@ MonoBehaviour:
   - InstanceId: 5b49a76ca4214c9d8d20f45335faf0b2
     Coord: {x: -5, y: 0}
     Cell: {fileID: 11400000, guid: e7e4f9c271529b4479864d417c2384cb, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -5759,6 +5970,7 @@ MonoBehaviour:
   - InstanceId: 49c0db0ec48a417f9792251aa7e24a63
     Coord: {x: -4, y: 0}
     Cell: {fileID: 11400000, guid: e7e4f9c271529b4479864d417c2384cb, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -5786,6 +5998,7 @@ MonoBehaviour:
   - InstanceId: e8d94ccbbaa845bb980c06c9371f078d
     Coord: {x: -3, y: 3}
     Cell: {fileID: 11400000, guid: e7e4f9c271529b4479864d417c2384cb, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -5813,6 +6026,7 @@ MonoBehaviour:
   - InstanceId: 38988c91686b41839b81e201fb242adb
     Coord: {x: -2, y: 4}
     Cell: {fileID: 11400000, guid: e7e4f9c271529b4479864d417c2384cb, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -5840,6 +6054,7 @@ MonoBehaviour:
   - InstanceId: 1ffc6882b5b346d8843d54198b15c387
     Coord: {x: -2, y: 3}
     Cell: {fileID: 11400000, guid: e7e4f9c271529b4479864d417c2384cb, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -5867,6 +6082,7 @@ MonoBehaviour:
   - InstanceId: 3ed547b9d3bf4377a2cecbf1ad1073bf
     Coord: {x: -2, y: 5}
     Cell: {fileID: 11400000, guid: e7e4f9c271529b4479864d417c2384cb, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -5894,6 +6110,7 @@ MonoBehaviour:
   - InstanceId: 468f34f7f540424da583d67df8fcada2
     Coord: {x: -1, y: 6}
     Cell: {fileID: 11400000, guid: e7e4f9c271529b4479864d417c2384cb, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -5921,6 +6138,7 @@ MonoBehaviour:
   - InstanceId: 0f4f156ad3f04e80a04bcee7396c49a0
     Coord: {x: 0, y: 7}
     Cell: {fileID: 11400000, guid: e7e4f9c271529b4479864d417c2384cb, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -5948,6 +6166,7 @@ MonoBehaviour:
   - InstanceId: c774e4ee2be14349ac562a743b6cdc88
     Coord: {x: -1, y: 7}
     Cell: {fileID: 11400000, guid: e7e4f9c271529b4479864d417c2384cb, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -5975,6 +6194,7 @@ MonoBehaviour:
   - InstanceId: 87f1f1da952345a29924d03d0dbddcad
     Coord: {x: -4, y: 2}
     Cell: {fileID: 11400000, guid: e7e4f9c271529b4479864d417c2384cb, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -6002,6 +6222,7 @@ MonoBehaviour:
   - InstanceId: b12203e84226430db5a11829f1b59fac
     Coord: {x: -3, y: 1}
     Cell: {fileID: 11400000, guid: e7e4f9c271529b4479864d417c2384cb, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -6029,6 +6250,7 @@ MonoBehaviour:
   - InstanceId: ea0615d0c34a41199aabc7f349706d9a
     Coord: {x: -4, y: -1}
     Cell: {fileID: 11400000, guid: e7e4f9c271529b4479864d417c2384cb, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -6056,6 +6278,7 @@ MonoBehaviour:
   - InstanceId: 64af9f94272d4d5494a91964c2950b7e
     Coord: {x: -1, y: 5}
     Cell: {fileID: 11400000, guid: e7e4f9c271529b4479864d417c2384cb, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -6083,6 +6306,7 @@ MonoBehaviour:
   - InstanceId: a2ecd3de9f544aedbd696307ee602116
     Coord: {x: -5, y: -2}
     Cell: {fileID: 11400000, guid: e7e4f9c271529b4479864d417c2384cb, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -6110,6 +6334,7 @@ MonoBehaviour:
   - InstanceId: e1d790a598e646e3b477d24f49e0bd3c
     Coord: {x: -5, y: -3}
     Cell: {fileID: 11400000, guid: e7e4f9c271529b4479864d417c2384cb, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -6137,6 +6362,7 @@ MonoBehaviour:
   - InstanceId: c4114968a68a48188bcc555096afbe6a
     Coord: {x: -4, y: -2}
     Cell: {fileID: 11400000, guid: e7e4f9c271529b4479864d417c2384cb, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -6164,6 +6390,7 @@ MonoBehaviour:
   - InstanceId: 61060af6b95647ca84f744d2741b498d
     Coord: {x: -3, y: -1}
     Cell: {fileID: 11400000, guid: e7e4f9c271529b4479864d417c2384cb, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -6191,6 +6418,7 @@ MonoBehaviour:
   - InstanceId: b88bd8e14e494e17b31c356ee102c81c
     Coord: {x: -3, y: -4}
     Cell: {fileID: 11400000, guid: e7e4f9c271529b4479864d417c2384cb, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -6218,6 +6446,7 @@ MonoBehaviour:
   - InstanceId: a6b46ba39bba407a8d6a45e03fb8ae71
     Coord: {x: -5, y: -4}
     Cell: {fileID: 11400000, guid: e7e4f9c271529b4479864d417c2384cb, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -6245,6 +6474,7 @@ MonoBehaviour:
   - InstanceId: 77e0dc3cccfd4f64aa164c522500f4e0
     Coord: {x: -5, y: -5}
     Cell: {fileID: 11400000, guid: e7e4f9c271529b4479864d417c2384cb, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -6272,6 +6502,7 @@ MonoBehaviour:
   - InstanceId: 670eb53ca2b24e46a015afc841eee70d
     Coord: {x: -5, y: -6}
     Cell: {fileID: 11400000, guid: e7e4f9c271529b4479864d417c2384cb, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -6299,6 +6530,7 @@ MonoBehaviour:
   - InstanceId: 3c2d50c076484fad9170b7f19f483822
     Coord: {x: -4, y: -4}
     Cell: {fileID: 11400000, guid: e7e4f9c271529b4479864d417c2384cb, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -6326,6 +6558,7 @@ MonoBehaviour:
   - InstanceId: ba5c9f6cb0ff40588bf2b9246371ff87
     Coord: {x: -4, y: -5}
     Cell: {fileID: 11400000, guid: e7e4f9c271529b4479864d417c2384cb, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -6353,6 +6586,7 @@ MonoBehaviour:
   - InstanceId: 83fbeb3bf5144e89b97476f064a3c682
     Coord: {x: -4, y: -3}
     Cell: {fileID: 11400000, guid: e7e4f9c271529b4479864d417c2384cb, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -6380,6 +6614,7 @@ MonoBehaviour:
   - InstanceId: 872e590ce6d446408782e4e2d130c829
     Coord: {x: -3, y: -6}
     Cell: {fileID: 11400000, guid: e7e4f9c271529b4479864d417c2384cb, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -6407,6 +6642,7 @@ MonoBehaviour:
   - InstanceId: 679e0ce3e0fc46d29252bc7f275e4642
     Coord: {x: -3, y: -5}
     Cell: {fileID: 11400000, guid: e7e4f9c271529b4479864d417c2384cb, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -6434,6 +6670,7 @@ MonoBehaviour:
   - InstanceId: 9415204c45a64ea08d797f7253e96d1a
     Coord: {x: -2, y: -6}
     Cell: {fileID: 11400000, guid: e7e4f9c271529b4479864d417c2384cb, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -6461,6 +6698,7 @@ MonoBehaviour:
   - InstanceId: 9a99ba4c40344e3aae9ae1d8ef3e01a4
     Coord: {x: -4, y: -6}
     Cell: {fileID: 11400000, guid: e7e4f9c271529b4479864d417c2384cb, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -6488,6 +6726,7 @@ MonoBehaviour:
   - InstanceId: 49c32592e32a4dc7a99d606e9154429b
     Coord: {x: -4, y: 3}
     Cell: {fileID: 11400000, guid: e7e4f9c271529b4479864d417c2384cb, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -6515,6 +6754,7 @@ MonoBehaviour:
   - InstanceId: bd7a956c4d1940b189caf7042a68fd31
     Coord: {x: -5, y: -1}
     Cell: {fileID: 11400000, guid: e7e4f9c271529b4479864d417c2384cb, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -6542,6 +6782,7 @@ MonoBehaviour:
   - InstanceId: 19a3d164139846749e4ebdb9f8b8821a
     Coord: {x: -6, y: -3}
     Cell: {fileID: 11400000, guid: e7e4f9c271529b4479864d417c2384cb, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -6569,6 +6810,7 @@ MonoBehaviour:
   - InstanceId: 59c6a712df9243ae95406d49dbc69ad8
     Coord: {x: -6, y: -4}
     Cell: {fileID: 11400000, guid: e7e4f9c271529b4479864d417c2384cb, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -6596,6 +6838,7 @@ MonoBehaviour:
   - InstanceId: c2cefaccbe1940cc85751b05662480da
     Coord: {x: -6, y: -5}
     Cell: {fileID: 11400000, guid: e7e4f9c271529b4479864d417c2384cb, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -6623,6 +6866,7 @@ MonoBehaviour:
   - InstanceId: 96d63fdfbff84dc397b3355fadc097af
     Coord: {x: -6, y: -2}
     Cell: {fileID: 11400000, guid: e7e4f9c271529b4479864d417c2384cb, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -6650,6 +6894,7 @@ MonoBehaviour:
   - InstanceId: d69d2172a2e847dda14b41c2c78c7b1e
     Coord: {x: -5, y: 1}
     Cell: {fileID: 11400000, guid: e7e4f9c271529b4479864d417c2384cb, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -6677,6 +6922,7 @@ MonoBehaviour:
   - InstanceId: 70f9b363e76e4d93bb2e7b6075ef9515
     Coord: {x: -6, y: -1}
     Cell: {fileID: 11400000, guid: e7e4f9c271529b4479864d417c2384cb, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -6704,6 +6950,7 @@ MonoBehaviour:
   - InstanceId: 97c5b04e21dd479e87246fe951af1580
     Coord: {x: -7, y: -3}
     Cell: {fileID: 11400000, guid: e7e4f9c271529b4479864d417c2384cb, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -6731,6 +6978,7 @@ MonoBehaviour:
   - InstanceId: c78849e1c8654819abe4e0430a4ddd44
     Coord: {x: -7, y: -2}
     Cell: {fileID: 11400000, guid: e7e4f9c271529b4479864d417c2384cb, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -6758,6 +7006,7 @@ MonoBehaviour:
   - InstanceId: e29cb67d50b242b2bffbe2752bed9672
     Coord: {x: -6, y: 2}
     Cell: {fileID: 11400000, guid: e7e4f9c271529b4479864d417c2384cb, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -6785,6 +7034,7 @@ MonoBehaviour:
   - InstanceId: 3c0b601442c6451085a4ca9b27ba14d5
     Coord: {x: -7, y: 2}
     Cell: {fileID: 11400000, guid: e7e4f9c271529b4479864d417c2384cb, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -6812,6 +7062,7 @@ MonoBehaviour:
   - InstanceId: 98a6e060a1b94adea14c8f578b7da7de
     Coord: {x: -7, y: 1}
     Cell: {fileID: 11400000, guid: e7e4f9c271529b4479864d417c2384cb, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -6839,6 +7090,7 @@ MonoBehaviour:
   - InstanceId: e1fb14a33b8b4e5faf1db581ca67cac2
     Coord: {x: -6, y: 3}
     Cell: {fileID: 11400000, guid: e7e4f9c271529b4479864d417c2384cb, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -6866,6 +7118,7 @@ MonoBehaviour:
   - InstanceId: 04b8965efe59429bac77185250edeee1
     Coord: {x: -3, y: 6}
     Cell: {fileID: 11400000, guid: e7e4f9c271529b4479864d417c2384cb, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -6893,6 +7146,7 @@ MonoBehaviour:
   - InstanceId: ed91729d55884557828179b58817dc8e
     Coord: {x: -2, y: 7}
     Cell: {fileID: 11400000, guid: e7e4f9c271529b4479864d417c2384cb, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -6920,6 +7174,7 @@ MonoBehaviour:
   - InstanceId: f56f9deeb0464ec0b58a7e1112d417a5
     Coord: {x: -3, y: 4}
     Cell: {fileID: 11400000, guid: e7e4f9c271529b4479864d417c2384cb, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -6947,6 +7202,7 @@ MonoBehaviour:
   - InstanceId: 1b0dd6e6228d4a43a47717d261de2357
     Coord: {x: -3, y: 5}
     Cell: {fileID: 11400000, guid: e7e4f9c271529b4479864d417c2384cb, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -6974,6 +7230,7 @@ MonoBehaviour:
   - InstanceId: 15230e8e0eed418f8d23eeb342ad9513
     Coord: {x: -2, y: 6}
     Cell: {fileID: 11400000, guid: e7e4f9c271529b4479864d417c2384cb, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -7001,6 +7258,7 @@ MonoBehaviour:
   - InstanceId: 5c396808b86345e9b6ba3c1354b79520
     Coord: {x: -5, y: 3}
     Cell: {fileID: 11400000, guid: e7e4f9c271529b4479864d417c2384cb, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -7028,6 +7286,7 @@ MonoBehaviour:
   - InstanceId: d83aa4c588244e5a8b002e95b57f44fa
     Coord: {x: -8, y: -1}
     Cell: {fileID: 11400000, guid: e7e4f9c271529b4479864d417c2384cb, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -7055,6 +7314,7 @@ MonoBehaviour:
   - InstanceId: 3e287a4f5806405d9b5ece6833a6f51e
     Coord: {x: -8, y: -2}
     Cell: {fileID: 11400000, guid: e7e4f9c271529b4479864d417c2384cb, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -7082,6 +7342,7 @@ MonoBehaviour:
   - InstanceId: 1dc4389555d148bd93da71b8e44fbb54
     Coord: {x: -7, y: 0}
     Cell: {fileID: 11400000, guid: e7e4f9c271529b4479864d417c2384cb, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -7109,6 +7370,7 @@ MonoBehaviour:
   - InstanceId: dcfaa2cb181a4a42ba081b3ff829a863
     Coord: {x: -4, y: 4}
     Cell: {fileID: 11400000, guid: e7e4f9c271529b4479864d417c2384cb, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -7136,6 +7398,7 @@ MonoBehaviour:
   - InstanceId: 6532ef7b689d4fd7b931b50ad51eefe2
     Coord: {x: -6, y: 1}
     Cell: {fileID: 11400000, guid: e7e4f9c271529b4479864d417c2384cb, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -7163,6 +7426,7 @@ MonoBehaviour:
   - InstanceId: a495e3e7c6ba49e786a3bdbacc1540bd
     Coord: {x: -6, y: 0}
     Cell: {fileID: 11400000, guid: e7e4f9c271529b4479864d417c2384cb, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -7190,6 +7454,7 @@ MonoBehaviour:
   - InstanceId: 8294c59999a9443b8bf1daee94480359
     Coord: {x: -5, y: 2}
     Cell: {fileID: 11400000, guid: e7e4f9c271529b4479864d417c2384cb, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -7217,6 +7482,7 @@ MonoBehaviour:
   - InstanceId: 1f3e6f0d5c4d4931aeeabf3f7650bff4
     Coord: {x: -7, y: -1}
     Cell: {fileID: 11400000, guid: e7e4f9c271529b4479864d417c2384cb, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -7244,6 +7510,7 @@ MonoBehaviour:
   - InstanceId: 8e9d04daace248a68aa2634129fa205e
     Coord: {x: -5, y: 4}
     Cell: {fileID: 11400000, guid: e7e4f9c271529b4479864d417c2384cb, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -7271,6 +7538,7 @@ MonoBehaviour:
   - InstanceId: 2838da2bd69443a59e2c41b8fd823a12
     Coord: {x: -5, y: 5}
     Cell: {fileID: 11400000, guid: e7e4f9c271529b4479864d417c2384cb, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -7298,6 +7566,7 @@ MonoBehaviour:
   - InstanceId: 174e56d98b814cad923a76a3b51e50a9
     Coord: {x: -4, y: 7}
     Cell: {fileID: 11400000, guid: e7e4f9c271529b4479864d417c2384cb, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -7325,6 +7594,7 @@ MonoBehaviour:
   - InstanceId: e1d8b8c30b5d49c6bedb36e71e24551e
     Coord: {x: -3, y: 7}
     Cell: {fileID: 11400000, guid: e7e4f9c271529b4479864d417c2384cb, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -7352,6 +7622,7 @@ MonoBehaviour:
   - InstanceId: 5d30120b4caa4580890058325b50164e
     Coord: {x: -4, y: 5}
     Cell: {fileID: 11400000, guid: e7e4f9c271529b4479864d417c2384cb, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -7379,6 +7650,7 @@ MonoBehaviour:
   - InstanceId: 04e44ee1480647d8a311a229c871cd7e
     Coord: {x: -1, y: 8}
     Cell: {fileID: 11400000, guid: e7e4f9c271529b4479864d417c2384cb, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -7406,6 +7678,7 @@ MonoBehaviour:
   - InstanceId: 4e1c52f913bf417d959c315c3fa324e6
     Coord: {x: 0, y: 8}
     Cell: {fileID: 11400000, guid: e7e4f9c271529b4479864d417c2384cb, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -7433,6 +7706,7 @@ MonoBehaviour:
   - InstanceId: 242e483a29ae4534ac4601ac943e77dc
     Coord: {x: 2, y: 9}
     Cell: {fileID: 11400000, guid: e7e4f9c271529b4479864d417c2384cb, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -7460,6 +7734,7 @@ MonoBehaviour:
   - InstanceId: d52e473ebd85443a9b3bf3d198be8dfe
     Coord: {x: 2, y: 10}
     Cell: {fileID: 11400000, guid: e7e4f9c271529b4479864d417c2384cb, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -7487,6 +7762,7 @@ MonoBehaviour:
   - InstanceId: 2c460b4b10e2429fb1005269d14df6c1
     Coord: {x: 3, y: 10}
     Cell: {fileID: 11400000, guid: e7e4f9c271529b4479864d417c2384cb, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -7514,6 +7790,7 @@ MonoBehaviour:
   - InstanceId: 741f2a1e3a944148b1501531266d7f1e
     Coord: {x: 1, y: 9}
     Cell: {fileID: 11400000, guid: e7e4f9c271529b4479864d417c2384cb, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -7541,6 +7818,7 @@ MonoBehaviour:
   - InstanceId: 19d1832d82544fac861b0e660ff2ea56
     Coord: {x: 1, y: 8}
     Cell: {fileID: 11400000, guid: e7e4f9c271529b4479864d417c2384cb, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -7568,6 +7846,7 @@ MonoBehaviour:
   - InstanceId: ed3a2e09b8034d80b9483c16ec319b53
     Coord: {x: 3, y: 8}
     Cell: {fileID: 11400000, guid: e7e4f9c271529b4479864d417c2384cb, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -7595,6 +7874,7 @@ MonoBehaviour:
   - InstanceId: 08c7f699a4644128b798418795dcd38e
     Coord: {x: 4, y: 8}
     Cell: {fileID: 11400000, guid: e7e4f9c271529b4479864d417c2384cb, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -7622,6 +7902,7 @@ MonoBehaviour:
   - InstanceId: 7f4b31987a3f4b1e87083cada3a8dfcc
     Coord: {x: 4, y: 9}
     Cell: {fileID: 11400000, guid: e7e4f9c271529b4479864d417c2384cb, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:
@@ -7649,6 +7930,7 @@ MonoBehaviour:
   - InstanceId: d9524ff835f840748498ba2b67eee9e2
     Coord: {x: 3, y: 9}
     Cell: {fileID: 11400000, guid: e7e4f9c271529b4479864d417c2384cb, type: 2}
+    Decal: {fileID: 0}
     Site:
       Raid:
         PreCapture:

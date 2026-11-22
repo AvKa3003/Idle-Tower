@@ -166,6 +166,7 @@ namespace IdleTower.UI.Views
                 cell.Setup(
                     info.Coord,
                     sprite,
+                    isFog ? null : info.Decal,
                     info.Presence,
                     info.HasFunctionalClick,
                     !isFog && info.CanClick);

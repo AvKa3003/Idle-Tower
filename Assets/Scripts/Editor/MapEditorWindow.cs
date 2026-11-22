@@ -54,6 +54,7 @@ namespace IdleTower.Editor
             public Vector2Int Coord;
             public string InstanceId;
             public Sprite Sprite;
+            public Sprite Decal;
             public Vector2 ContentPos;
             public bool Ghost;
         }
@@ -368,16 +369,22 @@ namespace IdleTower.Editor
                 for (var i = 0; i < _drawBuffer.Count; i++)
                 {
                     var cell = _drawBuffer[i];
-                    if (!cell.Ghost)
+                    if (cell.Ghost)
                     {
+                        var prevColor = GUI.color;
+                        GUI.color = new Color(1f, 1f, 1f, 0.4f);
                         DrawCellSprite(cell, rect, viewCenter);
+                        GUI.color = prevColor;
                         continue;
                     }
 
-                    var prevColor = GUI.color;
-                    GUI.color = new Color(1f, 1f, 1f, 0.4f);
                     DrawCellSprite(cell, rect, viewCenter);
-                    GUI.color = prevColor;
+                    if (cell.Decal != null)
+                    {
+                        var decal = cell;
+                        decal.Sprite = cell.Decal;
+                        DrawCellSprite(decal, rect, viewCenter);
+                    }
                 }
 
                 if (!string.IsNullOrEmpty(_selectedInstanceId))
@@ -553,6 +560,7 @@ namespace IdleTower.Editor
                     Coord = coord,
                     InstanceId = entry.FindPropertyRelative("InstanceId").stringValue ?? string.Empty,
                     Sprite = cell != null ? cell.Sprite : null,
+                    Decal = entry.FindPropertyRelative("Decal")?.objectReferenceValue as Sprite,
                     ContentPos = content
                 });
             }

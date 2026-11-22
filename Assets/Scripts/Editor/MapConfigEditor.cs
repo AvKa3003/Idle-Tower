@@ -113,6 +113,7 @@ namespace IdleTower.Editor
 
             var cellProp = entry.FindPropertyRelative("Cell");
             EditorGUILayout.PropertyField(cellProp);
+            EditorGUILayout.PropertyField(entry.FindPropertyRelative("Decal"));
 
             if (!IsRaid(cellProp))
                 return;

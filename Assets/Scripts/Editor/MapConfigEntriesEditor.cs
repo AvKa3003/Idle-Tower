@@ -191,6 +191,9 @@ namespace IdleTower.Editor
             entry.FindPropertyRelative("InstanceId").stringValue = instanceId;
             entry.FindPropertyRelative("Coord").vector2IntValue = coord;
             entry.FindPropertyRelative("Cell").objectReferenceValue = definition;
+            var decal = entry.FindPropertyRelative("Decal");
+            if (decal != null)
+                decal.objectReferenceValue = null;
             ResetSite(entry.FindPropertyRelative("Site"));
         }
 

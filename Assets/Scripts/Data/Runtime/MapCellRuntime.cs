@@ -1,5 +1,6 @@
 using IdleTower.Data.Definitions;
 using IdleTower.Map;
+using UnityEngine;
 
 namespace IdleTower.Data.Runtime
 {
@@ -15,18 +16,23 @@ namespace IdleTower.Data.Runtime
         /// <summary>Per-entry конфиг с MapConfig (Raid и др.).</summary>
         public MapCellSiteConfig Site { get; }
 
+        /// <summary>Картинка поверх клетки. На функционал не влияет.</summary>
+        public Sprite Decal { get; }
+
         public RaidSiteConfig RaidSite => Site?.Raid;
 
         public MapCellRuntime(
             string instanceId,
             MapCellDefinition definition,
             MapCellRuntimeState behaviorState,
-            MapCellSiteConfig site = null)
+            MapCellSiteConfig site = null,
+            Sprite decal = null)
         {
             InstanceId = instanceId ?? string.Empty;
             Definition = definition;
             BehaviorState = behaviorState ?? MapCellRuntimeState.Empty;
             Site = site;
+            Decal = decal;
             Presence = MapPresence.Fog;
         }
     }

@@ -6,7 +6,7 @@ using UnityEngine;
 namespace IdleTower.Editor
 {
     /// <summary>
-    /// Site.Raid только если Cell.Behavior = Raid; иначе Site в инспекторе скрыт.
+    /// Cell и Decal всегда. Site.Raid только если Cell.Behavior = Raid.
     /// </summary>
     [CustomPropertyDrawer(typeof(MapConfigEntry))]
     public sealed class MapConfigEntryDrawer : PropertyDrawer
@@ -22,6 +22,7 @@ namespace IdleTower.Editor
             h += Line(property.FindPropertyRelative("InstanceId"));
             h += Line(property.FindPropertyRelative("Coord"));
             h += Line(property.FindPropertyRelative("Cell"));
+            h += Line(property.FindPropertyRelative("Decal"));
 
             if (IsRaidEntry(property))
             {
@@ -57,6 +58,7 @@ namespace IdleTower.Editor
             y = DrawProp(position, y, property.FindPropertyRelative("InstanceId"));
             y = DrawProp(position, y, property.FindPropertyRelative("Coord"));
             y = DrawProp(position, y, property.FindPropertyRelative("Cell"));
+            y = DrawProp(position, y, property.FindPropertyRelative("Decal"));
 
             if (IsRaidEntry(property))
             {

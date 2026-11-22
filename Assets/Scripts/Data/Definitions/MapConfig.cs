@@ -29,6 +29,9 @@ namespace IdleTower.Data.Definitions
         public Vector2Int Coord;
         public MapCellDefinition Cell;
 
+        [Tooltip("Спрайт поверх клетки. Только картинка этого экземпляра, функционал не меняет.")]
+        public Sprite Decal;
+
         [Tooltip("Данные экземпляра клетки (Raid / позже другие типы).")]
         public MapCellSiteConfig Site;
     }
