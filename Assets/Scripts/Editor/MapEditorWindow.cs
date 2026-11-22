@@ -55,6 +55,7 @@ namespace IdleTower.Editor
             public string InstanceId;
             public Sprite Sprite;
             public Vector2 ContentPos;
+            public bool Ghost;
         }
 
         [MenuItem(MenuPath)]
@@ -357,6 +358,7 @@ namespace IdleTower.Editor
                     _hoverOccupied = _coordToEntry.ContainsKey(_hoverCoord.Value);
             }
             CollectVisibleCells(rect, viewCenter, halfX, halfY);
+            AppendPaintGhost(halfX, halfY);
 
             if (Event.current.type == EventType.Repaint)
             {
@@ -364,25 +366,17 @@ namespace IdleTower.Editor
                 GUI.BeginGroup(rect);
                 var clip = new Rect(0f, 0f, rect.width, rect.height);
                 for (var i = 0; i < _drawBuffer.Count; i++)
-                    DrawCellSprite(_drawBuffer[i], rect, viewCenter);
-
-                if (_tool == MapEditTool.Paint
-                    && _paintDefinition != null
-                    && _hoverCoord.HasValue
-                    && !_hoverOccupied)
                 {
-                    var ghostContent = IsoMapLayout.CoordToAnchored(_hoverCoord.Value, halfX, halfY);
+                    var cell = _drawBuffer[i];
+                    if (!cell.Ghost)
+                    {
+                        DrawCellSprite(cell, rect, viewCenter);
+                        continue;
+                    }
+
                     var prevColor = GUI.color;
                     GUI.color = new Color(1f, 1f, 1f, 0.4f);
-                    DrawCellSprite(
-                        new PreviewCell
-                        {
-                            Coord = _hoverCoord.Value,
-                            Sprite = _paintDefinition.Sprite,
-                            ContentPos = ghostContent
-                        },
-                        rect,
-                        viewCenter);
+                    DrawCellSprite(cell, rect, viewCenter);
                     GUI.color = prevColor;
                 }
 
@@ -563,6 +557,25 @@ namespace IdleTower.Editor
                 });
             }
 
+            _drawBuffer.Sort((a, b) => IsoMapLayout.CompareDepthBackToFront(a.Coord, b.Coord));
+        }
+
+        /// <summary>Призрак кисти в том же порядке глубины, что и клетки.</summary>
+        private void AppendPaintGhost(float halfX, float halfY)
+        {
+            if (_tool != MapEditTool.Paint
+                || _paintDefinition == null
+                || !_hoverCoord.HasValue
+                || _hoverOccupied)
+                return;
+
+            _drawBuffer.Add(new PreviewCell
+            {
+                Coord = _hoverCoord.Value,
+                Sprite = _paintDefinition.Sprite,
+                ContentPos = IsoMapLayout.CoordToAnchored(_hoverCoord.Value, halfX, halfY),
+                Ghost = true
+            });
             _drawBuffer.Sort((a, b) => IsoMapLayout.CompareDepthBackToFront(a.Coord, b.Coord));
         }
 

@@ -15,7 +15,7 @@ MonoBehaviour:
   baseWidth: 78
   baseHeight: 39
   spacingPixels: 0
-  stepAdjustX: 0.5
+  stepAdjustX: 1
   stepAdjustY: 0.5
   mapScale: 4
   mapScaleMin: 4
