@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 066563a943e05b24cab232bc2bc04a54, type: 3}
-  m_Name: ForestCell
+  m_Name: StoneCell
   m_EditorClassIdentifier: Assembly-CSharp::IdleTower.Data.Definitions.MapCellDefinition
-  id: forest
-  displayName: "\u041B\u0435\u0441"
-  sprite: {fileID: 9085546173938197295, guid: aadbaca318bd0f44abf479a80843812f, type: 3}
-  behavior: {fileID: 11400000, guid: 4946e0f7c11ea4543bfa45896bf533e7, type: 2}
+  id: stone
+  displayName: "\u041A\u0430\u043C\u0435\u043D\u044C"
+  sprite: {fileID: -2425659598031047993, guid: 5c4d66d4fe20b1b4b90ce89caa73eb04, type: 3}
+  behavior: {fileID: 11400000, guid: 5ef9f6de7dcfd2442b0463f65535fd5b, type: 2}

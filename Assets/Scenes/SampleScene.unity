@@ -3545,14 +3545,7 @@ MonoBehaviour:
   cellsRoot: {fileID: 934050103}
   cellPrefab: {fileID: 3360157428176800733, guid: 180ace91e124ce7478a1cd4fcc0752ac, type: 3}
   fogSprite: {fileID: -1766006069671443837, guid: ec2e97f776ee2af4c87bef8c0e48229c, type: 3}
-  baseWidth: 78
-  baseHeight: 39
-  spacingPixels: 0
-  stepAdjustX: 0.5
-  stepAdjustY: 0.5
-  mapScale: 4
-  mapScaleMin: 4
-  mapScaleMax: 8
+  viewConfig: {fileID: 11400000, guid: f05f87a154e27044e93d840b31d792fd, type: 2}
   viewport: {fileID: 1078079450}
   panDragThresholdPixels: 12
   wheelZoomSensitivity: 0.25
@@ -4224,7 +4217,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 1.5999756, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1072906538

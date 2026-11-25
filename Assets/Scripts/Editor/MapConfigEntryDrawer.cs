@@ -58,7 +58,7 @@ namespace IdleTower.Editor
             y = DrawProp(position, y, property.FindPropertyRelative("InstanceId"));
             y = DrawProp(position, y, property.FindPropertyRelative("Coord"));
             y = DrawProp(position, y, property.FindPropertyRelative("Cell"));
-            y = DrawProp(position, y, property.FindPropertyRelative("Decal"));
+            y = DrawDecal(position, y, property.FindPropertyRelative("Decal"));
 
             if (IsRaidEntry(property))
             {
@@ -83,6 +83,16 @@ namespace IdleTower.Editor
             var h = EditorGUI.GetPropertyHeight(prop, includeChildren);
             var rect = new Rect(area.x, y, area.width, h);
             EditorGUI.PropertyField(rect, prop, includeChildren);
+            return y + h + Pad;
+        }
+
+        private static float DrawDecal(Rect area, float y, SerializedProperty prop)
+        {
+            if (prop == null)
+                return y;
+
+            var h = EditorGUIUtility.singleLineHeight;
+            MapDecalSpriteField.Draw(new Rect(area.x, y, area.width, h), prop);
             return y + h + Pad;
         }
 

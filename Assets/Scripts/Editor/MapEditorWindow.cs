@@ -87,6 +87,7 @@ namespace IdleTower.Editor
             autoRepaintOnSceneChange = true;
             if (_config != null && _serializedConfig == null)
                 _serializedConfig = new SerializedObject(_config);
+            DropCellsWithoutDefinition();
             Undo.undoRedoPerformed += OnUndoRedo;
             SyncUnsavedFlag();
             PublishSelection(false);
@@ -614,12 +615,15 @@ namespace IdleTower.Editor
                     continue;
 
                 var cell = entry.FindPropertyRelative("Cell").objectReferenceValue as MapCellDefinition;
-                var behavior = cell != null ? cell.Behavior : null;
+                if (cell == null)
+                    continue;
+
+                var behavior = cell.Behavior;
                 _drawBuffer.Add(new PreviewCell
                 {
                     Coord = coord,
                     InstanceId = entry.FindPropertyRelative("InstanceId").stringValue ?? string.Empty,
-                    Sprite = cell != null ? cell.Sprite : null,
+                    Sprite = cell.Sprite,
                     Decal = entry.FindPropertyRelative("Decal")?.objectReferenceValue as Sprite,
                     ContentPos = content,
                     HasBehavior = behavior != null,
@@ -1381,6 +1385,7 @@ namespace IdleTower.Editor
             if (_serializedConfig == null)
                 return;
 
+            DropCellsWithoutDefinition();
             _serializedConfig.Update();
             var entries = _serializedConfig.FindProperty("entries");
             if (entries == null || !entries.isArray)
@@ -1450,6 +1455,7 @@ namespace IdleTower.Editor
             }
 
             _serializedConfig = new SerializedObject(_config);
+            var removed = DropCellsWithoutDefinition();
             var filled = MapConfigInstanceIdUtility.FillEmptyInstanceIds(_serializedConfig);
             _serializedConfig.Update();
 
@@ -1460,7 +1466,7 @@ namespace IdleTower.Editor
                 Debug.Log(
                     $"[MapEditor] Заполнено пустых InstanceId: {filled} (Save, чтобы записать ассет).");
             }
-            else
+            else if (removed == 0)
             {
                 ClearSessionDirty();
             }
@@ -1475,6 +1481,7 @@ namespace IdleTower.Editor
             if (_config == null || _serializedConfig == null)
                 return;
 
+            DropCellsWithoutDefinition();
             _serializedConfig.ApplyModifiedPropertiesWithoutUndo();
             EditorUtility.SetDirty(_config);
             AssetDatabase.SaveAssets();
@@ -1524,8 +1531,26 @@ namespace IdleTower.Editor
             _lastStrokeCoord = null;
             _statusHint = string.Empty;
             ClearSessionDirty();
+            DropCellsWithoutDefinition();
             PublishSelection(false);
             ActiveEditorTracker.sharedTracker.ForceRebuild();
+        }
+
+        /// <summary>Клетка без MapCellDefinition в сессию не входит. Save пишет массив уже без неё.</summary>
+        private int DropCellsWithoutDefinition()
+        {
+            if (_serializedConfig == null)
+                return 0;
+
+            var removed = MapConfigEntriesEditor.RemoveEntriesWithoutCell(_serializedConfig);
+            if (removed <= 0)
+                return 0;
+
+            MarkSessionDirty();
+            Debug.Log(
+                $"[MapEditor] Убраны клетки без MapCellDefinition: {removed}. " +
+                "Save запишет карту без них.");
+            return removed;
         }
 
         /// <summary>
@@ -1609,6 +1634,7 @@ namespace IdleTower.Editor
                 return;
 
             _serializedConfig?.Update();
+            DropCellsWithoutDefinition();
             if (EditorUtility.IsDirty(_config))
                 MarkSessionDirty();
             else

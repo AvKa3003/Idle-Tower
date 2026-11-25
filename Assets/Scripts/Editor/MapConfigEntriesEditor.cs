@@ -39,6 +39,36 @@ namespace IdleTower.Editor
         }
 
         /// <summary>
+        /// Удаляет entries без MapCellDefinition. Координата снова пустая: в карту они не входят.
+        /// </summary>
+        public static int RemoveEntriesWithoutCell(SerializedObject so)
+        {
+            if (so == null)
+                return 0;
+
+            so.Update();
+            var entries = Entries(so);
+            if (entries == null)
+                return 0;
+
+            var removed = 0;
+            for (var i = entries.arraySize - 1; i >= 0; i--)
+            {
+                var cell = entries.GetArrayElementAtIndex(i).FindPropertyRelative("Cell");
+                if (cell != null && cell.objectReferenceValue != null)
+                    continue;
+
+                entries.DeleteArrayElementAtIndex(i);
+                removed++;
+            }
+
+            if (removed > 0)
+                so.ApplyModifiedPropertiesWithoutUndo();
+
+            return removed;
+        }
+
+        /// <summary>
         /// Пустой coord получает копию шаблона: Cell, Decal и Site те же, InstanceId новый.
         /// </summary>
         public static bool TryPaintCopy(
@@ -217,7 +247,12 @@ namespace IdleTower.Editor
             var found = -1;
             for (var i = 0; i < entries.arraySize; i++)
             {
-                var c = entries.GetArrayElementAtIndex(i).FindPropertyRelative("Coord");
+                var entry = entries.GetArrayElementAtIndex(i);
+                var cell = entry.FindPropertyRelative("Cell");
+                if (cell == null || cell.objectReferenceValue == null)
+                    continue;
+
+                var c = entry.FindPropertyRelative("Coord");
                 if (c != null && c.vector2IntValue == coord)
                     found = i;
             }
